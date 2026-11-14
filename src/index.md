@@ -198,9 +198,11 @@ function customSeries(points) {
   return phSeries.map((d) => ({...d, area_id: "custom", hotspots: Math.round((sums.get(d.month) ?? 0) * 10) / 10, modis_aqua: NaN, modis_terra: NaN, viirs_snpp: NaN, viirs_noaa20: NaN}));
 }
 const series = area.id === "custom" ? (customPoints ? customSeries(customPoints) : []) : byArea.get(area.id) ?? [];
-const isFullMonth = (d) => d.days === new Date(Date.UTC(d.year, d.m, 0)).getUTCDate();
+const daysIn = (d) => new Date(Date.UTC(d.year, d.m, 0)).getUTCDate();
+const isFullMonth = (d) => d.days === daysIn(d);
 const monthMean = d3.rollup(series.filter(isFullMonth), (v) => d3.mean(v, (d) => d.hotspots), (d) => d.m);
-const sel = series.filter((d) => d.month >= lo && d.month <= hi).map((d) => ({...d, anomaly: Math.round((d.hotspots - monthMean.get(d.m)) * 10) / 10, partial: !isFullMonth(d)}));
+// A month still in progress is compared with the same share of the average month.
+const sel = series.filter((d) => d.month >= lo && d.month <= hi).map((d) => ({...d, anomaly: Math.round((d.hotspots - monthMean.get(d.m) * d.days / daysIn(d)) * 10) / 10, partial: !isFullMonth(d)}));
 const years = [...new Set(sel.map((d) => d.year))].sort((a, b) => b - a).map(String);
 const fmt = d3.format(",.0f");
 const areaTitle = area.id === "custom" ? (box ? `custom area (W ${box.w}, S ${box.s}, E ${box.e}, N ${box.n})` : "custom area") : area.name;
@@ -208,7 +210,7 @@ const areaTitle = area.id === "custom" ? (box ? `custom area (W ${box.w}, S ${bo
 
 ## Burning activity calendar: ${areaTitle}, ${lo} to ${hi}
 
-<p class="hint">Each cell is one month. ${colourBy === "Number of hotspots" ? "Colour shows the number of hotspots on the VIIRS scale." : "Colour shows how far each month is above (red) or below (blue) the average for that calendar month over all full years of the record."} Cells before February 2012 come from MODIS Aqua converted with ${area.id === "custom" ? "the factor of the region each hotspot is in" : `this area's factor (k = ${area.k.toFixed(2)})`}; cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
+<p class="hint">Each cell is one month. ${colourBy === "Number of hotspots" ? "Colour shows the number of hotspots on the VIIRS scale." : "Colour shows how far each month is above (red) or below (blue) the average for that calendar month over every complete month of the record; a month still in progress is compared with the same share of the average."} Cells before February 2012 come from MODIS Aqua converted with ${area.id === "custom" ? "the factor of the region each hotspot is in" : `this area's factor (k = ${area.k.toFixed(2)})`}; cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
 
 ```js
 const byCount = colourBy === "Number of hotspots";
@@ -245,7 +247,7 @@ const calendarFigure = display(resize((width) => calendar(width)));
 ```js
 // "How does the latest month compare?" — the selected end month against the same month in every other year of the record.
 const endRow = series.find((d) => d.month === hi);
-const sameMonth = series.filter((d) => d.m === endRow.m && d.year !== endRow.year);
+const sameMonth = series.filter((d) => d.m === endRow.m && d.year !== endRow.year && isFullMonth(d));
 // A month still in progress holds only the days so far; compare it with the same share of a typical month.
 const daysInMonth = new Date(Date.UTC(endRow.year, endRow.m, 0)).getUTCDate();
 const share = endRow.days / daysInMonth;
@@ -264,7 +266,7 @@ const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st",
   </div>
   <div class="card">
     <h2>Against the historical median</h2>
-    <span class="big">${med > 0 ? d3.format("+.0%")(endRow.hotspots / med - 1) : "n/a"}</span>
+    <span class="big">${med > 0 ? d3.format("+.0%")(endRow.hotspots / med - 1) : d3.format("+,.0f")(endRow.hotspots - med)}</span>
     <p>${partial ? `median for the first ${endRow.days} days of` : "median"} ${MONTHS[endRow.m - 1]}: ${fmt(med)} · mean: ${fmt(avg)} (${sameMonth.length} other years)</p>
   </div>
   <div class="card">
@@ -331,9 +333,11 @@ display(resize((width) => Plot.plot({
 ```js
 if (area.id === "custom") display(html`<p class="hint">For a custom area the raw counts of each sensor are not kept; choose a region or province to see this chart.</p>`);
 const overlap = area.id === "custom" ? [] : sel.filter((d) => d.year >= 2010);
+// For the whole country, convert each region with its own k and add them up, as the calendar does.
+const nationalAquaK = area.id === "ph" ? d3.rollup(areas.filter((a) => a.level === "region").flatMap((r) => byArea.get(r.id).map((d) => ({month: d.month, v: d.modis_aqua * r.k}))), (v) => d3.sum(v, (d) => d.v), (d) => d.month) : null;
 const cmp = overlap.flatMap((d) => [
   {month: new Date(d.month + "-15"), value: d.modis_aqua, series: "MODIS Aqua, raw count"},
-  {month: new Date(d.month + "-15"), value: d.modis_aqua * area.k, series: "MODIS Aqua × k (on the VIIRS scale)"},
+  {month: new Date(d.month + "-15"), value: nationalAquaK ? nationalAquaK.get(d.month) : d.modis_aqua * area.k, series: "MODIS Aqua × k (on the VIIRS scale)"},
   ...(d.year >= 2012 ? [{month: new Date(d.month + "-15"), value: d.viirs_snpp, series: "VIIRS Suomi NPP, raw count"}] : [])
 ]);
 display(resize((width) => Plot.plot({

@@ -17839,5 +17839,13 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-10-28,457,7.9275,125.74541,Suomi NPP (VIIRS),n,5.04,,p-compostela-valley,1
 2026-10-28,457,7.997,126.3079,Suomi NPP (VIIRS),n,4.3,,p-davao-oriental,1
 2026-10-29,440,6.47972,125.12312,Suomi NPP (VIIRS),n,3.55,,p-davao-del-sur,1
-2026-11-02,503,6.20956,125.63555,Suomi NPP (VIIRS),n,2.74,,p-davao-occidental,1
-2026-11-02,503,7.93462,125.90343,Suomi NPP (VIIRS),n,2.43,,p-compostela-valley,1
+2026-11-02,525,6.07532,125.6401,NOAA-20 (VIIRS),n,4.14,,p-davao-occidental,0.987
+2026-11-02,525,7.93515,125.90551,NOAA-20 (VIIRS),n,3.84,,p-compostela-valley,0.987
+2026-11-04,446,7.3902,125.37752,NOAA-20 (VIIRS),n,5.84,,p-davao-del-sur,0.987
+2026-11-04,446,7.51663,126.54883,NOAA-20 (VIIRS),n,4.59,,p-davao-oriental,0.987
+2026-11-05,427,7.56598,125.40321,NOAA-20 (VIIRS),n,3.92,,p-davao-del-norte,0.987
+2026-11-05,427,7.56719,125.40263,NOAA-20 (VIIRS),n,5.06,,p-davao-del-norte,0.987
+2026-11-05,427,7.61899,125.50377,NOAA-20 (VIIRS),n,2.32,,p-davao-del-norte,0.987
+2026-11-07,529,6.24241,125.58055,NOAA-20 (VIIRS),n,3.97,,p-davao-occidental,0.987
+2026-11-08,512,6.48025,125.51281,NOAA-20 (VIIRS),n,2.7,,p-davao-occidental,0.987
+2026-11-09,453,6.51162,125.1548,NOAA-20 (VIIRS),n,6.11,,p-davao-del-sur,0.987

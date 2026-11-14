@@ -23,6 +23,10 @@ const FIT_START = "2012-01-20", FIT_END = "2020-12-31";
 const N20_FIT_START = "2018-04-01", N20_FIT_END = "2025-12-31";
 const VIIRS_START_MONTH = "2012-02";
 const RECORD_START_MONTH = "2003-01";
+// Suomi NPP delivery ceased at 13:00 UTC on 2 Nov 2026 (NASA Earthdata alert): 2 Nov has its day pass but not its night pass,
+// so the last full Suomi NPP day is 1 Nov and NOAA-20 x f is used from 2 Nov.
+const SNPP_LAST_DAY = "2026-11-01";
+const snppDay = (d) => !missing.snpp.has(d) && d <= SNPP_LAST_DAY;
 
 // ---------- geometry ----------
 function loadAreas(file) {
@@ -108,10 +112,10 @@ function bump(areaId, date, s) {
   o[s]++;
 }
 // 2026 comes from the FIRMS area API (pipeline/fetch-2026.mjs), read after the yearly files.
-// Near-real-time rows carry no `type`, so rows within ~2 km of a spot FIRMS flagged as an active volcano
-// in the standard-quality record are dropped instead.
+// Near-real-time rows carry no `type`, so rows in the same or a neighbouring 0.02° cell as a spot FIRMS flagged as an
+// active volcano in the standard-quality record are dropped instead. Standard-quality files are read first so all volcano spots are known.
 const API_DIR = path.join(RAW, "firms_api");
-const apiFiles = fs.existsSync(API_DIR) ? fs.readdirSync(API_DIR).filter((f) => f.endsWith(".csv")).sort() : [];
+const apiFiles = fs.existsSync(API_DIR) ? fs.readdirSync(API_DIR).filter((f) => f.endsWith(".csv")).sort((a, b) => a.includes("_NRT_") - b.includes("_NRT_") || a.localeCompare(b)) : [];
 const sources = [...files.map((f) => ({ dir: "firms", f, sat: null })), ...apiFiles.map((f) => ({ dir: "firms_api", f, sat: f.startsWith("VIIRS_SNPP") ? "snpp" : f.startsWith("VIIRS_NOAA20") ? "n20" : null }))];
 const VCELL = 0.02;
 const volcanoCells = new Set();
@@ -227,7 +231,7 @@ function harmonisedDay(id, d) {
   const o = get(id, d);
   const m = d.slice(0, 7);
   if (m < VIIRS_START_MONTH) return missing.aqua.has(d) ? { v: 0, src: "gap" } : { v: o.aqua * kOf(id), src: "aqua" };
-  if (!missing.snpp.has(d) && d <= "2026-11-02") return { v: o.snpp, src: "snpp" };
+  if (snppDay(d)) return { v: o.snpp, src: "snpp" };
   if (d >= "2018-04-01" && !missing.n20.has(d)) return { v: o.n20 * fOf(id), src: "n20" };
   return { v: 0, src: "gap" };
 }
@@ -268,8 +272,8 @@ for (const p of keepPoints) {
   let use = false, weight = 1;
   const rid = regions[p.ri].id;
   if (m < VIIRS_START_MONTH) { use = p.sat === "aqua" && m >= RECORD_START_MONTH; weight = factors[rid].k ?? factors.ph.k; }
-  else if (p.sat === "snpp") use = !missing.snpp.has(p.date);
-  else if (p.sat === "n20") { use = missing.snpp.has(p.date) && p.date >= "2018-04-01" && !missing.n20.has(p.date); weight = factors[rid].f ?? factors.ph.f; }
+  else if (p.sat === "snpp") use = snppDay(p.date);
+  else if (p.sat === "n20") { use = !snppDay(p.date) && p.date >= "2018-04-01" && !missing.n20.has(p.date); weight = factors[rid].f ?? factors.ph.f; }
   if (!use) continue;
   const satName = { aqua: "Aqua (MODIS)", snpp: "Suomi NPP (VIIRS)", n20: "NOAA-20 (VIIRS)" }[p.sat];
   byRegion.get(p.ri).push([p.date, p.time, p.lat, p.lon, satName, p.conf, p.frp, p.type, p.pi >= 0 ? provinces[p.pi].id : "", Math.round(weight * 1000) / 1000]);

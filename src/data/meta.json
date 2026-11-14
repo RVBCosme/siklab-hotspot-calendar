@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-11-14T06:37:28.763Z",
+ "builtAt": "2026-11-14T08:28:16.889Z",
  "lastDate": "2026-11-13",
  "recordStart": "2003-01",
  "viirsStart": "2012-02",
@@ -12,20 +12,20 @@
   "2025-12-31"
  ],
  "stats": {
-  "read": 849386,
-  "kept": 759289,
+  "read": 849385,
+  "kept": 759288,
   "droppedType": 21016,
   "droppedLowConf": 66533,
   "outsideRegions": 2315,
   "snappedOrOutsideProvince": 0,
   "bySensor": {
-   "terra": 41181,
+   "terra": 41180,
    "aqua": 79070,
    "n20": 222101,
    "snpp": 416937
   },
   "droppedNearVolcano": 233,
-  "api": 75288
+  "api": 75287
  },
  "factors": {
   "ph": {

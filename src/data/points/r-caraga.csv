@@ -14815,10 +14815,13 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-10-29,440,8.80935,125.48448,Suomi NPP (VIIRS),n,9.31,,p-agusan-del-norte,1
 2026-11-01,525,8.08979,125.72627,Suomi NPP (VIIRS),n,2.19,,p-agusan-del-sur,1
 2026-11-01,525,8.34899,126.2813,Suomi NPP (VIIRS),n,3.97,,p-surigao-del-sur,1
-2026-11-02,503,8.03717,126.31908,Suomi NPP (VIIRS),n,3.28,,p-surigao-del-sur,1
-2026-11-02,503,8.07872,125.86905,Suomi NPP (VIIRS),n,1.7,,p-agusan-del-sur,1
-2026-11-02,503,8.09832,126.41364,Suomi NPP (VIIRS),n,5.34,,p-surigao-del-sur,1
-2026-11-02,503,8.10183,125.85386,Suomi NPP (VIIRS),n,1.92,,p-agusan-del-sur,1
-2026-11-02,503,8.386,126.26188,Suomi NPP (VIIRS),n,2.69,,p-surigao-del-sur,1
-2026-11-02,503,8.42613,126.21195,Suomi NPP (VIIRS),n,5.58,,p-surigao-del-sur,1
-2026-11-02,505,10.10332,125.61471,Suomi NPP (VIIRS),n,3.3,,p-dinagat-islands,1
+2026-11-02,525,8.09869,126.41554,NOAA-20 (VIIRS),n,5.83,,p-surigao-del-sur,0.938
+2026-11-02,525,8.42391,126.21416,NOAA-20 (VIIRS),n,2.9,,p-surigao-del-sur,0.938
+2026-11-02,525,8.47975,126.11905,NOAA-20 (VIIRS),n,3.22,,p-surigao-del-sur,0.938
+2026-11-02,527,10.10111,125.61366,NOAA-20 (VIIRS),n,11.92,,p-dinagat-islands,0.938
+2026-11-02,527,10.38468,125.61388,NOAA-20 (VIIRS),n,10.88,,p-dinagat-islands,0.938
+2026-11-03,505,8.39453,125.61342,NOAA-20 (VIIRS),n,8.19,,p-agusan-del-sur,0.938
+2026-11-03,505,8.61334,125.55695,NOAA-20 (VIIRS),n,4.36,,p-agusan-del-sur,0.938
+2026-11-04,446,8.50703,126.14436,NOAA-20 (VIIRS),n,2.81,,p-surigao-del-sur,0.938
+2026-11-04,448,10.10013,125.6126,NOAA-20 (VIIRS),n,4.15,,p-dinagat-islands,0.938
+2026-11-05,427,8.05287,125.51466,NOAA-20 (VIIRS),n,1.93,,p-agusan-del-sur,0.938

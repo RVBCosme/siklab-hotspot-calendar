@@ -18364,4 +18364,9 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-09-26,1734,7.83618,123.34988,Suomi NPP (VIIRS),n,0.3,,p-zamboanga-del-sur,1
 2026-10-21,529,8.25968,123.3747,Suomi NPP (VIIRS),n,2.82,,p-zamboanga-del-norte,1
 2026-10-28,1737,6.93591,122.07428,Suomi NPP (VIIRS),n,1.47,,p-zamboanga-del-sur,1
-2026-11-02,503,7.39881,122.27699,Suomi NPP (VIIRS),n,1.75,,p-zamboanga-del-sur,1
+2026-11-02,525,7.39873,122.27799,NOAA-20 (VIIRS),n,4.15,,p-zamboanga-del-sur,0.985
+2026-11-03,505,7.2577,122.15308,NOAA-20 (VIIRS),n,7.05,,p-zamboanga-del-sur,0.985
+2026-11-03,505,7.25834,122.15389,NOAA-20 (VIIRS),n,6.75,,p-zamboanga-del-sur,0.985
+2026-11-08,512,7.50111,122.44502,NOAA-20 (VIIRS),n,4.55,,p-zamboanga-sibugay,0.985
+2026-11-12,537,7.76076,122.23586,NOAA-20 (VIIRS),n,9.85,,p-zamboanga-del-norte,0.985
+2026-11-12,1815,8.0373,123.48051,NOAA-20 (VIIRS),n,1.26,,p-zamboanga-del-sur,0.985

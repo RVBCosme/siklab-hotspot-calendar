@@ -14730,3 +14730,5 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-09-30,523,12.5196,124.90355,Suomi NPP (VIIRS),n,2.12,,p-northern-samar,1
 2026-10-08,434,10.89042,124.99043,Suomi NPP (VIIRS),n,1.84,,p-leyte,1
 2026-10-22,512,11.54935,124.98845,Suomi NPP (VIIRS),n,1.84,,p-samar,1
+2026-11-02,527,12.11201,124.99816,NOAA-20 (VIIRS),n,6.39,,p-samar,1.049
+2026-11-09,455,10.1296,124.82301,NOAA-20 (VIIRS),n,2.04,,p-southern-leyte,1.049

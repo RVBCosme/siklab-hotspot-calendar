@@ -285,7 +285,7 @@ ph,2026-07,270.6,VIIRS (NOAA-20 fill),0,31,15,10,214,293
 ph,2026-08,1041,VIIRS Suomi NPP,0,31,120,22,1041,1185
 ph,2026-09,1011,VIIRS Suomi NPP,0,30,100,34,1011,905
 ph,2026-10,431,VIIRS Suomi NPP,0,31,25,47,431,438
-ph,2026-11,314.9,VIIRS (NOAA-20 fill),0,13,20,23,44,312
+ph,2026-11,309.2,VIIRS (NOAA-20 fill),0,13,20,23,44,312
 r-armm,2003-01,327.6,MODIS Aqua x k,0,31,31,9,0,0
 r-armm,2003-02,348.8,MODIS Aqua x k,0,28,33,7,0,0
 r-armm,2003-03,253.6,MODIS Aqua x k,0,31,24,0,0,0
@@ -572,7 +572,7 @@ r-armm,2026-07,10,VIIRS (NOAA-20 fill),0,31,0,0,9,16
 r-armm,2026-08,71,VIIRS Suomi NPP,0,31,3,1,71,86
 r-armm,2026-09,89,VIIRS Suomi NPP,0,30,9,0,89,79
 r-armm,2026-10,10,VIIRS Suomi NPP,0,31,0,0,10,18
-r-armm,2026-11,15.7,VIIRS (NOAA-20 fill),0,13,0,0,7,14
+r-armm,2026-11,12.6,VIIRS (NOAA-20 fill),0,13,0,0,7,14
 r-car,2003-01,238.3,MODIS Aqua x k,0,31,29,9,0,0
 r-car,2003-02,575.3,MODIS Aqua x k,0,28,70,36,0,0
 r-car,2003-03,698.5,MODIS Aqua x k,0,31,85,60,0,0
@@ -1433,7 +1433,7 @@ r-ilocos-region,2026-07,9,VIIRS (NOAA-20 fill),0,31,0,0,7,7
 r-ilocos-region,2026-08,1,VIIRS Suomi NPP,0,31,0,0,1,0
 r-ilocos-region,2026-09,8,VIIRS Suomi NPP,0,30,0,1,8,11
 r-ilocos-region,2026-10,43,VIIRS Suomi NPP,0,31,1,7,43,45
-r-ilocos-region,2026-11,40.5,VIIRS (NOAA-20 fill),0,13,2,1,7,36
+r-ilocos-region,2026-11,36.6,VIIRS (NOAA-20 fill),0,13,2,1,7,36
 r-cagayan-valley,2003-01,177,MODIS Aqua x k,0,31,16,6,0,0
 r-cagayan-valley,2003-02,829.7,MODIS Aqua x k,0,28,75,39,0,0
 r-cagayan-valley,2003-03,1227.9,MODIS Aqua x k,0,31,111,44,0,0
@@ -1720,7 +1720,7 @@ r-cagayan-valley,2026-07,53,VIIRS (NOAA-20 fill),0,31,6,4,46,54
 r-cagayan-valley,2026-08,3,VIIRS Suomi NPP,0,31,0,1,3,5
 r-cagayan-valley,2026-09,23,VIIRS Suomi NPP,0,30,3,1,23,30
 r-cagayan-valley,2026-10,51,VIIRS Suomi NPP,0,31,2,0,51,53
-r-cagayan-valley,2026-11,17.9,VIIRS (NOAA-20 fill),0,13,1,0,1,17
+r-cagayan-valley,2026-11,16.9,VIIRS (NOAA-20 fill),0,13,1,0,1,17
 r-central-luzon,2003-01,1216.6,MODIS Aqua x k,0,31,122,96,0,0
 r-central-luzon,2003-02,1037.1,MODIS Aqua x k,0,28,104,82,0,0
 r-central-luzon,2003-03,1575.5,MODIS Aqua x k,0,31,158,75,0,0
@@ -2007,7 +2007,7 @@ r-central-luzon,2026-07,38,VIIRS (NOAA-20 fill),0,31,1,3,30,37
 r-central-luzon,2026-08,5,VIIRS Suomi NPP,0,31,0,0,5,3
 r-central-luzon,2026-09,27,VIIRS Suomi NPP,0,30,2,9,27,15
 r-central-luzon,2026-10,64,VIIRS Suomi NPP,0,31,7,19,64,42
-r-central-luzon,2026-11,52.8,VIIRS (NOAA-20 fill),0,13,4,2,5,51
+r-central-luzon,2026-11,50.8,VIIRS (NOAA-20 fill),0,13,4,2,5,51
 r-calabarzon,2003-01,290,MODIS Aqua x k,0,31,28,11,0,0
 r-calabarzon,2003-02,466.1,MODIS Aqua x k,0,28,45,16,0,0
 r-calabarzon,2003-03,259,MODIS Aqua x k,0,31,25,19,0,0
@@ -2294,7 +2294,7 @@ r-calabarzon,2026-07,10,VIIRS (NOAA-20 fill),0,31,2,1,9,18
 r-calabarzon,2026-08,5,VIIRS Suomi NPP,0,31,0,0,5,4
 r-calabarzon,2026-09,23,VIIRS Suomi NPP,0,30,0,4,23,15
 r-calabarzon,2026-10,21,VIIRS Suomi NPP,0,31,1,7,21,15
-r-calabarzon,2026-11,17.3,VIIRS (NOAA-20 fill),0,13,0,1,2,16
+r-calabarzon,2026-11,15.3,VIIRS (NOAA-20 fill),0,13,0,1,2,16
 r-mimaropa,2003-01,671.9,MODIS Aqua x k,0,31,85,70,0,0
 r-mimaropa,2003-02,798.4,MODIS Aqua x k,0,28,101,50,0,0
 r-mimaropa,2003-03,1968.3,MODIS Aqua x k,0,31,249,76,0,0
@@ -2581,7 +2581,7 @@ r-mimaropa,2026-07,3,VIIRS (NOAA-20 fill),0,31,0,0,3,4
 r-mimaropa,2026-08,7,VIIRS Suomi NPP,0,31,2,0,7,7
 r-mimaropa,2026-09,3,VIIRS Suomi NPP,0,30,0,0,3,9
 r-mimaropa,2026-10,16,VIIRS Suomi NPP,0,31,0,1,16,4
-r-mimaropa,2026-11,17.3,VIIRS (NOAA-20 fill),0,13,3,2,0,19
+r-mimaropa,2026-11,19.3,VIIRS (NOAA-20 fill),0,13,3,2,0,19
 r-zamboanga-peninsula,2003-01,94.9,MODIS Aqua x k,0,31,11,6,0,0
 r-zamboanga-peninsula,2003-02,1130.3,MODIS Aqua x k,0,28,131,8,0,0
 r-zamboanga-peninsula,2003-03,1622.2,MODIS Aqua x k,0,31,188,20,0,0
@@ -3729,7 +3729,7 @@ r-central-visayas,2026-07,10.8,VIIRS (NOAA-20 fill),0,31,0,0,8,9
 r-central-visayas,2026-08,22,VIIRS Suomi NPP,0,31,0,1,22,36
 r-central-visayas,2026-09,18,VIIRS Suomi NPP,0,30,1,0,18,18
 r-central-visayas,2026-10,5,VIIRS Suomi NPP,0,31,0,0,5,15
-r-central-visayas,2026-11,12.1,VIIRS (NOAA-20 fill),0,13,0,0,0,15
+r-central-visayas,2026-11,14,VIIRS (NOAA-20 fill),0,13,0,0,0,15
 r-eastern-visayas,2003-01,9.8,MODIS Aqua x k,0,31,1,1,0,0
 r-eastern-visayas,2003-02,108.1,MODIS Aqua x k,0,28,11,6,0,0
 r-eastern-visayas,2003-03,265.2,MODIS Aqua x k,0,31,27,0,0,0
@@ -4016,7 +4016,7 @@ r-eastern-visayas,2026-07,8,VIIRS (NOAA-20 fill),0,31,0,0,7,3
 r-eastern-visayas,2026-08,107,VIIRS Suomi NPP,0,31,14,1,107,99
 r-eastern-visayas,2026-09,87,VIIRS Suomi NPP,0,30,17,0,87,82
 r-eastern-visayas,2026-10,2,VIIRS Suomi NPP,0,31,0,0,2,4
-r-eastern-visayas,2026-11,1,VIIRS (NOAA-20 fill),0,13,0,0,0,2
+r-eastern-visayas,2026-11,2.1,VIIRS (NOAA-20 fill),0,13,0,0,0,2
 r-northern-mindanao,2003-01,278.4,MODIS Aqua x k,0,31,27,24,0,0
 r-northern-mindanao,2003-02,309.3,MODIS Aqua x k,0,28,30,23,0,0
 r-northern-mindanao,2003-03,371.2,MODIS Aqua x k,0,31,36,18,0,0
@@ -4303,7 +4303,7 @@ r-northern-mindanao,2026-07,6,VIIRS (NOAA-20 fill),0,31,0,1,6,7
 r-northern-mindanao,2026-08,120,VIIRS Suomi NPP,0,31,6,0,120,146
 r-northern-mindanao,2026-09,128,VIIRS Suomi NPP,0,30,10,0,128,114
 r-northern-mindanao,2026-10,18,VIIRS Suomi NPP,0,31,2,0,18,9
-r-northern-mindanao,2026-11,7.8,VIIRS (NOAA-20 fill),0,13,0,2,2,9
+r-northern-mindanao,2026-11,8.8,VIIRS (NOAA-20 fill),0,13,0,2,2,9
 r-davao-region,2003-01,134.7,MODIS Aqua x k,0,31,13,6,0,0
 r-davao-region,2003-02,51.8,MODIS Aqua x k,0,28,5,1,0,0
 r-davao-region,2003-03,227.9,MODIS Aqua x k,0,31,22,0,0,0
@@ -4877,7 +4877,7 @@ r-soccsksargen,2026-07,17,VIIRS (NOAA-20 fill),0,31,0,0,16,17
 r-soccsksargen,2026-08,139,VIIRS Suomi NPP,0,31,5,2,139,166
 r-soccsksargen,2026-09,169,VIIRS Suomi NPP,0,30,7,0,169,138
 r-soccsksargen,2026-10,41,VIIRS Suomi NPP,0,31,1,1,41,46
-r-soccsksargen,2026-11,15.6,VIIRS (NOAA-20 fill),0,13,2,1,2,18
+r-soccsksargen,2026-11,18.4,VIIRS (NOAA-20 fill),0,13,2,1,2,18
 r-caraga,2003-01,9.3,MODIS Aqua x k,0,31,1,0,0,0
 r-caraga,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 r-caraga,2003-03,56.1,MODIS Aqua x k,0,31,6,1,0,0
@@ -5164,7 +5164,7 @@ r-caraga,2026-07,32.3,VIIRS (NOAA-20 fill),0,31,4,0,22,33
 r-caraga,2026-08,427,VIIRS Suomi NPP,0,31,81,16,427,482
 r-caraga,2026-09,325,VIIRS Suomi NPP,0,30,46,15,325,270
 r-caraga,2026-10,41,VIIRS Suomi NPP,0,31,2,1,41,49
-r-caraga,2026-11,13.7,VIIRS (NOAA-20 fill),0,13,0,0,9,11
+r-caraga,2026-11,11.4,VIIRS (NOAA-20 fill),0,13,0,0,9,11
 p-abra,2003-01,123.3,MODIS Aqua x k,0,31,15,8,0,0
 p-abra,2003-02,90.4,MODIS Aqua x k,0,28,11,8,0,0
 p-abra,2003-03,221.9,MODIS Aqua x k,0,31,27,9,0,0
@@ -6025,7 +6025,7 @@ p-agusan-del-sur,2026-07,11.8,VIIRS (NOAA-20 fill),0,31,1,0,8,12
 p-agusan-del-sur,2026-08,80,VIIRS Suomi NPP,0,31,2,0,80,117
 p-agusan-del-sur,2026-09,38,VIIRS Suomi NPP,0,30,3,0,38,45
 p-agusan-del-sur,2026-10,19,VIIRS Suomi NPP,0,31,2,0,19,18
-p-agusan-del-sur,2026-11,5.8,VIIRS (NOAA-20 fill),0,13,0,0,3,3
+p-agusan-del-sur,2026-11,3.8,VIIRS (NOAA-20 fill),0,13,0,0,3,3
 p-aklan,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-aklan,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 p-aklan,2003-03,0,MODIS Aqua x k,0,31,0,0,0,0
@@ -9756,7 +9756,7 @@ p-bukidnon,2026-07,1,VIIRS (NOAA-20 fill),0,31,0,0,1,0
 p-bukidnon,2026-08,49,VIIRS Suomi NPP,0,31,3,0,49,76
 p-bukidnon,2026-09,81,VIIRS Suomi NPP,0,30,7,0,81,55
 p-bukidnon,2026-10,13,VIIRS Suomi NPP,0,31,1,0,13,8
-p-bukidnon,2026-11,5.9,VIIRS (NOAA-20 fill),0,13,0,2,2,7
+p-bukidnon,2026-11,6.8,VIIRS (NOAA-20 fill),0,13,0,2,2,7
 p-bulacan,2003-01,89.7,MODIS Aqua x k,0,31,9,2,0,0
 p-bulacan,2003-02,69.8,MODIS Aqua x k,0,28,7,2,0,0
 p-bulacan,2003-03,69.8,MODIS Aqua x k,0,31,7,2,0,0
@@ -10043,7 +10043,7 @@ p-bulacan,2026-07,23,VIIRS (NOAA-20 fill),0,31,0,1,16,24
 p-bulacan,2026-08,0,VIIRS Suomi NPP,0,31,0,0,0,2
 p-bulacan,2026-09,20,VIIRS Suomi NPP,0,30,0,0,20,12
 p-bulacan,2026-10,29,VIIRS Suomi NPP,0,31,0,0,29,19
-p-bulacan,2026-11,17.9,VIIRS (NOAA-20 fill),0,13,0,2,0,19
+p-bulacan,2026-11,18.9,VIIRS (NOAA-20 fill),0,13,0,2,0,19
 p-cagayan,2003-01,44.2,MODIS Aqua x k,0,31,4,3,0,0
 p-cagayan,2003-02,165.9,MODIS Aqua x k,0,28,15,7,0,0
 p-cagayan,2003-03,431.4,MODIS Aqua x k,0,31,39,16,0,0
@@ -10330,7 +10330,7 @@ p-cagayan,2026-07,29,VIIRS (NOAA-20 fill),0,31,3,1,25,25
 p-cagayan,2026-08,0,VIIRS Suomi NPP,0,31,0,0,0,0
 p-cagayan,2026-09,7,VIIRS Suomi NPP,0,30,0,0,7,7
 p-cagayan,2026-10,29,VIIRS Suomi NPP,0,31,1,0,29,31
-p-cagayan,2026-11,11,VIIRS (NOAA-20 fill),0,13,1,0,1,10
+p-cagayan,2026-11,10,VIIRS (NOAA-20 fill),0,13,1,0,1,10
 p-camarines-norte,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-camarines-norte,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 p-camarines-norte,2003-03,17,MODIS Aqua x k,0,31,1,0,0,0
@@ -12052,7 +12052,7 @@ p-cavite,2026-07,0,VIIRS (NOAA-20 fill),0,31,0,1,0,3
 p-cavite,2026-08,0,VIIRS Suomi NPP,0,31,0,0,0,0
 p-cavite,2026-09,7,VIIRS Suomi NPP,0,30,0,0,7,1
 p-cavite,2026-10,3,VIIRS Suomi NPP,0,31,0,2,3,0
-p-cavite,2026-11,3.9,VIIRS (NOAA-20 fill),0,13,0,0,1,3
+p-cavite,2026-11,2.9,VIIRS (NOAA-20 fill),0,13,0,0,1,3
 p-cebu,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-cebu,2003-02,29.9,MODIS Aqua x k,0,28,2,6,0,0
 p-cebu,2003-03,0,MODIS Aqua x k,0,31,0,4,0,0
@@ -14922,7 +14922,7 @@ p-dinagat-islands,2026-07,5,VIIRS (NOAA-20 fill),0,31,2,0,5,4
 p-dinagat-islands,2026-08,178,VIIRS Suomi NPP,0,31,35,11,178,147
 p-dinagat-islands,2026-09,123,VIIRS Suomi NPP,0,30,21,10,123,103
 p-dinagat-islands,2026-10,1,VIIRS Suomi NPP,0,31,0,0,1,0
-p-dinagat-islands,2026-11,1.9,VIIRS (NOAA-20 fill),0,13,0,0,1,3
+p-dinagat-islands,2026-11,2.8,VIIRS (NOAA-20 fill),0,13,0,0,1,3
 p-eastern-samar,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-eastern-samar,2003-02,9.8,MODIS Aqua x k,0,28,1,1,0,0
 p-eastern-samar,2003-03,0,MODIS Aqua x k,0,31,0,0,0,0
@@ -16070,7 +16070,7 @@ p-ilocos-norte,2026-07,0,VIIRS (NOAA-20 fill),0,31,0,0,0,0
 p-ilocos-norte,2026-08,0,VIIRS Suomi NPP,0,31,0,0,0,0
 p-ilocos-norte,2026-09,6,VIIRS Suomi NPP,0,30,0,1,6,6
 p-ilocos-norte,2026-10,22,VIIRS Suomi NPP,0,31,0,2,22,17
-p-ilocos-norte,2026-11,24.3,VIIRS (NOAA-20 fill),0,13,0,1,6,18
+p-ilocos-norte,2026-11,18.3,VIIRS (NOAA-20 fill),0,13,0,1,6,18
 p-ilocos-sur,2003-01,11,MODIS Aqua x k,0,31,1,0,0,0
 p-ilocos-sur,2003-02,0,MODIS Aqua x k,0,28,0,7,0,0
 p-ilocos-sur,2003-03,65.8,MODIS Aqua x k,0,31,6,8,0,0
@@ -16644,7 +16644,7 @@ p-iloilo,2026-07,1,VIIRS (NOAA-20 fill),0,31,0,0,1,0
 p-iloilo,2026-08,0,VIIRS Suomi NPP,0,31,0,0,0,0
 p-iloilo,2026-09,0,VIIRS Suomi NPP,0,30,0,0,0,0
 p-iloilo,2026-10,1,VIIRS Suomi NPP,0,31,0,0,1,0
-p-iloilo,2026-11,5,VIIRS (NOAA-20 fill),0,13,0,1,2,3
+p-iloilo,2026-11,4,VIIRS (NOAA-20 fill),0,13,0,1,2,3
 p-isabela,2003-01,88.5,MODIS Aqua x k,0,31,8,0,0,0
 p-isabela,2003-02,497.8,MODIS Aqua x k,0,28,45,23,0,0
 p-isabela,2003-03,409.3,MODIS Aqua x k,0,31,37,13,0,0
@@ -17792,7 +17792,7 @@ p-laguna,2026-07,2,VIIRS (NOAA-20 fill),0,31,0,0,2,2
 p-laguna,2026-08,1,VIIRS Suomi NPP,0,31,0,0,1,0
 p-laguna,2026-09,2,VIIRS Suomi NPP,0,30,0,0,2,1
 p-laguna,2026-10,1,VIIRS Suomi NPP,0,31,0,0,1,0
-p-laguna,2026-11,2,VIIRS (NOAA-20 fill),0,13,0,1,1,1
+p-laguna,2026-11,1,VIIRS (NOAA-20 fill),0,13,0,1,1,1
 p-lanao-del-norte,2003-01,20.6,MODIS Aqua x k,0,31,2,0,0,0
 p-lanao-del-norte,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 p-lanao-del-norte,2003-03,30.9,MODIS Aqua x k,0,31,3,0,0,0
@@ -18366,7 +18366,7 @@ p-lanao-del-sur,2026-07,0,VIIRS (NOAA-20 fill),0,31,0,0,0,0
 p-lanao-del-sur,2026-08,10,VIIRS Suomi NPP,0,31,0,0,10,13
 p-lanao-del-sur,2026-09,12,VIIRS Suomi NPP,0,30,0,0,12,16
 p-lanao-del-sur,2026-10,0,VIIRS Suomi NPP,0,31,0,0,0,0
-p-lanao-del-sur,2026-11,2,VIIRS (NOAA-20 fill),0,13,0,0,2,0
+p-lanao-del-sur,2026-11,0,VIIRS (NOAA-20 fill),0,13,0,0,2,0
 p-leyte,2003-01,9.8,MODIS Aqua x k,0,31,1,1,0,0
 p-leyte,2003-02,29.5,MODIS Aqua x k,0,28,3,4,0,0
 p-leyte,2003-03,29.5,MODIS Aqua x k,0,31,3,0,0,0
@@ -18940,7 +18940,7 @@ p-maguindanao,2026-07,6,VIIRS (NOAA-20 fill),0,31,0,0,5,15
 p-maguindanao,2026-08,57,VIIRS Suomi NPP,0,31,3,1,57,63
 p-maguindanao,2026-09,68,VIIRS Suomi NPP,0,30,9,0,68,54
 p-maguindanao,2026-10,9,VIIRS Suomi NPP,0,31,0,0,9,17
-p-maguindanao,2026-11,13.7,VIIRS (NOAA-20 fill),0,13,0,0,5,14
+p-maguindanao,2026-11,12.6,VIIRS (NOAA-20 fill),0,13,0,0,5,14
 p-marinduque,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-marinduque,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 p-marinduque,2003-03,39.5,MODIS Aqua x k,0,31,5,5,0,0
@@ -21810,7 +21810,7 @@ p-negros-occidental,2026-07,2,VIIRS (NOAA-20 fill),0,31,0,1,2,1
 p-negros-occidental,2026-08,3,VIIRS Suomi NPP,0,31,0,0,3,4
 p-negros-occidental,2026-09,3,VIIRS Suomi NPP,0,30,0,2,3,1
 p-negros-occidental,2026-10,57,VIIRS Suomi NPP,0,31,8,9,57,66
-p-negros-occidental,2026-11,51.9,VIIRS (NOAA-20 fill),0,13,7,12,4,55
+p-negros-occidental,2026-11,52.9,VIIRS (NOAA-20 fill),0,13,7,12,4,55
 p-negros-oriental,2003-01,14.9,MODIS Aqua x k,0,31,1,6,0,0
 p-negros-oriental,2003-02,149.3,MODIS Aqua x k,0,28,10,10,0,0
 p-negros-oriental,2003-03,119.5,MODIS Aqua x k,0,31,8,13,0,0
@@ -22097,7 +22097,7 @@ p-negros-oriental,2026-07,0.9,VIIRS (NOAA-20 fill),0,31,0,0,0,1
 p-negros-oriental,2026-08,3,VIIRS Suomi NPP,0,31,0,0,3,8
 p-negros-oriental,2026-09,3,VIIRS Suomi NPP,0,30,0,0,3,0
 p-negros-oriental,2026-10,0,VIIRS Suomi NPP,0,31,0,0,0,8
-p-negros-oriental,2026-11,3.7,VIIRS (NOAA-20 fill),0,13,0,0,0,6
+p-negros-oriental,2026-11,5.6,VIIRS (NOAA-20 fill),0,13,0,0,0,6
 p-northern-samar,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-northern-samar,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 p-northern-samar,2003-03,39.3,MODIS Aqua x k,0,31,4,0,0,0
@@ -22671,7 +22671,7 @@ p-nueva-ecija,2026-07,6,VIIRS (NOAA-20 fill),0,31,1,0,6,6
 p-nueva-ecija,2026-08,0,VIIRS Suomi NPP,0,31,0,0,0,0
 p-nueva-ecija,2026-09,1,VIIRS Suomi NPP,0,30,0,0,1,0
 p-nueva-ecija,2026-10,2,VIIRS Suomi NPP,0,31,1,4,2,1
-p-nueva-ecija,2026-11,10,VIIRS (NOAA-20 fill),0,13,2,0,0,11
+p-nueva-ecija,2026-11,11,VIIRS (NOAA-20 fill),0,13,2,0,0,11
 p-nueva-vizcaya,2003-01,44.2,MODIS Aqua x k,0,31,4,3,0,0
 p-nueva-vizcaya,2003-02,110.6,MODIS Aqua x k,0,28,10,4,0,0
 p-nueva-vizcaya,2003-03,298.7,MODIS Aqua x k,0,31,27,11,0,0
@@ -23245,7 +23245,7 @@ p-occidental-mindoro,2026-07,0,VIIRS (NOAA-20 fill),0,31,0,0,0,1
 p-occidental-mindoro,2026-08,2,VIIRS Suomi NPP,0,31,0,0,2,1
 p-occidental-mindoro,2026-09,0,VIIRS Suomi NPP,0,30,0,0,0,2
 p-occidental-mindoro,2026-10,7,VIIRS Suomi NPP,0,31,0,0,7,2
-p-occidental-mindoro,2026-11,13.2,VIIRS (NOAA-20 fill),0,13,3,2,0,15
+p-occidental-mindoro,2026-11,15.2,VIIRS (NOAA-20 fill),0,13,3,2,0,15
 p-oriental-mindoro,2003-01,94.9,MODIS Aqua x k,0,31,12,8,0,0
 p-oriental-mindoro,2003-02,110.7,MODIS Aqua x k,0,28,14,7,0,0
 p-oriental-mindoro,2003-03,110.7,MODIS Aqua x k,0,31,14,5,0,0
@@ -24393,7 +24393,7 @@ p-pangasinan,2026-07,9,VIIRS (NOAA-20 fill),0,31,0,0,7,7
 p-pangasinan,2026-08,1,VIIRS Suomi NPP,0,31,0,0,1,0
 p-pangasinan,2026-09,2,VIIRS Suomi NPP,0,30,0,0,2,4
 p-pangasinan,2026-10,17,VIIRS Suomi NPP,0,31,1,5,17,20
-p-pangasinan,2026-11,15.2,VIIRS (NOAA-20 fill),0,13,2,0,1,17
+p-pangasinan,2026-11,17.3,VIIRS (NOAA-20 fill),0,13,2,0,1,17
 p-quezon,2003-01,62.2,MODIS Aqua x k,0,31,6,4,0,0
 p-quezon,2003-02,217.5,MODIS Aqua x k,0,28,21,3,0,0
 p-quezon,2003-03,93.2,MODIS Aqua x k,0,31,9,1,0,0
@@ -25828,7 +25828,7 @@ p-samar,2026-07,2,VIIRS (NOAA-20 fill),0,31,0,0,2,0
 p-samar,2026-08,18,VIIRS Suomi NPP,0,31,2,0,18,19
 p-samar,2026-09,13,VIIRS Suomi NPP,0,30,1,0,13,16
 p-samar,2026-10,1,VIIRS Suomi NPP,0,31,0,0,1,3
-p-samar,2026-11,0,VIIRS (NOAA-20 fill),0,13,0,0,0,1
+p-samar,2026-11,1,VIIRS (NOAA-20 fill),0,13,0,0,0,1
 p-sarangani,2003-01,126,MODIS Aqua x k,0,31,11,5,0,0
 p-sarangani,2003-02,91.6,MODIS Aqua x k,0,28,8,4,0,0
 p-sarangani,2003-03,148.9,MODIS Aqua x k,0,31,13,2,0,0
@@ -26115,7 +26115,7 @@ p-sarangani,2026-07,7,VIIRS (NOAA-20 fill),0,31,0,0,7,6
 p-sarangani,2026-08,24,VIIRS Suomi NPP,0,31,1,0,24,28
 p-sarangani,2026-09,41,VIIRS Suomi NPP,0,30,1,0,41,30
 p-sarangani,2026-10,19,VIIRS Suomi NPP,0,31,0,0,19,12
-p-sarangani,2026-11,10.7,VIIRS (NOAA-20 fill),0,13,0,0,2,11
+p-sarangani,2026-11,11.7,VIIRS (NOAA-20 fill),0,13,0,0,2,11
 p-siquijor,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-siquijor,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 p-siquijor,2003-03,0,MODIS Aqua x k,0,31,0,0,0,0
@@ -26976,7 +26976,7 @@ p-south-cotabato,2026-07,1,VIIRS (NOAA-20 fill),0,31,0,0,1,1
 p-south-cotabato,2026-08,40,VIIRS Suomi NPP,0,31,0,2,40,44
 p-south-cotabato,2026-09,24,VIIRS Suomi NPP,0,30,1,0,24,11
 p-south-cotabato,2026-10,7,VIIRS Suomi NPP,0,31,1,1,7,8
-p-south-cotabato,2026-11,1.9,VIIRS (NOAA-20 fill),0,13,1,1,0,3
+p-south-cotabato,2026-11,2.9,VIIRS (NOAA-20 fill),0,13,1,1,0,3
 p-southern-leyte,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-southern-leyte,2003-02,0,MODIS Aqua x k,0,28,0,0,0,0
 p-southern-leyte,2003-03,0,MODIS Aqua x k,0,31,0,0,0,0
@@ -27550,7 +27550,7 @@ p-sultan-kudarat,2026-07,3,VIIRS (NOAA-20 fill),0,31,0,0,2,4
 p-sultan-kudarat,2026-08,34,VIIRS Suomi NPP,0,31,3,0,34,45
 p-sultan-kudarat,2026-09,35,VIIRS Suomi NPP,0,30,2,0,35,28
 p-sultan-kudarat,2026-10,6,VIIRS Suomi NPP,0,31,0,0,6,5
-p-sultan-kudarat,2026-11,0,VIIRS (NOAA-20 fill),0,13,1,0,0,1
+p-sultan-kudarat,2026-11,1,VIIRS (NOAA-20 fill),0,13,1,0,0,1
 p-sulu,2003-01,0,MODIS Aqua x k,0,31,0,0,0,0
 p-sulu,2003-02,10.6,MODIS Aqua x k,0,28,1,0,0,0
 p-sulu,2003-03,0,MODIS Aqua x k,0,31,0,0,0,0
@@ -28411,7 +28411,7 @@ p-surigao-del-sur,2026-07,8.7,VIIRS (NOAA-20 fill),0,31,0,0,4,11
 p-surigao-del-sur,2026-08,67,VIIRS Suomi NPP,0,31,7,0,67,84
 p-surigao-del-sur,2026-09,55,VIIRS Suomi NPP,0,30,3,1,55,52
 p-surigao-del-sur,2026-10,9,VIIRS Suomi NPP,0,31,0,1,9,23
-p-surigao-del-sur,2026-11,5.9,VIIRS (NOAA-20 fill),0,13,0,0,5,5
+p-surigao-del-sur,2026-11,4.8,VIIRS (NOAA-20 fill),0,13,0,0,5,5
 p-tarlac,2003-01,179.5,MODIS Aqua x k,0,31,18,23,0,0
 p-tarlac,2003-02,189.5,MODIS Aqua x k,0,28,19,21,0,0
 p-tarlac,2003-03,877.5,MODIS Aqua x k,0,31,88,28,0,0
@@ -29272,7 +29272,7 @@ p-zambales,2026-07,0,VIIRS (NOAA-20 fill),0,31,0,2,0,0
 p-zambales,2026-08,0,VIIRS Suomi NPP,0,31,0,0,0,0
 p-zambales,2026-09,0,VIIRS Suomi NPP,0,30,0,8,0,1
 p-zambales,2026-10,14,VIIRS Suomi NPP,0,31,0,4,14,9
-p-zambales,2026-11,14,VIIRS (NOAA-20 fill),0,13,1,0,4,10
+p-zambales,2026-11,10,VIIRS (NOAA-20 fill),0,13,1,0,4,10
 p-zamboanga-del-norte,2003-01,25.9,MODIS Aqua x k,0,31,3,0,0,0
 p-zamboanga-del-norte,2003-02,422.8,MODIS Aqua x k,0,28,49,3,0,0
 p-zamboanga-del-norte,2003-03,1000.9,MODIS Aqua x k,0,31,116,10,0,0
@@ -29846,7 +29846,7 @@ p-zamboanga-del-sur,2026-07,1,VIIRS (NOAA-20 fill),0,31,0,0,1,0
 p-zamboanga-del-sur,2026-08,11,VIIRS Suomi NPP,0,31,0,0,11,6
 p-zamboanga-del-sur,2026-09,5,VIIRS Suomi NPP,0,30,0,0,5,5
 p-zamboanga-del-sur,2026-10,1,VIIRS Suomi NPP,0,31,0,0,1,1
-p-zamboanga-del-sur,2026-11,4,VIIRS (NOAA-20 fill),0,13,0,0,1,4
+p-zamboanga-del-sur,2026-11,3.9,VIIRS (NOAA-20 fill),0,13,0,0,1,4
 p-zamboanga-sibugay,2003-01,25.9,MODIS Aqua x k,0,31,3,2,0,0
 p-zamboanga-sibugay,2003-02,69,MODIS Aqua x k,0,28,8,2,0,0
 p-zamboanga-sibugay,2003-03,129.4,MODIS Aqua x k,0,31,15,3,0,0

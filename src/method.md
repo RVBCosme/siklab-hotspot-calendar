@@ -18,7 +18,7 @@ const n = d3.format(",");
 
 ## The problem
 
-NASA's FIRMS archive holds two families of fire hotspots. MODIS, on the Terra and Aqua satellites, has watched since 2000 with pixels about 1 km wide. VIIRS, on Suomi NPP (2012 to 2 November 2026), NOAA-20 (from 2018) and NOAA-21, uses pixels about 375 m wide and catches smaller fires. Over the Philippines, once both records are filtered the same way, Suomi NPP reports about **${meta.factors.ph.k.toFixed(1)} hotspots for every one** that MODIS Aqua reports. Laid end to end, the two records would show a jump in 2012 that is a change of instrument, not a change in burning.
+NASA's FIRMS archive holds two families of fire hotspots. MODIS, on the Terra and Aqua satellites, has watched since 2000 with pixels about 1 km wide. VIIRS, on Suomi NPP (2012 until its data stopped at 13:00 UTC on 2 November 2026, [NASA Earthdata](https://www.earthdata.nasa.gov/data/alerts-outages/suomi-npp-observations-cease-november-2-2026)), NOAA-20 (from 2018) and NOAA-21, uses pixels about 375 m wide and catches smaller fires. Over the Philippines, once both records are filtered the same way, Suomi NPP reports about **${meta.factors.ph.k.toFixed(1)} hotspots for every one** that MODIS Aqua reports. Laid end to end, the two records would show a jump in 2012 that is a change of instrument, not a change in burning.
 
 ## What we do
 
@@ -26,14 +26,14 @@ NASA's FIRMS archive holds two families of fire hotspots. MODIS, on the Terra an
 |---|---|---|
 | 1. Filter | Keep FIRMS hotspots flagged as vegetation fire or other land heat source; drop those FIRMS flags as active volcano or offshore. Drop low-confidence detections (MODIS confidence below 30, VIIRS "low"). | Not every hotspot is a fire; Mayon and Taal show up in the record. The same filter for both sensors. |
 | 2. Place | Assign each hotspot to its region and province (geoBoundaries 2020). Hotspots within about 5 km of the coast are given to the nearest province. | So any region or province can be selected. Hotspots more than about 5 km from every Philippine province are left out (${n(meta.stats.outsideRegions)}; most of them lie in neighbouring countries inside the rectangle used to download 2026). |
-| 3. Choose one scale | VIIRS is the reference. | MODIS ends in 2027; VIIRS continues on NOAA-20 and NOAA-21, so the record can keep growing on the same scale. |
-| 4. Convert MODIS | For each region, k = VIIRS hotspots ÷ MODIS Aqua hotspots over 20 January 2012 to 31 December 2020, counting only days both satellites delivered data. Months before February 2012 are MODIS Aqua × k. Provinces use their region's k. | Aqua crosses the equator at about 13:30, as Suomi NPP does, so k reflects the sensors rather than the time of day. The years from 2021 are left out of the fit because Terra and Aqua drifted from their orbits from 2021. |
-| 5. Keep VIIRS continuous | On days Suomi NPP has no data (NASA's missing-data table), NOAA-20 hotspots are used, scaled by f = Suomi NPP ÷ NOAA-20 over 2018–2025 (f = ${meta.factors.ph.f.toFixed(3)} nationally). | A missing day otherwise looks like a quiet day. |
+| 3. Choose one scale | VIIRS is the reference. | NASA expects MODIS science data to end in 2027 (Terra in February, Aqua in September; [NASA](https://science.nasa.gov/science-research/earth-science/terra-the-end-of-an-era)). VIIRS continues on NOAA-20 and NOAA-21, so the record can keep growing on the same scale. |
+| 4. Convert MODIS | For each region, k = VIIRS hotspots ÷ MODIS Aqua hotspots over 20 January 2012 to 31 December 2020, counting only days both satellites delivered data. Months before February 2012 are MODIS Aqua × k. Provinces use their region's k. | Aqua crosses the equator at about 13:30, as Suomi NPP does, so k reflects the sensors rather than the time of day. The years from 2021 are left out of the fit because Terra and Aqua no longer hold their orbits (Terra from late 2020, Aqua from 2021) and their crossing times have drifted since. |
+| 5. Keep VIIRS continuous | On days Suomi NPP has no data (NASA's missing-data table), and from 2 November 2026, when its data stopped partway through the day, NOAA-20 hotspots are used, scaled by f = Suomi NPP ÷ NOAA-20 over 2018–2025 (f = ${meta.factors.ph.f.toFixed(3)} nationally). | A missing day otherwise looks like a quiet day. |
 | 6. Count by month | Sum by calendar month, January 2003 onward. | Monthly counts show the fire season clearly; daily counts are too noisy. 2003 is the first full year with Aqua. |
 
-**Custom areas.** Every hotspot in the downloadable files carries a weight that puts it on the VIIRS scale: 1 for a VIIRS hotspot, the region's k for a MODIS Aqua hotspot, and f for a NOAA-20 hotspot used on a day Suomi NPP missed. A box drawn on the map gets its calendar by adding up the weights of the hotspots inside it, month by month. Adding up the weights of a province's hotspots gives exactly its calendar (checked for Benguet in 2024: 1,709 and 1,709).
+**Custom areas.** Every hotspot in the downloadable files carries a weight that puts it on the VIIRS scale: 1 for a VIIRS hotspot, the region's k for a MODIS Aqua hotspot, and f for a NOAA-20 hotspot used on a day Suomi NPP missed. A box drawn on the map gets its calendar by adding up the weights of the hotspots inside it, month by month. Adding up the weights of a province's hotspots gives its calendar, to within rounding (checked for Benguet in 2024: 1,709 and 1,709). Along a few region borders the region and province outlines disagree slightly: 10 of the 454,377 hotspots in the files lie in a region other than their province's, so a province's hotspot file can miss one of those.
 
-**Difference from the average.** The calendar can also be coloured by how far each month sits above or below the average of the same calendar month over every full year of the record, for the selected area.
+**Difference from the average.** The calendar can also be coloured by how far each month sits above or below the average of the same calendar month over every complete month of the record, for the selected area. A month still in progress is compared with the same share of that average.
 
 The approach follows the same family as the published GFED5 near-real-time method (Chen and others, 2026), which converts VIIRS detections with factors set by region from the years both sensors flew. Ours is simpler: one factor per region, applied to hotspot counts.
 
@@ -53,9 +53,9 @@ The tests and thresholds below were written into the code before the first run, 
 
 - For a whole year in one region, the converted MODIS count lands within about ${pc(T1.harmonised.annualMedianAbsPctError)} of what VIIRS saw, in a typical case. Without conversion it would be off by about ${pc(T1.baselineRawAqua.annualMedianAbsPctError)}.
 - A single month is much less certain: a typical error of about a third. Read the calendar for seasons and years, not for one month's exact number.
-- The season's shape survives: in about three region-years out of four the busiest month is the same in both records, and in more than nine out of ten it is within a month.
+- The season's shape survives: in about three region-years out of four the busiest month is the same in both records, and in more than nine out of ten it is within a month. (A factor multiplies every month alike, so it cannot change which month is busiest: this row measures how well the two records agree on the season, which is why it has one value.)
 - After 2021, when the MODIS satellites drifted, the error doubles, and one national factor does slightly better than per-region factors. Before February 2012 the calendar uses MODIS, and those years fall before the drift.
-- Pooling Terra with Aqua gave a slightly lower error in the held-out test (${pc(v.comparison_TerraPlusAqua_T1.annualMedianAbsPctError)} against ${pc(T1.harmonised.annualMedianAbsPctError)} for annual totals). We kept Aqua alone, as decided before the run, and record this as an open question.
+- Pooling Terra with Aqua gave a slightly lower error in the held-out test, counted on the days all three satellites delivered data (${pc(v.comparison_TerraPlusAqua_T1.annualMedianAbsPctError)} against ${pc(T1.harmonised.annualMedianAbsPctError)} for annual totals). We kept Aqua alone, as decided before the run, and record this as an open question.
 
 ## Check against fire seasons reported on the ground
 
@@ -92,7 +92,10 @@ In Benguet the three worst January–May seasons since 2003 are 2010, 2024 and 2
 - **No detection does not mean no fire.** FIRMS carries no cloud information. The wet season and cloudy years read low.
 - **Missing days** are marked with a dot on the calendar when a month lacks a week or more of data.
 - **Provinces** use their region's factor; a province's own factor would rest on too few hotspots.
-- **2026** comes from the FIRMS area API: standard quality up to the end of July (VIIRS) or August (MODIS), then near real time, which NASA later replaces with standard quality. Near-real-time rows carry no volcano flag, so detections within about 2 km of any spot FIRMS flagged as an active volcano are dropped (${n(meta.stats.droppedNearVolcano)} rows). The current month holds only the days so far and is marked as such.
+- **Metro Manila (NCR)** has so few fires that its factor rests on only ${n(meta.factors["r-ncr"].kAqua)} MODIS Aqua hotspots (2012–2020), against ${n(d3.min(Object.entries(meta.factors).filter(([id]) => id !== "ph" && id !== "r-ncr"), ([, f]) => f.kAqua))} or more for every other region. Read NCR's months before 2012 as very uncertain.
+- **The 87 provinces** are geoBoundaries' second level for 2020: 81 provinces, Metro Manila's four districts, Isabela City and Cotabato City.
+- **Dates** are FIRMS acquisition dates in UTC. The night pass, at about 01:30 Philippine time, is dated the day before, so a few hotspots at the turn of a month count in the earlier month.
+- **2026** comes from the FIRMS area API: standard quality up to the end of July (VIIRS) or August (MODIS), then near real time, which NASA later replaces with standard quality. Near-real-time rows carry no FIRMS type, so detections in the same or a neighbouring 0.02° cell (about 2 km) as any spot FIRMS flagged as an active volcano are dropped (${n(meta.stats.droppedNearVolcano)} rows). Offshore detections near the coast cannot be told apart and stay in from August 2026; in 2012–2025 they were 0.3–2.4% of a year's VIIRS hotspots. The current month holds only the days so far and is marked as such.
 - The record describes the past. It does not forecast.
 
 ## Factors by region
@@ -101,4 +104,4 @@ In Benguet the three worst January–May seasons since 2003 are 2010, 2024 and 2
 display(Inputs.table(areas.filter((a) => a.level !== "province").map((a) => ({Area: a.name, "k (VIIRS per MODIS Aqua hotspot)": +a.k.toFixed(2), "f (Suomi NPP per NOAA-20 hotspot)": +a.f.toFixed(3)})), {sort: "Area", rows: 20}));
 ```
 
-Built ${meta.builtAt.slice(0, 10)} from NASA FIRMS standard-quality yearly files for the Philippines (MODIS ${meta.recordStart.slice(0, 4)}–2025, VIIRS Suomi NPP 2012–2025, VIIRS NOAA-20 2018–2025) and the FIRMS area API for 2026 (1 January to ${meta.lastDate}).
+Built ${meta.builtAt.slice(0, 10)} from NASA FIRMS standard-quality yearly files for the Philippines (MODIS 2000–2025, used from ${meta.recordStart.slice(0, 4)}; VIIRS Suomi NPP 2012–2025, VIIRS NOAA-20 2018–2025) and the FIRMS area API for 2026 (1 January to ${meta.lastDate}).

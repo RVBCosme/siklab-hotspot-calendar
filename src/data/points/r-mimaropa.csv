@@ -67365,3 +67365,22 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-10-31,544,12.7152,121.44196,Suomi NPP (VIIRS),n,6.45,,p-oriental-mindoro,1
 2026-10-31,544,12.71918,121.44149,Suomi NPP (VIIRS),n,6.45,,p-oriental-mindoro,1
 2026-10-31,544,12.86118,121.37876,Suomi NPP (VIIRS),n,3.33,,p-oriental-mindoro,1
+2026-11-02,527,12.82812,121.12382,NOAA-20 (VIIRS),n,6.8,,p-occidental-mindoro,1.016
+2026-11-02,527,12.82861,121.12719,NOAA-20 (VIIRS),n,3.66,,p-occidental-mindoro,1.016
+2026-11-03,508,13.28591,120.85603,NOAA-20 (VIIRS),n,3.01,,p-oriental-mindoro,1.016
+2026-11-07,531,12.7125,121.09547,NOAA-20 (VIIRS),n,12.81,,p-occidental-mindoro,1.016
+2026-11-07,531,12.71609,121.09487,NOAA-20 (VIIRS),n,12.81,,p-occidental-mindoro,1.016
+2026-11-07,531,12.72344,121.17418,NOAA-20 (VIIRS),n,6.17,,p-occidental-mindoro,1.016
+2026-11-07,531,13.47099,120.58407,NOAA-20 (VIIRS),n,11.42,,p-occidental-mindoro,1.016
+2026-11-08,512,8.58718,117.51864,NOAA-20 (VIIRS),n,2.99,,p-palawan,1.016
+2026-11-08,514,12.71891,121.46291,NOAA-20 (VIIRS),n,2.02,,p-oriental-mindoro,1.016
+2026-11-09,453,13.00939,120.91364,NOAA-20 (VIIRS),n,3.85,,p-occidental-mindoro,1.016
+2026-11-09,453,13.01018,120.91797,NOAA-20 (VIIRS),n,5.19,,p-occidental-mindoro,1.016
+2026-11-11,559,12.58698,121.05486,NOAA-20 (VIIRS),n,5.1,,p-occidental-mindoro,1.016
+2026-11-11,559,12.89291,121.03114,NOAA-20 (VIIRS),n,6.23,,p-occidental-mindoro,1.016
+2026-11-11,559,12.8932,121.03358,NOAA-20 (VIIRS),n,6.23,,p-occidental-mindoro,1.016
+2026-11-12,537,12.82081,121.12083,NOAA-20 (VIIRS),n,7.97,,p-occidental-mindoro,1.016
+2026-11-13,520,11.79098,120.00816,NOAA-20 (VIIRS),n,3.79,,p-palawan,1.016
+2026-11-13,520,12.92831,120.99217,NOAA-20 (VIIRS),n,1.69,,p-occidental-mindoro,1.016
+2026-11-13,520,12.94384,120.95697,NOAA-20 (VIIRS),n,4.26,,p-occidental-mindoro,1.016
+2026-11-13,520,13.20136,120.75626,NOAA-20 (VIIRS),n,3,,p-occidental-mindoro,1.016

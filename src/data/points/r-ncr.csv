@@ -1379,3 +1379,8 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-10-16,525,14.70788,121.01188,Suomi NPP (VIIRS),n,1.5,,p-ncr-third-district,1
 2026-10-22,512,14.48525,121.05143,Suomi NPP (VIIRS),n,3.54,,p-ncr-fourth-district,1
 2026-10-26,1811,14.70814,121.01284,Suomi NPP (VIIRS),n,0.46,,p-ncr-third-district,1
+2026-11-03,508,14.43092,121.04279,NOAA-20 (VIIRS),n,3.06,,p-ncr-fourth-district,0.999
+2026-11-03,508,14.47129,121.04478,NOAA-20 (VIIRS),n,1.95,,p-ncr-fourth-district,0.999
+2026-11-03,508,14.72565,120.93824,NOAA-20 (VIIRS),n,3.31,,p-ncr-third-district,0.999
+2026-11-08,1745,14.71006,121.01096,NOAA-20 (VIIRS),n,1.32,,p-ncr-third-district,0.999
+2026-11-09,1728,14.70956,121.01075,NOAA-20 (VIIRS),n,1.09,,p-ncr-third-district,0.999

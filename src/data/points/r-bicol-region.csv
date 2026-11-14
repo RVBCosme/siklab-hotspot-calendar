@@ -14426,3 +14426,6 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-10-22,512,14.00917,122.97482,Suomi NPP (VIIRS),n,1.54,,p-camarines-norte,1
 2026-10-27,518,11.8333,124.02741,Suomi NPP (VIIRS),n,3.95,,p-masbate,1
 2026-10-27,518,11.83384,124.03098,Suomi NPP (VIIRS),n,3.95,,p-masbate,1
+2026-11-03,508,13.53043,123.32181,NOAA-20 (VIIRS),n,1.81,,p-camarines-sur,1.037
+2026-11-07,531,11.99802,123.81071,NOAA-20 (VIIRS),n,6.01,,p-masbate,1.037
+2026-11-07,531,12.01192,123.71716,NOAA-20 (VIIRS),n,6.94,,p-masbate,1.037

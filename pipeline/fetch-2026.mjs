@@ -1,4 +1,4 @@
-// Track A: fetch 2026 VIIRS hotspots for the Philippines from the NASA FIRMS area API.
+// Track A: fetch 2026 VIIRS and MODIS hotspots for the Philippines from the NASA FIRMS area API.
 // Needs FIRMS_MAP_KEY in .env (git-ignored). The key is never printed or written anywhere else.
 // Run: node pipeline/fetch-2026.mjs
 // Written with an AI assistant (Claude Code) during the hackathon, 14 Nov 2026; see logs/.
@@ -16,10 +16,11 @@ if (!KEY) { console.error("No FIRMS_MAP_KEY in .env. Add the line FIRMS_MAP_KEY=
 const BASE = "https://firms.modaps.eosdis.nasa.gov/api";
 const BBOX = "116,4,127,21.5"; // west,south,east,north around the Philippines; points outside Philippine regions are dropped later
 const START = "2026-01-01";
-const today = new Date().toISOString().slice(0, 10);
-const SNPP_END = "2026-11-02"; // Suomi NPP observations ceased 2 Nov 2026 (NASA alert)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const addDays = (d, n) => { const x = new Date(d + "T00:00:00Z"); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+// Fetch up to yesterday (UTC): today is never a complete day.
+const lastDay = addDays(new Date().toISOString().slice(0, 10), -1);
+const SNPP_END = "2026-11-02"; // Suomi NPP delivery ceased at 13:00 UTC on 2 Nov 2026 (NASA Earthdata alert); build-data.mjs uses it to 1 Nov
 
 async function get(url, label) {
   for (let attempt = 1; attempt <= 4; attempt++) {
@@ -50,10 +51,13 @@ function plan(spId, nrtId, end) {
   for (let d = addDays(spMax, 1); d <= end; d = addDays(d, 5)) out.push({ source: nrtId, date: d, days: Math.min(5, 1 + (new Date(end + "T00:00:00Z") - new Date(d + "T00:00:00Z")) / 864e5) });
   return out;
 }
-const jobs = [...plan("VIIRS_SNPP_SP", "VIIRS_SNPP_NRT", SNPP_END < today ? SNPP_END : today), ...plan("VIIRS_NOAA20_SP", "VIIRS_NOAA20_NRT", today), ...plan("MODIS_SP", "MODIS_NRT", today)];
+const jobs = [...plan("VIIRS_SNPP_SP", "VIIRS_SNPP_NRT", SNPP_END < lastDay ? SNPP_END : lastDay), ...plan("VIIRS_NOAA20_SP", "VIIRS_NOAA20_NRT", lastDay), ...plan("MODIS_SP", "MODIS_NRT", lastDay)];
 console.log(`${jobs.length} requests`);
 
-// 3. Fetch, one file per request; skip files already fetched (re-runs are cheap).
+// 3. Fetch, one file per request; skip standard-quality files already fetched (re-runs are cheap).
+// Near-real-time files are always fetched again, and once NASA publishes standard quality for those days the plan
+// no longer asks for them: remove the old ones first, so no day is read twice.
+for (const f of fs.readdirSync(OUT)) if (f.includes("_NRT_")) fs.unlinkSync(path.join(OUT, f));
 let rows = 0;
 for (const j of jobs) {
   const file = path.join(OUT, `${j.source}_${j.date}_${j.days}d.csv`);

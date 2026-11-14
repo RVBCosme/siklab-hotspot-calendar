@@ -23,6 +23,9 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 | geoBoundaries, Philippines ADM1 and ADM2 (2020), from NAMRIA, PSA and OCHA Philippines. Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866 | Placing hotspots in regions and provinces | CC BY 3.0 IGO, https://www.geoboundaries.org/ |
 | Chen, Y. and others (2026). GFED5 near-real-time. Earth System Science Data 18, 7535 | The family of method we follow (factors from the overlap years) | Open access, https://essd.copernicus.org/articles/18/7535/2026/ |
 | NASA FIRMS FAQ and attribute descriptions | Meaning of the type and confidence fields; satellite pass times | https://www.earthdata.nasa.gov/data/tools/firms/faq |
+| NASA Earthdata (2026). Suomi NPP Observations to Cease on November 2, 2026; and NASA Earthdata blog, Transitioning from Suomi NPP VIIRS & OMPS: What FIRMS Users Need to Know | The date and time Suomi NPP data stopped (13:00 UTC, 2 November 2026) | https://www.earthdata.nasa.gov/data/alerts-outages/suomi-npp-observations-cease-november-2-2026 ; https://www.earthdata.nasa.gov/news/blog/transitioning-from-suomi-npp-viirs-omps-what-firms-users-need-know |
+| NASA Science. Terra: The End of an Era; and the Aqua mission page | Terra and Aqua no longer hold their orbits; projected end of science: Terra February 2027, Aqua September 2027 | https://science.nasa.gov/science-research/earth-science/terra-the-end-of-an-era ; https://science.nasa.gov/mission/aqua |
+| News reports used in the check against reported fire seasons: Northern Philippine Times (Sept 2010), PTV News (March 2019), Rappler and Inquirer (2024) | Linked from the method page; cited, not reproduced | Each publisher's terms |
 
 ## Software
 

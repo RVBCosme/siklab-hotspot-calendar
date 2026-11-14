@@ -2,7 +2,7 @@
 
 A harmonised burning activity calendar for the Philippines, built from NASA FIRMS active fire hotspots during the NASA Space Apps Challenge 2026 (14–15 November 2026, Manila local event, challenge "Harmonization of MODIS and VIIRS Hot Spots") by team Siklab.
 
-MODIS and VIIRS count fire very differently: over the Philippines, VIIRS on Suomi NPP reports about ten hotspots for every one that MODIS on Aqua reports. This project converts the MODIS record (2003 to January 2012) onto the VIIRS scale with a factor per region, fitted on the years both satellites flew, so that one monthly series runs from January 2003 to the latest month for any of the 17 regions and 87 provinces.
+MODIS and VIIRS count fire very differently: over the Philippines, VIIRS on Suomi NPP reports about ten hotspots for every one that MODIS on Aqua reports. This project converts the MODIS record (2003 to January 2012) onto the VIIRS scale with a factor per region, fitted on the years both satellites flew, so that one monthly series runs from January 2003 to the latest month for any of the 17 regions and 87 province-level areas (81 provinces, Metro Manila's four districts and two cities), or for a box drawn on the map.
 
 - **Web application:** a static site built with Observable Framework (`src/`).
 - **Data pipeline:** `pipeline/build-data.mjs` (Node.js, no dependencies) turns the FIRMS yearly country files into the files in `src/data/`, and runs the validation tests.
@@ -20,7 +20,7 @@ npm ci
 # 3. Download geoBoundaries PHL ADM1 and ADM2 simplified GeoJSON to data/raw/geoboundaries/
 #    (PHL-ADM1_simplified.geojson, PHL-ADM2_simplified.geojson), release 41af8f1
 # 4. Optional, for 2026: put FIRMS_MAP_KEY=<your free FIRMS map key> in .env (git-ignored), then
-node pipeline/fetch-2026.mjs   # FIRMS area API, 1 Jan 2026 to today; the key is never printed
+node pipeline/fetch-2026.mjs   # FIRMS area API, 1 Jan 2026 to yesterday (UTC); near-real-time files are replaced each run; the key is never printed
 npm run data     # builds src/data/*  (about one minute)
 npm run build    # builds the static site into dist/
 ```
