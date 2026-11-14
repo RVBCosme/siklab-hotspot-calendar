@@ -1,5 +1,5 @@
 // Serve the built site (dist/) on http://127.0.0.1:8123 for local checks. Node only, no dependencies.
-// Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README and logs/.
+// Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README.
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";

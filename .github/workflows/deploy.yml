@@ -1,6 +1,6 @@
 # Builds the static site and publishes it to GitHub Pages.
 # Based on Observable Framework's documented GitHub Pages workflow (docs/deploying.md).
-# Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README and logs/.
+# Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README.
 name: Deploy
 
 on:

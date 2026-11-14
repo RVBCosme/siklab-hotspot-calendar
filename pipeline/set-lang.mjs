@@ -1,6 +1,6 @@
 // After `observable build`: mark every page as English (<html lang="en">) for screen readers, and allow pinch zoom
 // (Observable Framework 1.13.4 writes a bare <html> tag and a viewport tag with maximum-scale=1, and has no option for either).
-// Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README and logs/.
+// Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README.
 import fs from "node:fs";
 import path from "node:path";
 

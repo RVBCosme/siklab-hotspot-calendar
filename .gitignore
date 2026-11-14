@@ -5,3 +5,5 @@ data/raw/
 node_modules/
 dist/
 src/.observablehq/cache/
+# Working logs of sources, AI use and checks: kept on the Team Owner's computer, not published
+logs/

@@ -1,7 +1,7 @@
 // Track A: fetch 2026 VIIRS and MODIS hotspots for the Philippines from the NASA FIRMS area API.
 // Needs FIRMS_MAP_KEY in .env (git-ignored). The key is never printed or written anywhere else.
 // Run: node pipeline/fetch-2026.mjs
-// Written with an AI assistant (Claude Code) during the hackathon, 14 Nov 2026; see logs/.
+// Written with an AI assistant (Claude Code) during the hackathon, 14 Nov 2026; see README.
 import fs from "node:fs";
 import path from "node:path";
 

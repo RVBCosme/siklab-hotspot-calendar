@@ -2,7 +2,7 @@
 title: How it works and how well
 ---
 
-<!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README and logs/. -->
+<!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README. -->
 
 # How it works, and how well it works
 

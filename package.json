@@ -1,6 +1,6 @@
 {
   "name": "siklab-hotspots",
-  "description": "Harmonised MODIS + VIIRS burning activity calendar for the Philippines (NASA Space Apps 2026, team Siklab). Code and data pipeline written with AI assistance (Claude Code, Anthropic); see README and logs/.",
+  "description": "Harmonised MODIS + VIIRS burning activity calendar for the Philippines (NASA Space Apps 2026, team Siklab). Code and data pipeline written with AI assistance (Claude Code, Anthropic); see README.",
   "private": true,
   "type": "module",
   "scripts": {
