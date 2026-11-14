@@ -84,11 +84,16 @@ display(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSize: "1
   <h2>Is this month unusual? Compare it with every year since 2003</h2>
 
 ```js
-const mar = benguet.filter((d) => d.m === 3 && d.year <= 2025);
-display(Plot.plot({width: 900, height: 320, style: {fontSize: "13px"}, x: {label: null, tickFormat: "d", interval: 1}, y: {label: "Hotspots in March, Benguet", grid: true}, marks: [Plot.barY(mar, {x: "year", y: "h", fill: (d) => (d.year === 2024 ? "#d7301f" : "#fdae61")}), Plot.ruleY([d3.median(mar, (d) => d.h)], {stroke: "currentColor", strokeDasharray: "5,4"}), Plot.ruleY([0])]}));
+// The same comparison as the app's "Against the historical median" card: February 2024 against every other February.
+const feb = benguet.filter((d) => d.m === 2);
+const feb24 = feb.find((d) => d.year === 2024).h;
+const febMedian = d3.median(feb.filter((d) => d.year !== 2024), (d) => d.h);
+const febRank = 1 + feb.filter((d) => d.h > feb24).length;
+const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th");
+display(Plot.plot({width: 900, height: 300, style: {fontSize: "13px"}, x: {label: null, tickFormat: "d", interval: 1}, y: {label: "Hotspots in February, Benguet", grid: true}, marks: [Plot.barY(feb, {x: "year", y: "h", fill: (d) => (d.year === 2024 ? "#d7301f" : "#fdae61")}), Plot.ruleY([febMedian], {stroke: "currentColor", strokeDasharray: "5,4"}), Plot.ruleY([0])]}));
 ```
 
-  <p class="say">March 2024 in Benguet against the historical median (dashed): the question an emergency manager asks first. Designed for fire officers, land managers, responders and researchers.</p>
+  <p class="say">February 2024 in Benguet: ${fmt(feb24)} hotspots against a median of ${fmt(febMedian)} in the other ${feb.length - 1} years (dashed), the ${ordinal(febRank)} busiest February since 2003. The question an emergency manager asks first; designed for fire officers, land managers, responders and researchers.</p>
   <p class="slide-no">6 / 7</p>
 </div>
 
@@ -100,7 +105,7 @@ display(Plot.plot({width: 900, height: 320, style: {fontSize: "13px"}, x: {label
     <li>Next: a check with fire officers on the ground</li>
   </ul>
   <p class="who">Try it: rvbcosme.github.io/siklab-hotspot-calendar · Data: NASA FIRMS · Team Siklab</p>
-  <p class="ai-note">Code, charts and text made with AI assistance (Claude Code) and checked by the team; details on the Sources page. No AI-generated images.</p>
+  <p class="ai-note">Code, charts, text and screenshots made with AI assistance (Claude Code); decisions by the team. Details on the Sources page. No AI-generated images.</p>
   <p class="slide-no">7 / 7</p>
 </div>
 

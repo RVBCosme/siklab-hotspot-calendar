@@ -35,4 +35,4 @@ npm run build    # builds the static site into dist/
 
 ## Use of AI
 
-Code, data files and text in this repository were written or generated with the help of an AI assistant (Claude Code, Anthropic), and checked by the team. The full record of what the assistant did and what people checked is in `logs/`.
+Code, data files, text and the screenshots in `src/img/` were written, generated or taken with the help of an AI assistant (Claude Code, Anthropic). The team made the design decisions and published each change. The full record of what the assistant did, the checks run on the data, and what people decided is in `logs/` and on the site's Sources page.

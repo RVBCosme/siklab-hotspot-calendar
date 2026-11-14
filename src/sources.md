@@ -44,9 +44,11 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 
 | Tool | What it did | What a person checked |
 |---|---|---|
-| Claude Code (Anthropic, Claude Opus 5.5) | Before the hackathon: research and fact-checking on the challenge, the data and the rules. During the hackathon: read the guides and the forum, downloaded the FIRMS files, wrote the data pipeline (pipeline/build-data.mjs), the validation tests and this web application's code, drafted text on these pages, and took the screenshots of this application used in the demo (screenshots of the real pages, not generated images) | To be completed by the team |
+| Claude Code (Anthropic, Claude Opus 5.5) | Before the hackathon: research and fact-checking on the challenge, the data and the rules; on 11 November it also read the first and last few hundred bytes of three 2025 Philippine FIRMS files to learn their column format (see the note below). During the hackathon: read the guides and the forum, downloaded the FIRMS files, wrote the data pipeline (pipeline/build-data.mjs), the validation tests and this web application's code, drafted text on these pages, and took the screenshots of this application used in the demo (screenshots of the real pages, not generated images) | The Team Owner made each open decision (which MODIS satellite to convert, Metro Manila's factor, how the data is kept current, the project name, the disclosure below) and pushed the changes to the public repository. The numbers were checked with recounts run by the AI assistant, recorded in the repository's `logs/checks-track-c.md` |
 
 The code and the data files in this repository were written or generated with AI assistance, as stated above and in the repository's README. No AI-generated images, video or audio are used.
+
+**Before the event.** On 11 November a forum Navigator had written that NASA's data is public and there is no need to wait for the hackathon to access it (discussion 1925), and our AI assistant read the first and last few hundred bytes of three 2025 Philippine FIRMS files to learn their column format. Nothing was saved or processed. On 14 November the organisers said that downloading data before the start is not permitted (discussion 2011), so we state it here and on our project page. All data used in this project was downloaded after the 09:00 start on 14 November, and the repository's first commit is at 13:07 that day.
 
 ## Licence of this project
 
