@@ -1,0 +1,71 @@
+{
+ "rules": "Region x month, days with data from both satellites only. Annual errors over region-years with >= 100 VIIRS hotspots; monthly errors over months with >= 20.",
+ "T1_leaveOneYearOut_2012_2020": {
+  "harmonised": {
+   "annualMedianAbsPctError": 10,
+   "monthlyMedianAbsPctError": 33.4,
+   "peakMonthSame": 75.3,
+   "peakMonthWithinOne": 93.8,
+   "regionYears": 146,
+   "months": 1168
+  },
+  "baselineRawAqua": {
+   "annualMedianAbsPctError": 90.4,
+   "monthlyMedianAbsPctError": 91.4,
+   "peakMonthSame": 75.3,
+   "peakMonthWithinOne": 93.8,
+   "regionYears": 146,
+   "months": 1168
+  },
+  "baselineOneNationalFactor": {
+   "annualMedianAbsPctError": 13,
+   "monthlyMedianAbsPctError": 33.2,
+   "peakMonthSame": 75.3,
+   "peakMonthWithinOne": 93.8,
+   "regionYears": 146,
+   "months": 1168
+  }
+ },
+ "T2_driftYears_2021_2025": {
+  "harmonised": {
+   "annualMedianAbsPctError": 21.1,
+   "monthlyMedianAbsPctError": 38.6,
+   "peakMonthSame": 71.4,
+   "peakMonthWithinOne": 84.5,
+   "regionYears": 84,
+   "months": 554
+  },
+  "baselineRawAqua": {
+   "annualMedianAbsPctError": 90.5,
+   "monthlyMedianAbsPctError": 91.3,
+   "peakMonthSame": 71.4,
+   "peakMonthWithinOne": 84.5,
+   "regionYears": 84,
+   "months": 554
+  },
+  "baselineOneNationalFactor": {
+   "annualMedianAbsPctError": 19.1,
+   "monthlyMedianAbsPctError": 36.4,
+   "peakMonthSame": 71.4,
+   "peakMonthWithinOne": 84.5,
+   "regionYears": 84,
+   "months": 554
+  }
+ },
+ "comparison_TerraPlusAqua_T1": {
+  "annualMedianAbsPctError": 8.9,
+  "monthlyMedianAbsPctError": 29.1,
+  "peakMonthSame": 76.7,
+  "peakMonthWithinOne": 91.8,
+  "regionYears": 146,
+  "months": 1168
+ },
+ "M4_viirsContinuity_noaa20_vs_snpp_2018_2025": {
+  "annualMedianAbsPctError": 4.8,
+  "monthlyMedianAbsPctError": 13.7,
+  "peakMonthSame": 84.3,
+  "peakMonthWithinOne": 96.3,
+  "regionYears": 134,
+  "months": 916
+ }
+}

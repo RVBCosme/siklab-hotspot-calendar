@@ -1,0 +1,7 @@
+# Raw FIRMS downloads are re-fetched by script; keep them out of git
+data/raw/
+# Secrets: the FIRMS map key lives here and is never committed
+.env
+node_modules/
+dist/
+src/.observablehq/cache/

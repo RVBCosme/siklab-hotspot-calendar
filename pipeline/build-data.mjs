@@ -1,0 +1,330 @@
+// Track A data pipeline: FIRMS yearly country files (Philippines) -> harmonised monthly hotspot record.
+// Written with an AI assistant (Claude Code) during the hackathon, 14 Nov 2026; see logs/ai-use-track-a.md.
+// Run: node pipeline/build-data.mjs   (no dependencies; Node 18+)
+//
+// Rules (fixed before the first run; see the build plan, section 8 and 11):
+// - Keep FIRMS type 0 (presumed vegetation fire) and 2 (other static land source); drop 1 (active volcano) and 3 (offshore).
+// - Drop low confidence: MODIS confidence < 30, VIIRS confidence "l".
+// - Reference scale: VIIRS Suomi NPP. MODIS Aqua (same ~13:30/01:30 pass) is converted with a factor per region,
+//   k_r = sum(VIIRS) / sum(Aqua) over 2012-01-20..2020-12-31 on days both satellites delivered data
+//   (2021 onward is held out because Terra and Aqua drifted from their orbits from 2021).
+// - Suomi NPP outage days (FIRMS missing-data table) are filled from NOAA-20, scaled by f_r = sum(SNPP)/sum(NOAA-20) over 2018-04-01..2025-12-31.
+// - Record: Jan 2003 (first full year with Aqua) to the last month in the data. Aqua-derived before Feb 2012, VIIRS from Feb 2012.
+
+import fs from "node:fs";
+import path from "node:path";
+
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
+const RAW = path.join(ROOT, "data", "raw");
+const OUT = path.join(ROOT, "src", "data");
+fs.mkdirSync(path.join(OUT, "points"), { recursive: true });
+
+const FIT_START = "2012-01-20", FIT_END = "2020-12-31";
+const N20_FIT_START = "2018-04-01", N20_FIT_END = "2025-12-31";
+const VIIRS_START_MONTH = "2012-02";
+const RECORD_START_MONTH = "2003-01";
+
+// ---------- geometry ----------
+function loadAreas(file) {
+  const gj = JSON.parse(fs.readFileSync(path.join(RAW, "geoboundaries", file), "utf8"));
+  return gj.features.map((f) => {
+    const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+    const bboxes = polys.map((p) => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const [x, y] of p[0]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      return [x0, y0, x1, y1];
+    });
+    const bbox = bboxes.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])]);
+    return { name: f.properties.shapeName, iso: f.properties.shapeISO || "", polys, bboxes, bbox };
+  });
+}
+function inRing(x, y, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function inArea(x, y, a) {
+  if (x < a.bbox[0] || x > a.bbox[2] || y < a.bbox[1] || y > a.bbox[3]) return false;
+  for (let p = 0; p < a.polys.length; p++) {
+    const b = a.bboxes[p];
+    if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
+    const rings = a.polys[p];
+    if (inRing(x, y, rings[0])) {
+      let hole = false;
+      for (let h = 1; h < rings.length; h++) if (inRing(x, y, rings[h])) { hole = true; break; }
+      if (!hole) return true;
+    }
+  }
+  return false;
+}
+function segDist2(px, py, [ax, ay], [bx, by]) {
+  const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy;
+  let t = L ? ((px - ax) * dx + (py - ay) * dy) / L : 0;
+  t = Math.max(0, Math.min(1, t));
+  const qx = ax + t * dx - px, qy = ay + t * dy - py;
+  return qx * qx + qy * qy;
+}
+const SNAP_DEG = 0.05; // ~5 km: coastal hotspots just outside the simplified outline are given to the nearest area
+function locate(x, y, areas) {
+  for (let i = 0; i < areas.length; i++) if (inArea(x, y, areas[i])) return i;
+  let best = -1, bestD = SNAP_DEG * SNAP_DEG;
+  for (let i = 0; i < areas.length; i++) {
+    const a = areas[i];
+    if (x < a.bbox[0] - SNAP_DEG || x > a.bbox[2] + SNAP_DEG || y < a.bbox[1] - SNAP_DEG || y > a.bbox[3] + SNAP_DEG) continue;
+    for (const rings of a.polys) for (const ring of rings) for (let k = 1; k < ring.length; k++) {
+      const d = segDist2(x, y, ring[k - 1], ring[k]);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+  }
+  return best;
+}
+
+const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const regions = loadAreas("PHL-ADM1_simplified.geojson");
+const provinces = loadAreas("PHL-ADM2_simplified.geojson");
+regions.forEach((r) => (r.id = "r-" + slug(r.name)));
+provinces.forEach((p) => (p.id = "p-" + slug(p.name)));
+
+// ---------- FIRMS missing-data table ----------
+const missingHtml = JSON.parse(fs.readFileSync(path.join(RAW, "firms_missing_data.json"), "utf8")).html;
+const tds = [...missingHtml.matchAll(/<td>([^<]*)<\/td>/g)].map((m) => m[1].trim());
+const missing = { aqua: new Set(), terra: new Set(), snpp: new Set(), n20: new Set(), n21: new Set(), other: new Set() };
+const satKey = (s) => /Aqua/i.test(s) ? "aqua" : /Terra/i.test(s) ? "terra" : /Suomi|NPP/i.test(s) ? "snpp" : /NOAA-20/i.test(s) ? "n20" : /NOAA-21/i.test(s) ? "n21" : "other";
+for (let i = 0; i + 1 < tds.length; i += 2) if (/^\d{4}-\d{2}-\d{2}$/.test(tds[i])) missing[satKey(tds[i + 1])].add(tds[i]);
+
+// ---------- read hotspots ----------
+const SENSOR = { Aqua: "aqua", Terra: "terra", N: "snpp", N20: "n20" };
+const files = fs.readdirSync(path.join(RAW, "firms")).filter((f) => f.endsWith(".csv")).sort();
+const daily = new Map(); // key `${areaId}|${date}` -> {aqua,terra,snpp,n20}
+const keepPoints = []; // rows that may enter the harmonised hotspot dataset
+const stats = { read: 0, kept: 0, droppedType: 0, droppedLowConf: 0, outsideRegions: 0, snappedOrOutsideProvince: 0, bySensor: {} };
+function bump(areaId, date, s) {
+  const k = areaId + "|" + date;
+  let o = daily.get(k);
+  if (!o) daily.set(k, (o = { aqua: 0, terra: 0, snpp: 0, n20: 0 }));
+  o[s]++;
+}
+for (const f of files) {
+  const lines = fs.readFileSync(path.join(RAW, "firms", f), "utf8").split(/\r?\n/);
+  const head = lines[0].split(",");
+  const ix = Object.fromEntries(head.map((h, i) => [h, i]));
+  for (let li = 1; li < lines.length; li++) {
+    const line = lines[li];
+    if (!line) continue;
+    stats.read++;
+    const c = line.split(",");
+    const type = c[ix.type];
+    if (type === "1" || type === "3") { stats.droppedType++; continue; }
+    const sat = SENSOR[c[ix.satellite]];
+    if (!sat) continue;
+    const conf = c[ix.confidence];
+    if (sat === "aqua" || sat === "terra" ? Number(conf) < 30 : conf === "l") { stats.droppedLowConf++; continue; }
+    const lat = Number(c[ix.latitude]), lon = Number(c[ix.longitude]);
+    const ri = locate(lon, lat, regions);
+    if (ri < 0) { stats.outsideRegions++; continue; }
+    const pi = locate(lon, lat, provinces);
+    if (pi < 0) stats.snappedOrOutsideProvince++;
+    const date = c[ix.acq_date];
+    stats.kept++;
+    stats.bySensor[sat] = (stats.bySensor[sat] || 0) + 1;
+    bump("ph", date, sat);
+    bump(regions[ri].id, date, sat);
+    if (pi >= 0) bump(provinces[pi].id, date, sat);
+    if (sat !== "terra") keepPoints.push({ date, time: c[ix.acq_time], lat: c[ix.latitude], lon: c[ix.longitude], sat, conf, frp: c[ix.frp], type, ri, pi });
+  }
+  process.stdout.write(".");
+}
+console.log("\nread", stats.read, "kept", stats.kept);
+
+// province parent = region holding most of its hotspots
+const parentVotes = new Map();
+for (const p of keepPoints) if (p.pi >= 0) {
+  const m = parentVotes.get(p.pi) || new Map();
+  m.set(p.ri, (m.get(p.ri) || 0) + 1);
+  parentVotes.set(p.pi, m);
+}
+provinces.forEach((p, i) => {
+  const m = parentVotes.get(i);
+  p.parent = m ? regions[[...m.entries()].sort((a, b) => b[1] - a[1])[0][0]].id : null;
+});
+
+// ---------- per-area daily series ----------
+const areaIds = ["ph", ...regions.map((r) => r.id), ...provinces.map((p) => p.id)];
+const allDates = [...new Set([...daily.keys()].map((k) => k.split("|")[1]))].sort();
+const lastDate = allDates[allDates.length - 1];
+function dayRange(a, b) {
+  const out = [];
+  for (let d = new Date(a + "T00:00:00Z"); d <= new Date(b + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + 1)) out.push(d.toISOString().slice(0, 10));
+  return out;
+}
+const DAYS = dayRange("2002-07-04", lastDate);
+const get = (id, d) => daily.get(id + "|" + d) || { aqua: 0, terra: 0, snpp: 0, n20: 0 };
+
+function ratio(id, a, b, num, den, start, end) {
+  let sn = 0, sd = 0;
+  for (const d of DAYS) {
+    if (d < start || d > end || missing[a].has(d) || missing[b].has(d)) continue;
+    const o = get(id, d);
+    sn += o[num]; sd += o[den];
+  }
+  return { factor: sd > 0 ? sn / sd : null, num: sn, den: sd };
+}
+const factors = {};
+for (const r of [{ id: "ph" }, ...regions]) {
+  const k = ratio(r.id, "snpp", "aqua", "snpp", "aqua", FIT_START, FIT_END);
+  const f = ratio(r.id, "snpp", "n20", "snpp", "n20", N20_FIT_START, N20_FIT_END);
+  factors[r.id] = { k: k.factor, kViirs: k.num, kAqua: k.den, f: f.factor, fSnpp: f.num, fN20: f.den };
+}
+const regionOf = (id) => (id.startsWith("p-") ? provinces.find((p) => p.id === id).parent : id);
+const kOf = (id) => {
+  const rid = regionOf(id);
+  return (rid && factors[rid].k) || factors.ph.k;
+};
+const fOf = (id) => {
+  const rid = regionOf(id);
+  return (rid && factors[rid].f) || factors.ph.f;
+};
+
+// harmonised daily value and its source
+function harmonisedDay(id, d) {
+  if (id === "ph") {
+    // The country is the sum of its regions, each converted with its own factor.
+    let v = 0, src = "gap";
+    for (const r of regions) { const x = harmonisedDay(r.id, d); v += x.v; if (x.src !== "gap") src = x.src; }
+    return { v, src };
+  }
+  const o = get(id, d);
+  const m = d.slice(0, 7);
+  if (m < VIIRS_START_MONTH) return missing.aqua.has(d) ? { v: 0, src: "gap" } : { v: o.aqua * kOf(id), src: "aqua" };
+  if (!missing.snpp.has(d) && d <= "2026-11-02") return { v: o.snpp, src: "snpp" };
+  if (d >= "2018-04-01" && !missing.n20.has(d)) return { v: o.n20 * fOf(id), src: "n20" };
+  return { v: 0, src: "gap" };
+}
+
+// ---------- monthly table ----------
+const months = [...new Set(DAYS.map((d) => d.slice(0, 7)))].filter((m) => m >= RECORD_START_MONTH);
+const monthlyRows = [];
+for (const id of areaIds) {
+  const acc = new Map();
+  for (const d of DAYS) {
+    const m = d.slice(0, 7);
+    if (m < RECORD_START_MONTH) continue;
+    let a = acc.get(m);
+    if (!a) acc.set(m, (a = { h: 0, aqua: 0, terra: 0, snpp: 0, n20: 0, gapDays: 0, n20Days: 0, nDays: 0 }));
+    a.nDays++;
+    const o = get(id, d);
+    a.aqua += o.aqua; a.terra += o.terra; a.snpp += o.snpp; a.n20 += o.n20;
+    const hd = harmonisedDay(id, d);
+    a.h += hd.v;
+    if (hd.src === "gap") a.gapDays++;
+    if (hd.src === "n20") a.n20Days++;
+  }
+  for (const m of months) {
+    const { h, aqua, terra, snpp, n20, gapDays, n20Days, nDays } = acc.get(m);
+    const src = m < VIIRS_START_MONTH ? "MODIS Aqua x k" : n20Days > 0 ? "VIIRS (NOAA-20 fill)" : "VIIRS Suomi NPP";
+    monthlyRows.push([id, m, Math.round(h * 10) / 10, src, gapDays, nDays, aqua, terra, snpp, n20]);
+  }
+}
+fs.writeFileSync(
+  path.join(OUT, "monthly.csv"),
+  "area_id,month,hotspots_harmonised,source,gap_days,days,modis_aqua,modis_terra,viirs_snpp,viirs_noaa20\n" + monthlyRows.map((r) => r.join(",")).join("\n") + "\n"
+);
+
+// ---------- harmonised hotspot points, one file per region ----------
+const byRegion = new Map(regions.map((r, i) => [i, []]));
+for (const p of keepPoints) {
+  const m = p.date.slice(0, 7);
+  let use = false, weight = 1;
+  const rid = regions[p.ri].id;
+  if (m < VIIRS_START_MONTH) { use = p.sat === "aqua" && m >= RECORD_START_MONTH; weight = factors[rid].k ?? factors.ph.k; }
+  else if (p.sat === "snpp") use = !missing.snpp.has(p.date);
+  else if (p.sat === "n20") { use = missing.snpp.has(p.date) && p.date >= "2018-04-01" && !missing.n20.has(p.date); weight = factors[rid].f ?? factors.ph.f; }
+  if (!use) continue;
+  const satName = { aqua: "Aqua (MODIS)", snpp: "Suomi NPP (VIIRS)", n20: "NOAA-20 (VIIRS)" }[p.sat];
+  byRegion.get(p.ri).push([p.date, p.time, p.lat, p.lon, satName, p.conf, p.frp, p.type, p.pi >= 0 ? provinces[p.pi].id : "", Math.round(weight * 1000) / 1000]);
+}
+const PHEAD = "date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id,weight_viirs_equivalent\n";
+for (const [ri, rows] of byRegion) {
+  rows.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  fs.writeFileSync(path.join(OUT, "points", regions[ri].id + ".csv"), PHEAD + rows.map((r) => r.join(",")).join("\n") + "\n");
+}
+
+// ---------- areas ----------
+const areas = [
+  { id: "ph", name: "Philippines (all regions)", level: "country", parent: null, k: factors.ph.k, f: factors.ph.f },
+  ...regions.map((r) => ({ id: r.id, name: r.name === "ARMM" ? "BARMM (ARMM in the 2020 boundaries)" : r.name, level: "region", parent: "ph", k: factors[r.id].k, f: factors[r.id].f, bbox: r.bbox })),
+  ...provinces.map((p) => ({ id: p.id, name: p.name, level: "province", parent: p.parent, k: kOf(p.id), f: fOf(p.id), bbox: p.bbox })),
+];
+fs.writeFileSync(path.join(OUT, "areas.json"), JSON.stringify(areas));
+fs.writeFileSync(
+  path.join(OUT, "meta.json"),
+  JSON.stringify({ builtAt: new Date().toISOString(), lastDate, recordStart: RECORD_START_MONTH, viirsStart: VIIRS_START_MONTH, fit: [FIT_START, FIT_END], n20Fit: [N20_FIT_START, N20_FIT_END], stats, factors, missingDays: Object.fromEntries(Object.entries(missing).map(([k, v]) => [k, v.size])) }, null, 1)
+);
+// ---------- validation (track C). Rules fixed before the first run: ----------
+// Unit: region x month, counted only on days when both satellites delivered data.
+// T1 (reported first): leave-one-year-out inside the fit years 2012-2020 (factor refitted without the test year).
+// T2: the held-out drift years 2021-2025, factor from 2012-2020.
+// Baselines: B0 raw Aqua count (no harmonisation); B1 one national factor for every region.
+// M1 (headline): median absolute % error of annual totals, region-years with >= 100 VIIRS hotspots.
+// M2: median absolute % error of monthly counts, months with >= 20 VIIRS hotspots.
+// M3: share of region-years whose busiest month is the same in Aqua and VIIRS (and within one month).
+// M4: VIIRS continuity, NOAA-20 x f vs Suomi NPP annual totals 2018-2025 (f refitted leave-one-year-out).
+// Comparison: M1 under T1 if Terra+Aqua are pooled instead of Aqua alone.
+const median = (a) => { const s = [...a].sort((x, y) => x - y); const n = s.length; return n ? (n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2) : null; };
+const regionIdsV = regions.map((r) => r.id);
+const aligned = {}; // id -> year -> month(1..12) -> {A, V, TA, N20, S}
+for (const id of ["ph", ...regionIdsV]) {
+  aligned[id] = {};
+  for (const d of DAYS) {
+    if (d < FIT_START || d > "2025-12-31") continue;
+    const y = +d.slice(0, 4), mo = +d.slice(5, 7);
+    const yy = (aligned[id][y] ||= {});
+    const c = (yy[mo] ||= { A: 0, V: 0, TA: 0, TAV: 0, N20: 0, S: 0 });
+    const o = get(id, d);
+    if (!missing.aqua.has(d) && !missing.snpp.has(d)) { c.A += o.aqua; c.V += o.snpp; }
+    if (!missing.aqua.has(d) && !missing.terra.has(d) && !missing.snpp.has(d)) { c.TA += o.aqua + o.terra; c.TAV += o.snpp; }
+    if (d >= N20_FIT_START && !missing.n20.has(d) && !missing.snpp.has(d)) { c.N20 += o.n20; c.S += o.snpp; }
+  }
+}
+const sumYears = (id, years, fa, fb) => { let a = 0, b = 0; for (const y of years) for (const mo in aligned[id][y] || {}) { a += aligned[id][y][mo][fa]; b += aligned[id][y][mo][fb]; } return b > 0 ? a / b : null; };
+const FITY = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020], DRIFTY = [2021, 2022, 2023, 2024, 2025];
+function evaluate(testYears, factorFor, num = "V", den = "A") {
+  const ann = [], mon = [], peak = [], peak1 = [];
+  for (const id of regionIdsV) for (const y of testYears) {
+    const k = factorFor(id, y);
+    if (k == null) continue;
+    const mm = aligned[id][y] || {};
+    let P = 0, V = 0; const pm = [], vm = [];
+    for (let mo = 1; mo <= 12; mo++) {
+      const c = mm[mo] || { [num]: 0, [den]: 0 };
+      const p = c[den] * k, v = c[num];
+      P += p; V += v; pm.push(p); vm.push(v);
+      if (v >= 20) mon.push(Math.abs(p - v) / v);
+    }
+    if (V >= 100) {
+      ann.push(Math.abs(P - V) / V);
+      const ap = pm.indexOf(Math.max(...pm)), av = vm.indexOf(Math.max(...vm));
+      peak.push(ap === av ? 1 : 0);
+      peak1.push(Math.min(Math.abs(ap - av), 12 - Math.abs(ap - av)) <= 1 ? 1 : 0);
+    }
+  }
+  const pct = (x) => (x == null ? null : Math.round(x * 1000) / 10);
+  return { annualMedianAbsPctError: pct(median(ann)), monthlyMedianAbsPctError: pct(median(mon)), peakMonthSame: pct(peak.length ? peak.reduce((a, b) => a + b) / peak.length : null), peakMonthWithinOne: pct(peak1.length ? peak1.reduce((a, b) => a + b) / peak1.length : null), regionYears: ann.length, months: mon.length };
+}
+const loyo = (id, y) => sumYears(id, FITY.filter((x) => x !== y), "V", "A");
+const loyoNat = (id, y) => sumYears("ph", FITY.filter((x) => x !== y), "V", "A");
+const full = (id) => sumYears(id, FITY, "V", "A");
+const validation = {
+  rules: "Region x month, days with data from both satellites only. Annual errors over region-years with >= 100 VIIRS hotspots; monthly errors over months with >= 20.",
+  T1_leaveOneYearOut_2012_2020: { harmonised: evaluate(FITY, loyo), baselineRawAqua: evaluate(FITY, () => 1), baselineOneNationalFactor: evaluate(FITY, loyoNat) },
+  T2_driftYears_2021_2025: { harmonised: evaluate(DRIFTY, (id) => full(id)), baselineRawAqua: evaluate(DRIFTY, () => 1), baselineOneNationalFactor: evaluate(DRIFTY, () => full("ph")) },
+  comparison_TerraPlusAqua_T1: evaluate(FITY, (id, y) => sumYears(id, FITY.filter((x) => x !== y), "TAV", "TA"), "TAV", "TA"),
+  M4_viirsContinuity_noaa20_vs_snpp_2018_2025: evaluate([2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], (id, y) => sumYears(id, [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025].filter((x) => x !== y), "S", "N20"), "S", "N20"),
+};
+fs.writeFileSync(path.join(OUT, "validation.json"), JSON.stringify(validation, null, 1));
+console.log("validation", JSON.stringify(validation, null, 1));
+
+console.log("factors ph", factors.ph, "\nstats", stats, "\nlastDate", lastDate, "\nprovinces without parent", provinces.filter((p) => !p.parent).map((p) => p.name));
