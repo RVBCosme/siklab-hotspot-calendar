@@ -23,6 +23,8 @@ const fmt = d3.format(",.0f");
 const T1 = v.T1_leaveOneYearOut_2012_2020;
 ```
 
+<p class="deck-help"><a href="./siklab-demo-slides.pdf" download>Download these 7 slides as a PDF</a> · Arrow keys move between slides.</p>
+
 <div class="slide title-slide">
   <p class="kicker">NASA Space Apps Challenge 2026 · Harmonization of MODIS and VIIRS Hot Spots · Manila</p>
   <h1>One fire calendar for the Philippines, whichever satellite saw the fire</h1>
@@ -130,6 +132,7 @@ addEventListener("keydown", (e) => {
 .bignums { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 1rem; font-size: 1.1rem; }
 .bignums span { display: block; font-size: 2.6rem; font-weight: 700; color: #d7301f; }
 .future { font-size: 1.4rem; line-height: 1.8; }
+.deck-help { width: min(100%, 1000px); margin: 0 auto 1rem; font-size: 0.95rem; max-width: none; }
 .ai-note { position: absolute; left: 2.5rem; bottom: 0.6rem; font-size: 0.8rem; color: var(--theme-foreground-muted); max-width: 80%; }
 /* Print or "Save as PDF": one slide per 16:9 page. */
 @page { size: 1000px 563px; margin: 0; }
