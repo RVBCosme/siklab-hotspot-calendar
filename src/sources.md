@@ -10,6 +10,7 @@ title: Sources and credits
 |---|---|---|
 | NASA FIRMS, MODIS Collection 6.1 active fire hotspots (Terra and Aqua) | Yearly standard-quality files for the Philippines, 2000–2025. Aqua 2003 onward enters the calendar; Terra is used only in a comparison test | https://firms.modaps.eosdis.nasa.gov/country/ |
 | NASA FIRMS, VIIRS 375 m active fire hotspots (Suomi NPP and NOAA-20) | Yearly standard-quality files for the Philippines: Suomi NPP 2012–2025, NOAA-20 2018–2025 | https://firms.modaps.eosdis.nasa.gov/country/ |
+| NASA FIRMS area API, 2026 | MODIS (MODIS_SP, MODIS_NRT) and VIIRS Suomi NPP and NOAA-20 (VIIRS_SNPP_SP/NRT, VIIRS_NOAA20_SP/NRT) for a rectangle around the Philippines, 1 January 2026 to the latest day; standard quality where available, near real time after | https://firms.modaps.eosdis.nasa.gov/api/area/ (free map key) |
 | NASA FIRMS missing-data table | Days each satellite delivered no data | https://firms.modaps.eosdis.nasa.gov/api/missing_data/ |
 | NASA GIBS (Global Imagery Browse Services): Blue Marble shaded relief and bathymetry, and 15 m coastlines | Base map for the custom-area map | https://gibs.earthdata.nasa.gov/ |
 

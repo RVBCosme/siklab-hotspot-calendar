@@ -40,7 +40,7 @@ async function get(url, label) {
 const avail = await get(`${BASE}/data_availability/csv/${KEY}/ALL`, "data_availability");
 if (!/^data_id/i.test(avail.trim())) { console.error("Unexpected answer from data_availability (is the key valid?):", avail.slice(0, 120).replace(KEY, "<key>")); process.exit(1); }
 const range = Object.fromEntries(avail.trim().split(/\r?\n/).slice(1).map((l) => { const [id, min, max] = l.split(","); return [id, { min, max }]; }));
-for (const id of ["VIIRS_SNPP_SP", "VIIRS_SNPP_NRT", "VIIRS_NOAA20_SP", "VIIRS_NOAA20_NRT"]) console.log(id, range[id] ? `${range[id].min} .. ${range[id].max}` : "not listed");
+for (const id of ["VIIRS_SNPP_SP", "VIIRS_SNPP_NRT", "VIIRS_NOAA20_SP", "VIIRS_NOAA20_NRT", "MODIS_SP", "MODIS_NRT"]) console.log(id, range[id] ? `${range[id].min} .. ${range[id].max}` : "not listed");
 
 // 2. Plan: standard quality (SP) where it exists, near real time (NRT) after it, with no overlap.
 function plan(spId, nrtId, end) {
@@ -50,7 +50,7 @@ function plan(spId, nrtId, end) {
   for (let d = addDays(spMax, 1); d <= end; d = addDays(d, 5)) out.push({ source: nrtId, date: d, days: Math.min(5, 1 + (new Date(end + "T00:00:00Z") - new Date(d + "T00:00:00Z")) / 864e5) });
   return out;
 }
-const jobs = [...plan("VIIRS_SNPP_SP", "VIIRS_SNPP_NRT", SNPP_END < today ? SNPP_END : today), ...plan("VIIRS_NOAA20_SP", "VIIRS_NOAA20_NRT", today)];
+const jobs = [...plan("VIIRS_SNPP_SP", "VIIRS_SNPP_NRT", SNPP_END < today ? SNPP_END : today), ...plan("VIIRS_NOAA20_SP", "VIIRS_NOAA20_NRT", today), ...plan("MODIS_SP", "MODIS_NRT", today)];
 console.log(`${jobs.length} requests`);
 
 // 3. Fetch, one file per request; skip files already fetched (re-runs are cheap).

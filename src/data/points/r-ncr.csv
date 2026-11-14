@@ -1323,3 +1323,59 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2025-11-15,1730,14.70669,121.01058,Suomi NPP (VIIRS),n,1.12,2,p-ncr-third-district,1
 2025-12-12,1725,14.70771,121.01073,Suomi NPP (VIIRS),n,0.51,2,p-ncr-third-district,1
 2025-12-26,1803,14.70734,121.01208,Suomi NPP (VIIRS),n,0.59,2,p-ncr-third-district,1
+2026-01-03,1713,14.67031,120.98182,Suomi NPP (VIIRS),n,2.04,0,p-ncr-third-district,1
+2026-01-03,1713,14.67153,120.98474,Suomi NPP (VIIRS),n,1.57,0,p-ncr-third-district,1
+2026-01-28,512,14.43112,121.04248,Suomi NPP (VIIRS),n,1.83,0,p-ncr-fourth-district,1
+2026-02-24,1739,14.69657,121.05054,Suomi NPP (VIIRS),n,0.47,0,p-ncr-second-district,1
+2026-03-01,513,14.4859,121.0523,Suomi NPP (VIIRS),n,1.84,0,p-ncr-fourth-district,1
+2026-03-05,1810,14.70909,121.01006,Suomi NPP (VIIRS),n,0.5,2,p-ncr-third-district,1
+2026-03-06,519,14.71557,120.97182,Suomi NPP (VIIRS),n,3.93,0,p-ncr-third-district,1
+2026-03-06,1752,14.63915,121.04243,Suomi NPP (VIIRS),n,3.2,0,p-ncr-second-district,1
+2026-03-10,1657,14.3839,121.01979,NOAA-20 (VIIRS),n,0.62,0,p-ncr-fourth-district,0.999
+2026-03-13,1720,14.7097,121.01241,Suomi NPP (VIIRS),n,0.4,2,p-ncr-third-district,1
+2026-03-13,1720,14.70978,121.00983,Suomi NPP (VIIRS),n,0.79,2,p-ncr-third-district,1
+2026-03-17,1745,14.46682,121.05221,Suomi NPP (VIIRS),n,1.2,0,p-ncr-fourth-district,1
+2026-03-17,1745,14.70823,121.01247,Suomi NPP (VIIRS),n,0.36,2,p-ncr-third-district,1
+2026-03-22,1752,14.708,121.01232,Suomi NPP (VIIRS),n,0.36,2,p-ncr-third-district,1
+2026-03-24,1714,14.7069,121.01131,Suomi NPP (VIIRS),n,0.42,2,p-ncr-third-district,1
+2026-03-26,544,14.35723,121.0153,Suomi NPP (VIIRS),n,5.63,0,p-ncr-fourth-district,1
+2026-03-26,544,14.35779,121.01983,Suomi NPP (VIIRS),n,5.63,0,p-ncr-fourth-district,1
+2026-04-03,455,14.44445,121.04637,Suomi NPP (VIIRS),n,7.75,0,p-ncr-fourth-district,1
+2026-04-03,455,14.6045,121.09664,Suomi NPP (VIIRS),n,2.86,0,p-ncr-second-district,1
+2026-04-03,455,14.74728,120.99452,Suomi NPP (VIIRS),n,3.08,0,p-ncr-third-district,1
+2026-04-06,1811,14.70685,121.01103,Suomi NPP (VIIRS),n,0.54,2,p-ncr-third-district,1
+2026-04-17,1806,14.70862,121.01181,Suomi NPP (VIIRS),n,1.11,2,p-ncr-third-district,1
+2026-04-23,521,14.73271,121.0451,Suomi NPP (VIIRS),n,5.68,0,p-ncr-second-district,1
+2026-04-23,1753,14.69943,121.04839,Suomi NPP (VIIRS),n,1.17,0,p-ncr-second-district,1
+2026-04-30,1741,14.70925,121.01144,NOAA-20 (VIIRS),n,1.14,2,p-ncr-third-district,0.999
+2026-05-01,450,14.58287,121.01703,NOAA-20 (VIIRS),n,3.49,0,p-ncr-city-of-manila-first-district,0.999
+2026-05-02,1704,14.71064,121.01057,NOAA-20 (VIIRS),n,1.42,2,p-ncr-third-district,0.999
+2026-05-06,1729,14.46805,121.0252,NOAA-20 (VIIRS),n,20.17,0,p-ncr-fourth-district,0.999
+2026-05-06,1729,14.47137,121.02573,NOAA-20 (VIIRS),n,20.17,0,p-ncr-fourth-district,0.999
+2026-05-15,528,14.75594,120.99397,NOAA-20 (VIIRS),n,2.68,0,p-ncr-third-district,0.999
+2026-05-17,1723,14.5352,121.10265,NOAA-20 (VIIRS),n,0.8,0,p-ncr-second-district,0.999
+2026-05-17,1723,14.53578,121.09871,NOAA-20 (VIIRS),n,0.8,0,p-ncr-fourth-district,0.999
+2026-05-22,1729,14.7082,121.01106,NOAA-20 (VIIRS),n,0.91,2,p-ncr-third-district,0.999
+2026-05-25,540,14.36929,121.01456,NOAA-20 (VIIRS),n,3.19,0,p-ncr-fourth-district,0.999
+2026-05-25,540,14.36985,121.01904,NOAA-20 (VIIRS),n,3.19,0,p-ncr-fourth-district,0.999
+2026-05-25,540,14.37371,121.01403,NOAA-20 (VIIRS),n,3.44,0,p-ncr-fourth-district,0.999
+2026-05-25,540,14.37428,121.01851,NOAA-20 (VIIRS),n,3.44,0,p-ncr-fourth-district,0.999
+2026-05-26,522,14.70894,121.01196,NOAA-20 (VIIRS),n,3.39,2,p-ncr-third-district,0.999
+2026-05-28,1717,14.71049,121.01079,NOAA-20 (VIIRS),n,2.59,2,p-ncr-third-district,0.999
+2026-06-10,1755,14.70647,121.01157,Suomi NPP (VIIRS),n,0.58,2,p-ncr-third-district,1
+2026-06-11,1736,14.70731,121.01099,Suomi NPP (VIIRS),n,0.58,2,p-ncr-third-district,1
+2026-06-16,1743,14.70709,121.01106,Suomi NPP (VIIRS),n,0.36,2,p-ncr-third-district,1
+2026-06-25,1814,14.70834,121.00932,Suomi NPP (VIIRS),n,0.64,2,p-ncr-third-district,1
+2026-06-28,1718,14.70744,121.01061,Suomi NPP (VIIRS),n,1.99,2,p-ncr-third-district,1
+2026-07-08,1731,14.70947,121.01234,Suomi NPP (VIIRS),n,0.57,2,p-ncr-third-district,1
+2026-07-17,530,14.47176,121.04569,Suomi NPP (VIIRS),n,3.55,0,p-ncr-fourth-district,1
+2026-07-19,1725,14.70949,121.01305,Suomi NPP (VIIRS),n,0.93,2,p-ncr-third-district,1
+2026-08-20,1726,14.70809,121.01153,Suomi NPP (VIIRS),n,1.76,,p-ncr-third-district,1
+2026-09-14,525,14.74715,120.99409,Suomi NPP (VIIRS),n,3.3,,p-ncr-third-district,1
+2026-09-14,1758,14.7063,121.01266,Suomi NPP (VIIRS),n,1.62,,p-ncr-third-district,1
+2026-09-15,1737,14.70867,121.01311,Suomi NPP (VIIRS),n,0.5,,p-ncr-third-district,1
+2026-09-25,1752,14.4631,121.01839,Suomi NPP (VIIRS),n,2.08,,p-ncr-fourth-district,1
+2026-09-25,1752,14.46656,121.01901,Suomi NPP (VIIRS),n,1.27,,p-ncr-fourth-district,1
+2026-10-16,525,14.70788,121.01188,Suomi NPP (VIIRS),n,1.5,,p-ncr-third-district,1
+2026-10-22,512,14.48525,121.05143,Suomi NPP (VIIRS),n,3.54,,p-ncr-fourth-district,1
+2026-10-26,1811,14.70814,121.01284,Suomi NPP (VIIRS),n,0.46,,p-ncr-third-district,1

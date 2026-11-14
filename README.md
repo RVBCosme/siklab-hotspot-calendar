@@ -19,6 +19,8 @@ npm ci
 #    https://firms.modaps.eosdis.nasa.gov/api/missing_data/?action=fetch_data
 # 3. Download geoBoundaries PHL ADM1 and ADM2 simplified GeoJSON to data/raw/geoboundaries/
 #    (PHL-ADM1_simplified.geojson, PHL-ADM2_simplified.geojson), release 41af8f1
+# 4. Optional, for 2026: put FIRMS_MAP_KEY=<your free FIRMS map key> in .env (git-ignored), then
+node pipeline/fetch-2026.mjs   # FIRMS area API, 1 Jan 2026 to today; the key is never printed
 npm run data     # builds src/data/*  (about one minute)
 npm run build    # builds the static site into dist/
 ```

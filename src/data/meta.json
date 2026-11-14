@@ -1,6 +1,6 @@
 {
- "builtAt": "2026-11-14T05:14:18.182Z",
- "lastDate": "2025-12-31",
+ "builtAt": "2026-11-14T06:37:28.763Z",
+ "lastDate": "2026-11-13",
  "recordStart": "2003-01",
  "viirsStart": "2012-02",
  "fit": [
@@ -12,20 +12,20 @@
   "2025-12-31"
  ],
  "stats": {
-  "read": 770186,
-  "kept": 692785,
-  "droppedType": 17337,
-  "droppedLowConf": 60058,
-  "outsideRegions": 6,
+  "read": 849386,
+  "kept": 759289,
+  "droppedType": 21016,
+  "droppedLowConf": 66533,
+  "outsideRegions": 2315,
   "snappedOrOutsideProvince": 0,
   "bySensor": {
-   "terra": 39484,
-   "aqua": 76431,
-   "n20": 190158,
-   "snpp": 386712
+   "terra": 41181,
+   "aqua": 79070,
+   "n20": 222101,
+   "snpp": 416937
   },
-  "droppedNearVolcano": 0,
-  "api": 0
+  "droppedNearVolcano": 233,
+  "api": 75288
  },
  "factors": {
   "ph": {

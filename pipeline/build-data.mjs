@@ -181,7 +181,8 @@ provinces.forEach((p, i) => {
 // ---------- per-area daily series ----------
 const areaIds = ["ph", ...regions.map((r) => r.id), ...provinces.map((p) => p.id)];
 const allDates = [...new Set([...daily.keys()].map((k) => k.split("|")[1]))].sort();
-const lastDate = allDates[allDates.length - 1];
+// The record ends on the last day with VIIRS data: VIIRS is the reference scale, and MODIS can run a day ahead.
+const lastDate = allDates.filter((d) => { const o = daily.get("ph|" + d); return o && o.snpp + o.n20 > 0; }).pop();
 function dayRange(a, b) {
   const out = [];
   for (let d = new Date(a + "T00:00:00Z"); d <= new Date(b + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + 1)) out.push(d.toISOString().slice(0, 10));
