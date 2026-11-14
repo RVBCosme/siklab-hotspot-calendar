@@ -53,6 +53,35 @@ The tests and thresholds below were written into the code before the first run, 
 - After 2021, when the MODIS satellites drifted, the error doubles, and one national factor does slightly better than per-region factors. Before February 2012 the calendar uses MODIS, and those years fall before the drift.
 - Pooling Terra with Aqua gave a slightly lower error in the held-out test (${pc(v.comparison_TerraPlusAqua_T1.annualMedianAbsPctError)} against ${pc(T1.harmonised.annualMedianAbsPctError)} for annual totals). We kept Aqua alone, as decided before the run, and record this as an open question.
 
+## Check against fire seasons reported on the ground
+
+A second, independent check: do seasons that local news reported as bad fire seasons stand out in the calendar? The three below are every Cordillera fire surge our research found a published report of, with a place and a period; none was left out. Season totals and ranks are computed live from the calendar's data, over the full years 2003–2025.
+
+```js
+const monthly = FileAttachment("data/monthly.csv").csv();
+```
+
+```js
+function seasonRank(areaId, months, year) {
+  const by = d3.rollup(monthly.filter((d) => d.area_id === areaId && months.includes(+d.month.slice(5, 7))), (v) => d3.sum(v, (d) => +d.hotspots_harmonised), (d) => +d.month.slice(0, 4));
+  const fullYears = [...by.keys()].filter((y) => y <= 2025);
+  const sorted = fullYears.map((y) => by.get(y)).sort((a, b) => b - a);
+  const v = by.get(year);
+  return {value: v, rank: 1 + sorted.filter((x) => x > v).length, of: sorted.length, ratio: v / d3.median(sorted), sensor: year < 2012 ? "MODIS Aqua, converted" : "VIIRS"};
+}
+const checks = [
+  {report: "At least 2,310 ha burned in Benguet, January–May 2010, most of it in Kabayan in February–March", source: "Northern Philippine Times, Sept 2010", url: "https://northphiltimes.blogspot.com/2010/09/forest-fires-hit-2310-hectares-in.html", area: "p-benguet", areaName: "Benguet", months: [1, 2, 3, 4, 5], label: "Jan–May", year: 2010},
+  {report: "165 fire incidents in the Cordillera, 1 January–12 March 2019", source: "PTV News, March 2019", url: "https://ptvnews.ph/cordillera-records-165-fires-in-less-than-3-months/", area: "r-car", areaName: "CAR", months: [1, 2, 3], label: "Jan–Mar", year: 2019},
+  {report: "161 fires in the Cordillera, 1 January–29 February 2024 (read once, not re-checked)", source: "Rappler and Inquirer, 2024", url: "https://www.rappler.com/philippines/luzon/cordillera-faces-crisis-alarming-spike-wildfires/", area: "r-car", areaName: "CAR", months: [1, 2], label: "Jan–Feb", year: 2024}
+].map((c) => ({...c, ...seasonRank(c.area, c.months, c.year)}));
+display(html`<table>
+  <thead><tr><th>What was reported</th><th>Area and season in the calendar</th><th>Hotspots (VIIRS scale)</th><th>Rank since 2003</th><th>Against the median season</th><th>Record used</th></tr></thead>
+  <tbody>${checks.map((c) => html`<tr><td>${c.report} (<a href=${c.url}>${c.source}</a>)</td><td>${c.areaName}, ${c.label} ${c.year}</td><td>${d3.format(",.0f")(c.value)}</td><td><b>${c.rank} of ${c.of}</b></td><td>${c.ratio.toFixed(1)}×</td><td>${c.sensor}</td></tr>`)}</tbody>
+</table>`);
+```
+
+In Benguet the three worst January–May seasons since 2003 are 2010, 2024 and 2019, the three surges named in local reports, although 2010 comes from converted MODIS and the other two from VIIRS. This is a check on three events, not a statistical test, and all three were El Niño years, when clearer skies also let satellites see more.
+
 ## Limits
 
 - **A hotspot is not a fire.** One fire can make many hotspots, and small or short fires, or fires under cloud, make none. The counts compare like with like across years; they are not a count of fires or of area burned.
