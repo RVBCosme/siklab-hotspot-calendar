@@ -2,7 +2,7 @@
 title: Sources and credits
 ---
 
-<!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README and logs/. -->
+<!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README. -->
 
 # Sources, licences and AI use
 
@@ -45,7 +45,7 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 
 | Tool | What it did | What a person checked |
 |---|---|---|
-| Claude Code (Anthropic, Claude Opus 5.5) | Before the hackathon: research and fact-checking on the challenge, the data and the rules; on 11 November it also read the first and last few hundred bytes of three 2025 Philippine FIRMS files to learn their column format (see the note below). During the hackathon: read the guides and the forum, downloaded the FIRMS files, wrote the data pipeline (pipeline/build-data.mjs), the validation tests and this web application's code, drafted text on these pages, and took the screenshots of this application used in the demo (screenshots of the real pages, not generated images) | The Team Owner made each open decision (which MODIS satellite to convert, Metro Manila's factor, how the data is kept current, the project name, the disclosure below) and pushed the changes to the public repository. The numbers were checked with recounts run by the AI assistant, recorded in the repository's `logs/checks-track-c.md` |
+| Claude Code (Anthropic) | Before the hackathon: research and fact-checking on the challenge, the data and the rules; on 11 November it also read the first and last few hundred bytes of three 2025 Philippine FIRMS files to learn their column format (see the note below). During the hackathon: read the guides and the forum, downloaded the FIRMS files, wrote the data pipeline (pipeline/build-data.mjs), the validation tests and this web application's code, drafted text on these pages, and took the screenshots of this application used in the demo (screenshots of the real pages, not generated images) | The Team Owner made each open decision (which MODIS satellite to convert, Metro Manila's factor, how the data is kept current, the project name, the disclosure below) and pushed the changes to the public repository. The numbers were checked with recounts run by the AI assistant; the tests and their results are on the method page |
 
 The code and the data files in this repository were written or generated with AI assistance, as stated above and in the repository's README. No AI-generated images, video or audio are used.
 
