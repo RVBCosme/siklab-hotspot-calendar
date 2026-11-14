@@ -3,8 +3,9 @@
 // Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const DIST = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..", "dist");
+const DIST = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "dist");
 let n = 0;
 for (const f of fs.readdirSync(DIST).filter((f) => f.endsWith(".html"))) {
   const p = path.join(DIST, f);

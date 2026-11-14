@@ -4,8 +4,9 @@
 // Written with an AI assistant (Claude Code) during the hackathon, 14 Nov 2026; see README.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "data", "raw", "firms_api");
 fs.mkdirSync(OUT, { recursive: true });
 
