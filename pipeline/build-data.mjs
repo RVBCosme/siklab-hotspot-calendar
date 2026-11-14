@@ -2,7 +2,7 @@
 // Written with an AI assistant (Claude Code) during the hackathon, 14 Nov 2026; see logs/ai-use-track-a.md.
 // Run: node pipeline/build-data.mjs   (no dependencies; Node 18+)
 //
-// Rules (fixed before the first run; see the build plan, section 8 and 11):
+// Rules (fixed before the first run; the validation rules are written out above the validation code at the end of this file):
 // - Keep FIRMS type 0 (presumed vegetation fire) and 2 (other static land source); drop 1 (active volcano) and 3 (offshore).
 // - Drop low confidence: MODIS confidence < 30, VIIRS confidence "l".
 // - Reference scale: VIIRS Suomi NPP. MODIS Aqua (same ~13:30/01:30 pass) is converted with a factor per region,
@@ -277,6 +277,8 @@ for (const p of keepPoints) {
   else if (p.sat === "n20") { use = !snppDay(p.date) && p.date >= "2018-04-01" && !missing.n20.has(p.date); weight = factors[rid].f ?? factors.ph.f; }
   if (!use) continue;
   const satName = { aqua: "Aqua (MODIS)", snpp: "Suomi NPP (VIIRS)", n20: "NOAA-20 (VIIRS)" }[p.sat];
+  stats.pointsInFiles = (stats.pointsInFiles || 0) + 1;
+  if (p.pi >= 0 && provinces[p.pi].parent !== rid) stats.pointsRegionNotProvinceParent = (stats.pointsRegionNotProvinceParent || 0) + 1;
   byRegion.get(p.ri).push([p.date, p.time, p.lat, p.lon, satName, p.conf, p.frp, p.type, p.pi >= 0 ? provinces[p.pi].id : "", Math.round(weight * 1000) / 1000]);
 }
 const PHEAD = "date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id,weight_viirs_equivalent\n";
@@ -289,7 +291,7 @@ for (const [ri, rows] of byRegion) {
 const areas = [
   { id: "ph", name: "Philippines (all regions)", level: "country", parent: null, k: factors.ph.k, f: factors.ph.f },
   ...regions.map((r) => ({ id: r.id, name: r.name === "ARMM" ? "BARMM (ARMM in the 2020 boundaries)" : r.name, level: "region", parent: "ph", k: factors[r.id].k, f: factors[r.id].f, bbox: r.bbox })),
-  ...provinces.map((p) => ({ id: p.id, name: p.name, level: "province", parent: p.parent, k: kOf(p.id), f: fOf(p.id), bbox: p.bbox })),
+  ...provinces.map((p) => ({ id: p.id, name: p.name === "Compostela Valley" ? "Davao de Oro (Compostela Valley in the 2020 boundaries)" : p.name, level: "province", parent: p.parent, k: kOf(p.id), f: fOf(p.id), bbox: p.bbox })),
 ];
 fs.writeFileSync(path.join(OUT, "areas.json"), JSON.stringify(areas));
 fs.writeFileSync(

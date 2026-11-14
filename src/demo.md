@@ -16,7 +16,6 @@ const meta = FileAttachment("data/meta.json").json();
 ```
 
 ```js
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const rows = monthlyRaw.map((d) => ({id: d.area_id, month: d.month, year: +d.month.slice(0, 4), m: +d.month.slice(5, 7), h: +d.hotspots_harmonised, aqua: +d.modis_aqua, snpp: +d.viirs_snpp}));
 const benguet = rows.filter((d) => d.id === "p-benguet");
 const ph = rows.filter((d) => d.id === "ph");
@@ -30,7 +29,7 @@ const T1 = v.T1_leaveOneYearOut_2012_2020;
 <div class="slide title-slide">
   <p class="kicker">NASA Space Apps Challenge 2026 · Harmonization of MODIS and VIIRS Hot Spots · Manila</p>
   <h1>One fire calendar for the Philippines, whichever satellite saw the fire</h1>
-  <p class="who">Team Siklab: Rene Vincent Cosme, Prince Zablan, Charles Derick Yu and Gerardo Razon</p>
+  <p class="who">Team Siklab: Rene Vincent Cosme, Prince Zablan, Charles Derick Yu and Gerardo Razon III</p>
   <p class="slide-no">1 / 7</p>
 </div>
 
@@ -51,13 +50,10 @@ display(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSize: "1
 
 <div class="slide">
   <h2>What we built: a harmonised burning activity calendar</h2>
-
-```js
-const cal = benguet.filter((d) => d.year <= 2025);
-display(Plot.plot({width: 900, height: 272, padding: 0.04, marginLeft: 40, style: {fontSize: "10px"}, x: {domain: d3.range(1, 13), tickFormat: (m) => MONTHS[m - 1], axis: "top", label: null}, y: {domain: [...new Set(cal.map((d) => String(d.year)))].reverse(), label: null}, color: {type: "sqrt", scheme: "YlOrRd", legend: true, label: "Hotspots (VIIRS scale)"}, marks: [Plot.cell(cal, {x: "m", y: (d) => String(d.year), fill: "h", inset: 0.5})]}));
-```
-
-  <p class="say">Benguet, 2003–2025, one cell per month. Pick any of 17 regions or 87 province-level areas, or draw a box on a NASA map, and any period; download the numbers, the hotspots and the image.</p>
+  <div class="shot">
+    <img src="./img/app-calendar.png" alt="Screenshot of the live web application: Benguet selected from January 2003 to November 2026, and its burning activity calendar with one cell per month">
+    <p class="say">The live app, with Benguet selected: one cell per month since 2003. Pick the whole country, any of 17 regions or 87 province-level areas, or draw a box on a NASA map, and any period; download the numbers, the hotspots, the calendar and the charts.</p>
+  </div>
   <p class="slide-no">3 / 7</p>
 </div>
 
@@ -131,6 +127,8 @@ addEventListener("keydown", (e) => {
 .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 1.2rem; }
 .steps > div { background: var(--theme-background); border-radius: 8px; padding: 1rem; }
 .steps b { display: block; font-size: 1.8rem; color: #d7301f; }
+.shot { display: grid; grid-template-columns: 1.45fr 1fr; gap: 1.2rem; align-items: center; }
+.shot img { width: 100%; border: 1px solid var(--theme-foreground-faintest); border-radius: 6px; }
 .bignums { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 1rem; font-size: 1.1rem; }
 .bignums span { display: block; font-size: 2.6rem; font-weight: 700; color: #d7301f; }
 .future { font-size: 1.4rem; line-height: 1.8; }

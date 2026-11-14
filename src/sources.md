@@ -44,7 +44,7 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 
 | Tool | What it did | What a person checked |
 |---|---|---|
-| Claude Code (Anthropic, Claude Opus 5.5) | Before the hackathon: research and fact-checking on the challenge, the data and the rules. During the hackathon: read the guides and the forum, downloaded the FIRMS files, wrote the data pipeline (pipeline/build-data.mjs), the validation tests and this web application's code, and drafted text on these pages | To be completed by the team |
+| Claude Code (Anthropic, Claude Opus 5.5) | Before the hackathon: research and fact-checking on the challenge, the data and the rules. During the hackathon: read the guides and the forum, downloaded the FIRMS files, wrote the data pipeline (pipeline/build-data.mjs), the validation tests and this web application's code, drafted text on these pages, and took the screenshots of this application used in the demo (screenshots of the real pages, not generated images) | To be completed by the team |
 
 The code and the data files in this repository were written or generated with AI assistance, as stated above and in the repository's README. No AI-generated images, video or audio are used.
 
