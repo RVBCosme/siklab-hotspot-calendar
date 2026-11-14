@@ -31,6 +31,10 @@ NASA's FIRMS archive holds two families of fire hotspots. MODIS, on the Terra an
 | 5. Keep VIIRS continuous | On days Suomi NPP has no data (NASA's missing-data table), NOAA-20 hotspots are used, scaled by f = Suomi NPP ÷ NOAA-20 over 2018–2025 (f = ${meta.factors.ph.f.toFixed(3)} nationally). | A missing day otherwise looks like a quiet day. |
 | 6. Count by month | Sum by calendar month, January 2003 onward. | Monthly counts show the fire season clearly; daily counts are too noisy. 2003 is the first full year with Aqua. |
 
+**Custom areas.** Every hotspot in the downloadable files carries a weight that puts it on the VIIRS scale: 1 for a VIIRS hotspot, the region's k for a MODIS Aqua hotspot, and f for a NOAA-20 hotspot used on a day Suomi NPP missed. A box drawn on the map gets its calendar by adding up the weights of the hotspots inside it, month by month, so it matches the region and province calendars exactly where they overlap.
+
+**Difference from the average.** The calendar can also be coloured by how far each month sits above or below the average of the same calendar month over every full year of the record, for the selected area.
+
 The approach follows the same family as the published GFED5 near-real-time method (Chen and others, 2026), which converts VIIRS detections with factors set by region from the years both sensors flew. Ours is simpler: one factor per region, applied to hotspot counts.
 
 ## How well it works

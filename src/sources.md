@@ -11,6 +11,7 @@ title: Sources and credits
 | NASA FIRMS, MODIS Collection 6.1 active fire hotspots (Terra and Aqua) | Yearly standard-quality files for the Philippines, 2000–2025. Aqua 2003 onward enters the calendar; Terra is used only in a comparison test | https://firms.modaps.eosdis.nasa.gov/country/ |
 | NASA FIRMS, VIIRS 375 m active fire hotspots (Suomi NPP and NOAA-20) | Yearly standard-quality files for the Philippines: Suomi NPP 2012–2025, NOAA-20 2018–2025 | https://firms.modaps.eosdis.nasa.gov/country/ |
 | NASA FIRMS missing-data table | Days each satellite delivered no data | https://firms.modaps.eosdis.nasa.gov/api/missing_data/ |
+| NASA GIBS (Global Imagery Browse Services): Blue Marble shaded relief and bathymetry, and 15 m coastlines | Base map for the custom-area map | https://gibs.earthdata.nasa.gov/ |
 
 We acknowledge the use of data and imagery from NASA's Fire Information for Resource Management System (FIRMS), https://www.earthdata.nasa.gov/data/tools/firms, part of NASA's Earth Science Data and Information System (ESDIS).
 
@@ -28,6 +29,8 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 |---|---|---|
 | Observable Framework 1.13.4 | Static site generator for this app | ISC |
 | Observable Plot, Observable Inputs, D3 (bundled with Framework) | Charts, controls, CSV handling | ISC |
+| Leaflet (bundled with Framework) | The custom-area map | BSD-2-Clause |
+| OpenStreetMap tiles (optional base map with place names) | Orientation on the custom-area map | Data © OpenStreetMap contributors, ODbL; tiles under the OSM tile usage policy |
 | Node.js | Runs the data pipeline | MIT |
 
 ## Use of AI (Super Intelligence) tools

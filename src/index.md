@@ -51,12 +51,14 @@ const monthly = monthlyRaw.map((d) => ({
 const byArea = d3.group(monthly, (d) => d.area_id);
 const allMonths = [...new Set(monthly.map((d) => d.month))].sort();
 const regionName = new Map(areas.map((a) => [a.id, a.name]));
+const CUSTOM = {id: "custom", name: "Custom area", level: "custom"};
 const areaOptions = [
   ...areas.filter((a) => a.level === "country"),
+  CUSTOM,
   ...areas.filter((a) => a.level === "region").sort((a, b) => d3.ascending(a.name, b.name)),
   ...areas.filter((a) => a.level === "province").sort((a, b) => d3.ascending(a.name, b.name))
 ];
-const label = (a) => (a.level === "province" ? `${a.name} (province, ${regionName.get(a.parent)})` : a.level === "region" ? `${a.name} (region)` : a.name);
+const label = (a) => (a.level === "custom" ? "Custom area: draw a box on the map or enter coordinates" : a.level === "province" ? `${a.name} (province, ${regionName.get(a.parent)})` : a.level === "region" ? `${a.name} (region)` : a.name);
 ```
 
 <div class="card controls">
@@ -65,24 +67,151 @@ const label = (a) => (a.level === "province" ? `${a.name} (province, ${regionNam
 const area = view(Inputs.select(areaOptions, {label: "Area", format: label, value: areaOptions[0]}));
 const fromMonth = view(Inputs.select(allMonths, {label: "From", value: allMonths[0]}));
 const toMonth = view(Inputs.select(allMonths, {label: "To", value: allMonths[allMonths.length - 1]}));
+const colourBy = view(Inputs.radio(["Number of hotspots", "Difference from the average for that month"], {label: "Colour by", value: "Number of hotspots"}));
+const ramp = view(Inputs.select(new Map([["Yellow–orange–red (ColorBrewer, colour-blind safe)", "ylorrd"], ["Viridis (colour-blind safe)", "viridis"]]), {label: "Colour ramp"}));
 ```
 
 </div>
 
 ```js
-const lo = fromMonth <= toMonth ? fromMonth : toMonth;
-const hi = fromMonth <= toMonth ? toMonth : fromMonth;
-const series = byArea.get(area.id) ?? [];
-const sel = series.filter((d) => d.month >= lo && d.month <= hi);
-const years = [...new Set(sel.map((d) => d.year))].sort((a, b) => b - a).map(String);
-const fmt = d3.format(",.0f");
+// Custom area: a box drawn on a NASA GIBS base map, or typed as coordinates.
+function areaPicker(initial) {
+  const GIBS = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best";
+  const root = html`<div class="picker card">
+    <div class="map"></div>
+    <div class="coords">
+      <label>West <input type="number" step="0.01" min="114" max="128" data-k="w"></label>
+      <label>South <input type="number" step="0.01" min="4" max="22" data-k="s"></label>
+      <label>East <input type="number" step="0.01" min="114" max="128" data-k="e"></label>
+      <label>North <input type="number" step="0.01" min="4" max="22" data-k="n"></label>
+      <button type="button" data-act="apply">Use these coordinates</button>
+      <button type="button" data-act="draw">Draw a box on the map</button>
+    </div>
+    <p class="hint picker-msg">Longitude and latitude in decimal degrees. Click "Draw a box", then click two opposite corners on the map.</p>
+  </div>`;
+  const mapDiv = root.querySelector(".map");
+  const msg = root.querySelector(".picker-msg");
+  const inputs = Object.fromEntries([...root.querySelectorAll("input")].map((i) => [i.dataset.k, i]));
+  for (const i of Object.values(inputs)) i.addEventListener("input", (e) => e.stopPropagation());
+  const map = L.map(mapDiv, {minZoom: 4, maxZoom: 10}).setView([12.5, 122], 5);
+  // NASA GIBS Blue Marble with coastlines by default; OpenStreetMap as an alternative for place names.
+  // (GIBS's label tiles are not transparent, so they are not used.)
+  const blueMarble = L.layerGroup([
+    L.tileLayer(`${GIBS}/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg`, {maxNativeZoom: 8, attribution: "Base map: NASA GIBS Blue Marble and coastlines"}),
+    L.tileLayer(`${GIBS}/Coastlines_15m/default/GoogleMapsCompatible_Level13/{z}/{y}/{x}.png`, {maxNativeZoom: 13, opacity: 0.6})
+  ]).addTo(map);
+  const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 10, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+  L.control.layers({"NASA Blue Marble": blueMarble, "OpenStreetMap (place names)": osm}, null, {collapsed: false}).addTo(map);
+  const points = L.layerGroup().addTo(map);
+  const rect = L.rectangle([[initial.s, initial.w], [initial.n, initial.e]], {color: "#ffd400", weight: 2, fill: false}).addTo(map);
+  const r3 = (x) => Math.round(x * 1000) / 1000;
+  function setBox(b, fit) {
+    if (![b.w, b.s, b.e, b.n].every(Number.isFinite)) { msg.textContent = "Enter four numbers."; return; }
+    b = {w: r3(Math.min(b.w, b.e)), e: r3(Math.max(b.w, b.e)), s: r3(Math.min(b.s, b.n)), n: r3(Math.max(b.s, b.n))};
+    if (b.e - b.w < 0.02 || b.n - b.s < 0.02) { msg.textContent = "The box is too small: make it at least 0.02° on each side."; return; }
+    if ((b.e - b.w) * (b.n - b.s) > 16) { msg.textContent = "The box is larger than 16 square degrees. For a whole region or the country, choose it from the Area list."; return; }
+    msg.textContent = `Box: west ${b.w}, south ${b.s}, east ${b.e}, north ${b.n}.`;
+    for (const k of ["w", "s", "e", "n"]) inputs[k].value = b[k];
+    rect.setBounds([[b.s, b.w], [b.n, b.e]]);
+    if (fit) map.fitBounds(rect.getBounds(), {padding: [30, 30], maxZoom: 9});
+    root.value = b;
+    root.dispatchEvent(new Event("input", {bubbles: true}));
+  }
+  let drawing = false, start = null, temp = null;
+  root.querySelector("[data-act=draw]").onclick = () => {
+    drawing = true;
+    start = null;
+    mapDiv.style.cursor = "crosshair";
+    msg.textContent = "Click one corner of the box on the map, then the opposite corner.";
+  };
+  root.querySelector("[data-act=apply]").onclick = () => setBox({w: +inputs.w.value, s: +inputs.s.value, e: +inputs.e.value, n: +inputs.n.value}, true);
+  map.on("click", (e) => {
+    if (!drawing) return;
+    if (!start) {
+      start = e.latlng;
+      temp = L.rectangle([start, start], {color: "#ffd400", weight: 1, dashArray: "4"}).addTo(map);
+      return;
+    }
+    const b = L.latLngBounds(start, e.latlng);
+    temp.remove();
+    drawing = false;
+    mapDiv.style.cursor = "";
+    setBox({w: b.getWest(), s: b.getSouth(), e: b.getEast(), n: b.getNorth()}, false);
+  });
+  map.on("mousemove", (e) => { if (drawing && start && temp) temp.setBounds(L.latLngBounds(start, e.latlng)); });
+  for (const k of ["w", "s", "e", "n"]) inputs[k].value = initial[k];
+  root.value = initial;
+  root.points = points;
+  // Leaflet needs the element on the page to know its size.
+  let fitted = false;
+  new ResizeObserver(() => { map.invalidateSize(); if (!fitted && mapDiv.clientWidth) { fitted = true; map.fitBounds(rect.getBounds(), {padding: [60, 60], maxZoom: 8}); } }).observe(mapDiv);
+  return root;
+}
+
+// Hotspot files are loaded once per region, only when needed.
+const pointCache = new Map();
+function regionRows(id) {
+  if (!pointCache.has(id)) {
+    pointCache.set(id, pointFiles[id].csv().then((rows) => {
+      for (const r of rows) { r.lat = +r.latitude; r.lon = +r.longitude; r.month = r.date.slice(0, 7); r.w = +r.weight_viirs_equivalent; r.region_id = id; }
+      return rows;
+    }));
+  }
+  return pointCache.get(id);
+}
+async function pointsInBox(b) {
+  const pad = 0.1;
+  const ids = areas.filter((a) => a.level === "region" && a.bbox[0] - pad <= b.e && a.bbox[2] + pad >= b.w && a.bbox[1] - pad <= b.n && a.bbox[3] + pad >= b.s).map((a) => a.id);
+  const parts = await Promise.all(ids.map(regionRows));
+  return parts.flat().filter((p) => p.lon >= b.w && p.lon <= b.e && p.lat >= b.s && p.lat <= b.n);
+}
 ```
 
-## Burning activity calendar: ${area.name}, ${lo} to ${hi}
-
-<p class="hint">Each cell is one month. Colour shows the number of hotspots on the VIIRS scale. Cells before February 2012 come from MODIS Aqua converted with this area's factor (k = ${area.k.toFixed(2)}); cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
+```js
+const picker = area.id === "custom" ? areaPicker({w: 120.4, s: 16.2, e: 121.0, n: 16.8}) : null;
+const box = picker ? view(picker) : null;
+```
 
 ```js
+const customPoints = box ? await pointsInBox(box) : null;
+```
+
+```js
+// On the custom map, show the hotspots of the selected period (a random sample if there are very many).
+if (picker && customPoints) {
+  picker.points.clearLayers();
+  const inRange = customPoints.filter((d) => d.month >= lo && d.month <= hi);
+  const shown = inRange.length > 12000 ? d3.shuffler(d3.randomLcg(1))(inRange.slice()).slice(0, 12000) : inRange;
+  const renderer = L.canvas();
+  for (const p of shown) L.circleMarker([p.lat, p.lon], {renderer, radius: 1.5, stroke: false, fillColor: p.month < "2012-02" ? "#fdae61" : "#ff3b1f", fillOpacity: 0.5}).addTo(picker.points);
+  display(html`<p class="hint">${fmt(inRange.length)} hotspots in this box from ${lo} to ${hi}${inRange.length > shown.length ? `; the map shows a random ${fmt(shown.length)} of them` : ""}. Light orange: MODIS Aqua (before February 2012); red: VIIRS.</p>`);
+}
+```
+
+```js
+const lo = fromMonth <= toMonth ? fromMonth : toMonth;
+const hi = fromMonth <= toMonth ? toMonth : fromMonth;
+const phSeries = byArea.get("ph");
+// A custom area's monthly record is the sum of its hotspots' weights (each hotspot already on the VIIRS scale).
+function customSeries(points) {
+  const sums = d3.rollup(points, (v) => d3.sum(v, (d) => d.w), (d) => d.month);
+  return phSeries.map((d) => ({...d, area_id: "custom", hotspots: Math.round((sums.get(d.month) ?? 0) * 10) / 10, modis_aqua: NaN, modis_terra: NaN, viirs_snpp: NaN, viirs_noaa20: NaN}));
+}
+const series = area.id === "custom" ? (customPoints ? customSeries(customPoints) : []) : byArea.get(area.id) ?? [];
+const isFullMonth = (d) => d.days === new Date(Date.UTC(d.year, d.m, 0)).getUTCDate();
+const monthMean = d3.rollup(series.filter(isFullMonth), (v) => d3.mean(v, (d) => d.hotspots), (d) => d.m);
+const sel = series.filter((d) => d.month >= lo && d.month <= hi).map((d) => ({...d, anomaly: Math.round((d.hotspots - monthMean.get(d.m)) * 10) / 10, partial: !isFullMonth(d)}));
+const years = [...new Set(sel.map((d) => d.year))].sort((a, b) => b - a).map(String);
+const fmt = d3.format(",.0f");
+const areaTitle = area.id === "custom" ? (box ? `custom area (W ${box.w}, S ${box.s}, E ${box.e}, N ${box.n})` : "custom area") : area.name;
+```
+
+## Burning activity calendar: ${areaTitle}, ${lo} to ${hi}
+
+<p class="hint">Each cell is one month. ${colourBy === "Number of hotspots" ? "Colour shows the number of hotspots on the VIIRS scale." : "Colour shows how far each month is above (red) or below (blue) the average for that calendar month over all full years of the record."} Cells before February 2012 come from MODIS Aqua converted with ${area.id === "custom" ? "the factor of the region each hotspot is in" : `this area's factor (k = ${area.k.toFixed(2)})`}; cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
+
+```js
+const byCount = colourBy === "Number of hotspots";
 function calendar(width) {
   return Plot.plot({
     width,
@@ -91,16 +220,19 @@ function calendar(width) {
     padding: 0.06,
     x: {domain: d3.range(1, 13), tickFormat: (m) => MONTHS[m - 1], label: null, axis: "top"},
     y: {domain: years, label: null},
-    color: {type: "sqrt", scheme: "YlOrRd", label: "Hotspots (VIIRS-equivalent)", legend: true, zero: true, ticks: 5, tickFormat: "~s", width: 360},
+    color: byCount
+      ? {type: "sqrt", scheme: ramp, label: "Hotspots (VIIRS-equivalent)", legend: true, zero: true, ticks: 5, tickFormat: "~s", width: 360}
+      : {type: "diverging-sqrt", scheme: "rdbu", reverse: true, pivot: 0, label: "Hotspots above (+) or below (−) the average for that month", legend: true, ticks: 5, tickFormat: "+~s", width: 360},
     marks: [
       Plot.cell(sel, {
         x: "m",
         y: (d) => String(d.year),
-        fill: "hotspots",
+        fill: byCount ? "hotspots" : "anomaly",
         inset: 0.5,
-        channels: {Month: "month", Source: "source", "Missing days": "gap_days"},
-        tip: {format: {x: false, y: false, fill: (v) => fmt(v)}}
+        channels: {Month: "month", Hotspots: "hotspots", "Difference from the month's average": "anomaly", Source: "source", "Missing days": "gap_days", "Month in progress": (d) => (d.partial ? "yes, partial" : "")},
+        tip: {format: {x: false, y: false, fill: false, Hotspots: (v) => fmt(v), "Difference from the month's average": (v) => d3.format("+,.0f")(v)}}
       }),
+      Plot.cell(sel.filter((d) => d.partial), {x: "m", y: (d) => String(d.year), inset: 0.5, stroke: "currentColor", strokeDasharray: "2,2", fill: "none"}),
       Plot.dot(sel.filter((d) => d.gap_days >= 7), {x: "m", y: (d) => String(d.year), r: 2.5, fill: "currentColor"})
     ]
   });
@@ -126,7 +258,7 @@ const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st",
   <div class="card">
     <h2>${MONTHS[endRow.m - 1]} ${endRow.year}${partial ? `, 1–${endRow.days} only` : ""}</h2>
     <span class="big">${fmt(endRow.hotspots)}</span>
-    <p>hotspots (VIIRS-equivalent) in ${area.name}${partial ? " so far this month" : ""}</p>
+    <p>hotspots (VIIRS-equivalent) in ${areaTitle}${partial ? " so far this month" : ""}</p>
   </div>
   <div class="card">
     <h2>Against the historical median</h2>
@@ -191,7 +323,8 @@ display(resize((width) => Plot.plot({
 ## What harmonisation changes
 
 ```js
-const overlap = sel.filter((d) => d.year >= 2010);
+if (area.id === "custom") display(html`<p class="hint">For a custom area the raw counts of each sensor are not kept; choose a region or province to see this chart.</p>`);
+const overlap = area.id === "custom" ? [] : sel.filter((d) => d.year >= 2010);
 const cmp = overlap.flatMap((d) => [
   {month: new Date(d.month + "-15"), value: d.modis_aqua, series: "MODIS Aqua, raw count"},
   {month: new Date(d.month + "-15"), value: d.modis_aqua * area.k, series: "MODIS Aqua × k (on the VIIRS scale)"},
@@ -234,20 +367,20 @@ function downloadButton(text, filename, makeBlob) {
   };
   return b;
 }
-const stem = `${area.id}_${lo}_${hi}`;
-const analyticsCsv = () => new Blob([d3.csvFormat(sel.map((d) => ({area: area.name, month: d.month, hotspots_viirs_equivalent: d.hotspots, source: d.source, missing_days: d.gap_days, modis_aqua_raw: d.modis_aqua, modis_terra_raw: d.modis_terra, viirs_snpp_raw: d.viirs_snpp, viirs_noaa20_raw: d.viirs_noaa20, factor_k: area.k})))], {type: "text/csv"});
+const stem = area.id === "custom" && box ? `custom_${box.w}_${box.s}_${box.e}_${box.n}_${lo}_${hi}` : `${area.id}_${lo}_${hi}`;
+const custom = area.id === "custom";
+const analyticsCsv = () => new Blob([d3.csvFormat(sel.map((d) => ({area: areaTitle, month: d.month, hotspots_viirs_equivalent: d.hotspots, difference_from_month_average: d.anomaly, source: d.source, missing_days: d.gap_days, month_in_progress: d.partial ? "yes" : "", modis_aqua_raw: custom ? "" : d.modis_aqua, modis_terra_raw: custom ? "" : d.modis_terra, viirs_snpp_raw: custom ? "" : d.viirs_snpp, viirs_noaa20_raw: custom ? "" : d.viirs_noaa20, factor_k: custom ? "per region" : area.k})))], {type: "text/csv"});
+const HOTSPOT_COLUMNS = ["date", "time_utc", "latitude", "longitude", "satellite", "confidence", "frp", "firms_type", "province_id", "region_id", "weight_viirs_equivalent"];
 async function hotspotCsv() {
-  const ids = area.level === "country" ? Object.keys(pointFiles) : [area.level === "region" ? area.id : area.parent];
-  const parts = [];
-  for (const id of ids) {
-    const rows = await pointFiles[id].csv();
-    for (const r of rows) {
-      if (r.date.slice(0, 7) < lo || r.date.slice(0, 7) > hi) continue;
-      if (area.level === "province" && r.province_id !== area.id) continue;
-      parts.push({...r, region_id: id});
-    }
+  let rows;
+  if (custom) rows = customPoints ?? [];
+  else {
+    const ids = area.level === "country" ? Object.keys(pointFiles) : [area.level === "region" ? area.id : area.parent];
+    rows = (await Promise.all(ids.map(regionRows))).flat();
+    if (area.level === "province") rows = rows.filter((r) => r.province_id === area.id);
   }
-  return new Blob([d3.csvFormat(parts)], {type: "text/csv"});
+  const parts = rows.filter((r) => r.month >= lo && r.month <= hi);
+  return new Blob([d3.csvFormat(parts, HOTSPOT_COLUMNS)], {type: "text/csv"});
 }
 const svgBlob = () => {
   // The figure holds the colour legend and the calendar; the calendar is the tallest SVG.
@@ -274,4 +407,9 @@ display(html`<div class="downloads">
 .controls form { margin-bottom: 0.4rem; }
 .downloads { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .dl { padding: 0.5rem 0.9rem; font: inherit; cursor: pointer; }
+.picker .map { height: 420px; border-radius: 6px; margin-bottom: 0.6rem; }
+.picker .coords { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; }
+.picker .coords input { width: 6.5rem; font: inherit; }
+.picker .coords button { font: inherit; padding: 0.35rem 0.7rem; cursor: pointer; }
+@media (max-width: 640px) { .picker .map { height: 320px; } .big { font-size: 1.8rem; } }
 </style>
