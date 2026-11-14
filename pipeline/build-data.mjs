@@ -107,8 +107,25 @@ function bump(areaId, date, s) {
   if (!o) daily.set(k, (o = { aqua: 0, terra: 0, snpp: 0, n20: 0 }));
   o[s]++;
 }
-for (const f of files) {
-  const lines = fs.readFileSync(path.join(RAW, "firms", f), "utf8").split(/\r?\n/);
+// 2026 comes from the FIRMS area API (pipeline/fetch-2026.mjs), read after the yearly files.
+// Near-real-time rows carry no `type`, so rows within ~2 km of a spot FIRMS flagged as an active volcano
+// in the standard-quality record are dropped instead.
+const API_DIR = path.join(RAW, "firms_api");
+const apiFiles = fs.existsSync(API_DIR) ? fs.readdirSync(API_DIR).filter((f) => f.endsWith(".csv")).sort() : [];
+const sources = [...files.map((f) => ({ dir: "firms", f, sat: null })), ...apiFiles.map((f) => ({ dir: "firms_api", f, sat: f.startsWith("VIIRS_SNPP") ? "snpp" : f.startsWith("VIIRS_NOAA20") ? "n20" : null }))];
+const VCELL = 0.02;
+const volcanoCells = new Set();
+const cellKey = (lat, lon) => Math.round(lat / VCELL) + "," + Math.round(lon / VCELL);
+const nearVolcano = (lat, lon) => {
+  const a = Math.round(lat / VCELL), b = Math.round(lon / VCELL);
+  for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) if (volcanoCells.has(a + i + "," + (b + j))) return true;
+  return false;
+};
+stats.droppedNearVolcano = 0;
+stats.api = 0;
+const seenApi = new Set();
+for (const { dir, f, sat: fileSat } of sources) {
+  const lines = fs.readFileSync(path.join(RAW, dir, f), "utf8").split(/\r?\n/);
   const head = lines[0].split(",");
   const ix = Object.fromEntries(head.map((h, i) => [h, i]));
   for (let li = 1; li < lines.length; li++) {
@@ -116,10 +133,20 @@ for (const f of files) {
     if (!line) continue;
     stats.read++;
     const c = line.split(",");
-    const type = c[ix.type];
+    const type = ix.type === undefined ? undefined : c[ix.type];
+    if (type === "1") volcanoCells.add(cellKey(Number(c[ix.latitude]), Number(c[ix.longitude])));
     if (type === "1" || type === "3") { stats.droppedType++; continue; }
-    const sat = SENSOR[c[ix.satellite]];
+    if (type === undefined && nearVolcano(Number(c[ix.latitude]), Number(c[ix.longitude]))) { stats.droppedNearVolcano++; continue; }
+    const sat = fileSat ?? SENSOR[c[ix.satellite]];
     if (!sat) continue;
+    if (dir === "firms_api") {
+      // The yearly files end on 31 Dec 2025; keep API rows from 2026 only, and drop exact duplicates.
+      if (c[ix.acq_date] < "2026-01-01") continue;
+      const k = sat + c[ix.acq_date] + c[ix.acq_time] + c[ix.latitude] + c[ix.longitude];
+      if (seenApi.has(k)) continue;
+      seenApi.add(k);
+      stats.api++;
+    }
     const conf = c[ix.confidence];
     if (sat === "aqua" || sat === "terra" ? Number(conf) < 30 : conf === "l") { stats.droppedLowConf++; continue; }
     const lat = Number(c[ix.latitude]), lon = Number(c[ix.longitude]);

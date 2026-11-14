@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-11-14T05:06:53.135Z",
+ "builtAt": "2026-11-14T05:14:18.182Z",
  "lastDate": "2025-12-31",
  "recordStart": "2003-01",
  "viirsStart": "2012-02",
@@ -23,7 +23,9 @@
    "aqua": 76431,
    "n20": 190158,
    "snpp": 386712
-  }
+  },
+  "droppedNearVolcano": 0,
+  "api": 0
  },
  "factors": {
   "ph": {
