@@ -640,6 +640,30 @@ display(html`<div class="downloads">
 
 <p class="hint">Data run from ${meta.recordStart} to ${meta.lastDate}. Designed for fire officers, land managers, emergency responders and researchers. It describes the past and does not forecast.</p>
 
+## Tell us what to fix
+
+<p class="hint">Found a mistake, something unclear, or something you need? Send it to the team as an issue on GitHub. It opens a short form that already links to the view you are looking at. You need a free GitHub account, and what you write is public, so leave out personal details.</p>
+
+```js
+// Feedback goes to the public repository as a GitHub issue, pre-filled with a link to the current view (read at click time).
+const ISSUES = "https://github.com/RVBCosme/siklab-hotspot-calendar/issues/new";
+const feedbackLink = html`<a class="feedback" href=${ISSUES} target="_blank" rel="noopener">Send feedback on GitHub (opens in a new tab)</a>`;
+feedbackLink.onclick = () => {
+  const body = `View I was looking at: ${location.href}
+
+What were you trying to do?
+
+
+What was wrong, unclear or missing?
+
+
+What would you use this for?
+`;
+  feedbackLink.href = `${ISSUES}?${new URLSearchParams({title: "Feedback: ", body})}`;
+};
+display(feedbackLink);
+```
+
 <style>
 .lede { font-size: 1.1rem; max-width: 60rem; }
 .hint { color: var(--theme-foreground-muted); font-size: 0.9rem; max-width: 60rem; }
@@ -661,6 +685,7 @@ display(html`<div class="downloads">
 .explain p { line-height: 1.6; }
 .plain { max-width: 60rem; font-size: 1.08rem; line-height: 1.6; border-left: 3px solid #d7301f; padding: 0.1rem 0 0.1rem 1rem; }
 .plain p { margin: 0.45rem 0; max-width: none; }
+.feedback { display: inline-block; margin: 0.2rem 0 1rem; font-weight: 600; }
 .share { margin-top: 0.5rem; padding: 0.35rem 0.8rem; font: inherit; cursor: pointer; }
 .map-grid { grid-auto-rows: auto; }
 .map-grid .card { margin: 0; min-height: 420px; }
