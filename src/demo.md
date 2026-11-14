@@ -28,7 +28,7 @@ const T1 = v.T1_leaveOneYearOut_2012_2020;
 <div class="slide title-slide">
   <p class="kicker">NASA Space Apps Challenge 2026 · Harmonization of MODIS and VIIRS Hot Spots · Manila</p>
   <h1>One fire calendar for the Philippines, whichever satellite saw the fire</h1>
-  <p class="who">Team Siklab: [team members' names]</p>
+  <p class="who">Team Siklab: Rene Vincent Cosme, Prince Zablan, Charles Derick Yu and Gerardo Razon</p>
   <p class="slide-no">1 / 7</p>
 </div>
 
