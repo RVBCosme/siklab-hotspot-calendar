@@ -1,5 +1,6 @@
 // After `observable build`: mark every page as English (<html lang="en">) for screen readers.
 // Observable Framework 1.13.4 writes a bare <html> tag and has no option for it.
+// Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README and logs/.
 import fs from "node:fs";
 import path from "node:path";
 

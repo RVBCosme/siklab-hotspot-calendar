@@ -2,6 +2,8 @@
 title: Calendar
 ---
 
+<!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README and logs/. -->
+
 # Philippine burning activity calendar
 
 <p class="lede">How many fire hotspots did satellites see, month by month since 2003, in a Philippine region or province? MODIS and VIIRS count fire very differently, so this calendar puts both on one scale: the sensor that saw a fire no longer changes the number you read.</p>
@@ -286,7 +288,7 @@ const profile = d3.range(1, 13).map((m) => {
   return {m, median: d3.median(v), q1: d3.quantile(v, 0.25), q3: d3.quantile(v, 0.75), max: d3.max(v)};
 });
 const endYearRows = sel.filter((d) => d.year === endRow.year);
-display(resize((width) => Plot.plot({
+const seasonFigure = display(resize((width) => Plot.plot({
   width,
   height: 260,
   x: {domain: d3.range(1, 13), tickFormat: (m) => MONTHS[m - 1], label: null},
@@ -310,7 +312,7 @@ display(resize((width) => Plot.plot({
 const yearly = d3.rollups(sel, (v) => ({total: d3.sum(v, (d) => d.hotspots), months: v.length, source: v[0].source.startsWith("MODIS") ? "MODIS Aqua, converted" : "VIIRS"}), (d) => d.year).map(([year, o]) => ({year, ...o}));
 const fullYears = yearly.filter((d) => d.months === 12);
 const yearMean = d3.mean(fullYears, (d) => d.total);
-display(resize((width) => Plot.plot({
+const yearsFigure = display(resize((width) => Plot.plot({
   width,
   height: 260,
   x: {label: null, tickFormat: "d", interval: 1},
@@ -340,7 +342,7 @@ const cmp = overlap.flatMap((d) => [
   {month: new Date(d.month + "-15"), value: nationalAquaK ? nationalAquaK.get(d.month) : d.modis_aqua * area.k, series: "MODIS Aqua × k (on the VIIRS scale)"},
   ...(d.year >= 2012 ? [{month: new Date(d.month + "-15"), value: d.viirs_snpp, series: "VIIRS Suomi NPP, raw count"}] : [])
 ]);
-display(resize((width) => Plot.plot({
+const harmonisationFigure = display(resize((width) => Plot.plot({
   width,
   height: 260,
   x: {label: null},
@@ -394,9 +396,9 @@ async function hotspotCsv() {
   const parts = rows.filter((r) => r.month >= lo && r.month <= hi);
   return new Blob([d3.csvFormat(parts, HOTSPOT_COLUMNS)], {type: "text/csv"});
 }
-const svgBlob = () => {
-  // The figure holds the colour legend and the calendar; the calendar is the tallest SVG.
-  const svg = [...calendarFigure.querySelectorAll("svg")].sort((x, y) => +y.getAttribute("height") - +x.getAttribute("height"))[0];
+const svgBlob = (figure) => () => {
+  // A figure may hold a colour legend and the chart; the chart is the tallest SVG.
+  const svg = [...figure.querySelectorAll("svg")].sort((x, y) => +y.getAttribute("height") - +x.getAttribute("height"))[0];
   const clone = svg.cloneNode(true);
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   return new Blob([new XMLSerializer().serializeToString(clone)], {type: "image/svg+xml"});
@@ -404,7 +406,10 @@ const svgBlob = () => {
 display(html`<div class="downloads">
   ${downloadButton("Monthly analytics (CSV)", `monthly_${stem}.csv`, analyticsCsv)}
   ${downloadButton("Hotspots in this search (CSV)", `hotspots_${stem}.csv`, hotspotCsv)}
-  ${downloadButton("Calendar image (SVG)", `calendar_${stem}.svg`, svgBlob)}
+  ${downloadButton("Calendar image (SVG)", `calendar_${stem}.svg`, svgBlob(calendarFigure))}
+  ${downloadButton("Season chart (SVG)", `season_${stem}.svg`, svgBlob(seasonFigure))}
+  ${downloadButton("Yearly totals chart (SVG)", `years_${stem}.svg`, svgBlob(yearsFigure))}
+  ${custom ? "" : downloadButton("Harmonisation chart (SVG)", `harmonisation_${stem}.svg`, svgBlob(harmonisationFigure))}
 </div>`);
 ```
 
