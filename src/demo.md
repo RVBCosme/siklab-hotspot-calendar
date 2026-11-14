@@ -57,7 +57,7 @@ const cal = benguet.filter((d) => d.year <= 2025);
 display(Plot.plot({width: 900, height: 272, padding: 0.04, marginLeft: 40, style: {fontSize: "10px"}, x: {domain: d3.range(1, 13), tickFormat: (m) => MONTHS[m - 1], axis: "top", label: null}, y: {domain: [...new Set(cal.map((d) => String(d.year)))].reverse(), label: null}, color: {type: "sqrt", scheme: "YlOrRd", legend: true, label: "Hotspots (VIIRS scale)"}, marks: [Plot.cell(cal, {x: "m", y: (d) => String(d.year), fill: "h", inset: 0.5})]}));
 ```
 
-  <p class="say">Benguet, 2003–2025, one cell per month. Pick any of 17 regions or 87 province-level areas, or draw a box on a NASA map, and any period; download the numbers, the hotspots and the charts.</p>
+  <p class="say">Benguet, 2003–2025, one cell per month. Pick any of 17 regions or 87 province-level areas, or draw a box on a NASA map, and any period; download the numbers, the hotspots and the image.</p>
   <p class="slide-no">3 / 7</p>
 </div>
 
