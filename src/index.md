@@ -334,99 +334,6 @@ display(html`<div class="plain">
 </div>`);
 ```
 
-## Where was it burning?
-
-```js
-// Province map of the selection. Areas are in km² on the sphere (d3.geoArea × Earth's radius²).
-const EARTH_RADIUS_KM = 6371.0088;
-const provinceKm2 = new Map(provinceShapes.features.map((f) => [f.properties.id, d3.geoArea(f) * EARTH_RADIUS_KM ** 2]));
-```
-
-```js
-// Per province: hotspots over the period (and per 100 km², so large and small provinces compare fairly),
-// and the end month against that province's average for the same calendar month (as in the calendar).
-const provinceStats = provinceShapes.features.map((f) => {
-  const id = f.properties.id;
-  const rows = byArea.get(id) ?? [];
-  const total = d3.sum(rows, (d) => (d.month >= lo && d.month <= hi ? d.hotspots : 0));
-  const end = rows.find((d) => d.month === hi);
-  const average = d3.mean(rows.filter((d) => d.m === end.m && isFullMonth(d)), (d) => d.hotspots) * (end.days / daysIn(end));
-  return {id, name: f.properties.name, parent: f.properties.parent, total, density: (100 * total) / provinceKm2.get(id), end: end.hotspots, average, diff: end.hotspots - average};
-});
-// Metro Manila's hotspots are mostly industrial and other static heat sources, and its factor rests on few detections (method page, Limits).
-const ncrStaticPct = Math.round((100 * meta.stats.pointsNcrStaticSource) / meta.stats.pointsNcr);
-const ncrNote = `Metro Manila: ${ncrStaticPct}% of its hotspots are flagged by FIRMS as industrial or other static heat sources, not vegetation fires, and its numbers before 2012 rest on few detections`;
-const statById = new Map(provinceStats.map((d) => [d.id, d]));
-const mapValue = (id) => (byCount ? statById.get(id).density : statById.get(id).diff);
-function provinceMap(width) {
-  const features = provinceShapes.features;
-  const chosen = features.filter((f) => (area.level === "province" ? f.properties.id === area.id : area.level === "region" ? f.properties.parent === area.id : false));
-  const tipText = (f) => {
-    const s = statById.get(f.properties.id);
-    const caution = s.parent === "r-ncr" ? `\nAbout ${ncrStaticPct}% are industrial heat sources, not vegetation fires` : "";
-    return byCount
-      ? `${s.name}\n${fmt(s.total)} hotspots, ${lo} to ${hi}\n${s.density.toFixed(1)} per 100 km²${caution}\nClick to see its calendar`
-      : `${s.name}\n${MONTHS[endRow.m - 1]} ${endRow.year}: ${fmt(s.end)} hotspots\nAverage of every complete ${MONTHS[endRow.m - 1]}${partial ? " (same days)" : ""}: ${fmt(s.average)}${caution}\nClick to see its calendar`;
-  };
-  // Height from the islands' own shape at this width (Mercator), capped so the map fits a screen.
-  const [[, y0], [, y1]] = d3.geoPath(d3.geoMercator().fitWidth(width - 20, provinceShapes)).bounds(provinceShapes);
-  const plot = Plot.plot({
-    width,
-    height: Math.round(Math.min(y1 - y0 + 20, 720)),
-    projection: {type: "mercator", domain: provinceShapes, inset: 10},
-    ariaLabel: `Map of Philippine provinces, ${byCount ? `hotspots per 100 km² from ${lo} to ${hi}` : `${MONTHS[endRow.m - 1]} ${endRow.year} against each province's average`}`,
-    ariaDescription: "Each province is coloured by its value. The list next to the map names the top provinces with their values; choose one there to open its calendar.",
-    color: byCount
-      ? {type: "sqrt", scheme: ramp, zero: true, legend: true, label: "Hotspots per 100 km²", width: 300}
-      : {type: "diverging-sqrt", scheme: "rdbu", reverse: true, pivot: 0, legend: true, label: `${MONTHS[endRow.m - 1]} ${endRow.year}: above (+) or below (−) the average`, tickFormat: "+~s", width: 300},
-    marks: [
-      Plot.geo(features, {fill: (f) => mapValue(f.properties.id), stroke: "var(--theme-background)", strokeWidth: 0.4}),
-      Plot.geo(chosen, {stroke: "currentColor", strokeWidth: 2}),
-      area.id === "custom" && box ? Plot.line([[box.w, box.s], [box.e, box.s], [box.e, box.n], [box.w, box.n], [box.w, box.s]], {stroke: "currentColor", strokeWidth: 2}) : null,
-      Plot.tip(features, Plot.pointer(Plot.geoCentroid({title: tipText})))
-    ]
-  });
-  // A click opens the province named in the tip (the pointer's current value), so what the tip says is what opens.
-  plot.style.cursor = "pointer";
-  plot.addEventListener("click", () => { if (plot.value) selectArea(plot.value.properties.id); });
-  return quiet(plot);
-}
-const mapFigure = resize((width) => provinceMap(width));
-const ranking = provinceStats
-  .filter((d) => (byCount ? d.total > 0 : d.diff > 0))
-  .sort((a, b) => mapValue(b.id) - mapValue(a.id))
-  .slice(0, 10);
-const rankMax = d3.max(ranking, (d) => mapValue(d.id)) || 1;
-const rankedList = html`<div class="ranked">
-  <h3>${byCount ? "Most hotspots for their size (per 100 km²)" : `Most above their average, ${MONTHS[endRow.m - 1]} ${endRow.year} (hotspots)`}</h3>
-  ${ranking.length
-    ? html`<ol>${ranking.map((d) => html`<li><div class="row">
-        <span><button type="button" onclick=${() => selectArea(d.id)}>${d.name}</button>${d.parent === "r-ncr" ? html`<sup aria-hidden="true">†</sup><span class="visually-hidden"> (see the note below the list)</span>` : ""}</span>
-        <span class="num">${byCount ? d.density.toFixed(1) : `+${fmt(d.diff)}`}</span>
-        <span class="bar" style=${`width: ${(100 * mapValue(d.id)) / rankMax}%`}></span>
-      </div></li>`)}</ol>`
-    : html`<p class="hint">No province is above its average in ${MONTHS[endRow.m - 1]} ${endRow.year}.</p>`}
-  ${ranking.some((d) => d.parent === "r-ncr") ? html`<p class="hint">† ${ncrNote} (<a href="./method#limits">Limits</a>).</p>` : ""}
-</div>`;
-// Every province's value as a sortable table: the keyboard and screen-reader route to what the map shows by colour.
-const provinceTable = Inputs.table(
-  provinceStats.map((d) => ({Province: d.name, Region: regionName.get(d.parent), [`Hotspots, ${lo} to ${hi}`]: Math.round(d.total), "Per 100 km²": +d.density.toFixed(1), [`${MONTHS[endRow.m - 1]} ${endRow.year}`]: Math.round(d.end), [`Average ${MONTHS[endRow.m - 1]}${partial ? " (same days)" : ""}`]: Math.round(d.average)})),
-  {sort: byCount ? "Per 100 km²" : `${MONTHS[endRow.m - 1]} ${endRow.year}`, reverse: true, rows: 12, select: false}
-);
-```
-
-<div class="grid grid-cols-3 map-grid">
-  <div class="card grid-colspan-2">${mapFigure}</div>
-  <div class="card">${rankedList}</div>
-</div>
-
-<details class="all-provinces">
-  <summary>All 87 provinces as a table</summary>
-  ${provinceTable}
-</details>
-
-<p class="hint">Each shape is a province, ${byCount ? `coloured by hotspots per 100 km² from ${lo} to ${hi}, so large and small provinces can be compared fairly` : `coloured by how far ${MONTHS[endRow.m - 1]} ${endRow.year} sits above (red) or below (blue) the average of every complete ${MONTHS[endRow.m - 1]} in that province, as in the calendar`}. Click a province, or a name in the list, to open its calendar. The map shows data up to ${meta.lastDate}, refreshed by hand from NASA FIRMS; it is not live. For today's detections, see NASA's <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener">FIRMS Fire Map</a> (an external NASA site).</p>
-
 <h2 id="calendar" tabindex="-1">Burning activity calendar: ${areaTitle}, ${lo} to ${hi}</h2>
 
 <p class="hint">Each cell is one month. ${colourBy === "Number of hotspots" ? "Colour shows the number of hotspots on the VIIRS scale." : "Colour shows how far each month is above (red) or below (blue) the average for that calendar month over every complete month of the record; a month still in progress is compared with the same share of the average."} Cells before February 2012 come from MODIS Aqua converted with ${factorText}; cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
@@ -501,6 +408,99 @@ const rankCard = endRow.hotspots === 0
 </div>
 
 <p class="hint">${partial ? `${MONTHS[endRow.m - 1]} ${endRow.year} is still in progress: the comparison scales other years' ${MONTHS[endRow.m - 1]} to its first ${endRow.days} days, assuming hotspots spread evenly through the month. ` : ""}${endRow.gap_days > 0 ? `Warning: ${endRow.gap_days} day(s) of ${MONTHS[endRow.m - 1]} ${endRow.year} have no satellite data, so this month reads low.` : ""} Change "To" to compare any other month.</p>
+
+## Where was it burning?
+
+```js
+// Province map of the selection. Areas are in km² on the sphere (d3.geoArea × Earth's radius²).
+const EARTH_RADIUS_KM = 6371.0088;
+const provinceKm2 = new Map(provinceShapes.features.map((f) => [f.properties.id, d3.geoArea(f) * EARTH_RADIUS_KM ** 2]));
+```
+
+```js
+// Per province: hotspots over the period (and per 100 km², so large and small provinces compare fairly),
+// and the end month against that province's average for the same calendar month (as in the calendar).
+const provinceStats = provinceShapes.features.map((f) => {
+  const id = f.properties.id;
+  const rows = byArea.get(id) ?? [];
+  const total = d3.sum(rows, (d) => (d.month >= lo && d.month <= hi ? d.hotspots : 0));
+  const end = rows.find((d) => d.month === hi);
+  const average = d3.mean(rows.filter((d) => d.m === end.m && isFullMonth(d)), (d) => d.hotspots) * (end.days / daysIn(end));
+  return {id, name: f.properties.name, parent: f.properties.parent, total, density: (100 * total) / provinceKm2.get(id), end: end.hotspots, average, diff: end.hotspots - average};
+});
+// Metro Manila's hotspots are mostly industrial and other static heat sources, and its factor rests on few detections (method page, Limits).
+const ncrStaticPct = Math.round((100 * meta.stats.pointsNcrStaticSource) / meta.stats.pointsNcr);
+const ncrNote = `Metro Manila's four districts are not ranked here: ${ncrStaticPct}% of their hotspots are industrial or other static heat sources (FIRMS type 2), not vegetation fires. They are on the map and in the table`;
+const statById = new Map(provinceStats.map((d) => [d.id, d]));
+const mapValue = (id) => (byCount ? statById.get(id).density : statById.get(id).diff);
+function provinceMap(width) {
+  const features = provinceShapes.features;
+  const chosen = features.filter((f) => (area.level === "province" ? f.properties.id === area.id : area.level === "region" ? f.properties.parent === area.id : false));
+  const tipText = (f) => {
+    const s = statById.get(f.properties.id);
+    const caution = s.parent === "r-ncr" ? `\nAbout ${ncrStaticPct}% are industrial heat sources, not vegetation fires` : "";
+    return byCount
+      ? `${s.name}\n${fmt(s.total)} hotspots, ${lo} to ${hi}\n${s.density.toFixed(1)} per 100 km²${caution}\nClick to see its calendar`
+      : `${s.name}\n${MONTHS[endRow.m - 1]} ${endRow.year}: ${fmt(s.end)} hotspots\nAverage of every complete ${MONTHS[endRow.m - 1]}${partial ? " (same days)" : ""}: ${fmt(s.average)}${caution}\nClick to see its calendar`;
+  };
+  // Height from the islands' own shape at this width (Mercator), capped so the map fits a screen.
+  const [[, y0], [, y1]] = d3.geoPath(d3.geoMercator().fitWidth(width - 20, provinceShapes)).bounds(provinceShapes);
+  const plot = Plot.plot({
+    width,
+    height: Math.round(Math.min(y1 - y0 + 20, 720)),
+    projection: {type: "mercator", domain: provinceShapes, inset: 10},
+    ariaLabel: `Map of Philippine provinces, ${byCount ? `hotspots per 100 km² from ${lo} to ${hi}` : `${MONTHS[endRow.m - 1]} ${endRow.year} against each province's average`}`,
+    ariaDescription: "Each province is coloured by its value. The list next to the map names the top provinces with their values; choose one there to open its calendar.",
+    color: byCount
+      ? {type: "sqrt", scheme: ramp, zero: true, legend: true, label: "Hotspots per 100 km²", width: 300}
+      : {type: "diverging-sqrt", scheme: "rdbu", reverse: true, pivot: 0, legend: true, label: `${MONTHS[endRow.m - 1]} ${endRow.year}: above (+) or below (−) the average`, tickFormat: "+~s", width: 300},
+    marks: [
+      Plot.geo(features, {fill: (f) => mapValue(f.properties.id), stroke: "var(--theme-background)", strokeWidth: 0.4}),
+      Plot.geo(chosen, {stroke: "currentColor", strokeWidth: 2}),
+      area.id === "custom" && box ? Plot.line([[box.w, box.s], [box.e, box.s], [box.e, box.n], [box.w, box.n], [box.w, box.s]], {stroke: "currentColor", strokeWidth: 2}) : null,
+      Plot.tip(features, Plot.pointer(Plot.geoCentroid({title: tipText})))
+    ]
+  });
+  // A click opens the province named in the tip (the pointer's current value), so what the tip says is what opens.
+  plot.style.cursor = "pointer";
+  plot.addEventListener("click", () => { if (plot.value) selectArea(plot.value.properties.id); });
+  return quiet(plot);
+}
+const mapFigure = resize((width) => provinceMap(width));
+const ranking = provinceStats
+  .filter((d) => d.parent !== "r-ncr" && (byCount ? d.total > 0 : d.diff > 0))
+  .sort((a, b) => mapValue(b.id) - mapValue(a.id))
+  .slice(0, 10);
+const rankMax = d3.max(ranking, (d) => mapValue(d.id)) || 1;
+const rankedList = html`<div class="ranked">
+  <h3>${byCount ? "Most hotspots for their size (per 100 km²)" : `Most above their average, ${MONTHS[endRow.m - 1]} ${endRow.year} (hotspots)`}</h3>
+  ${ranking.length
+    ? html`<ol>${ranking.map((d) => html`<li><div class="row">
+        <span><button type="button" onclick=${() => selectArea(d.id)}>${d.name}</button></span>
+        <span class="num">${byCount ? d.density.toFixed(1) : `+${fmt(d.diff)}`}</span>
+        <span class="bar" style=${`width: ${(100 * mapValue(d.id)) / rankMax}%`}></span>
+      </div></li>`)}</ol>`
+    : html`<p class="hint">No province is above its average in ${MONTHS[endRow.m - 1]} ${endRow.year}.</p>`}
+  <p class="hint">${ncrNote}; see <a href="./method#limits">Limits</a>.</p>
+</div>`;
+// Every province's value as a sortable table: the keyboard and screen-reader route to what the map shows by colour.
+const provinceTable = Inputs.table(
+  provinceStats.map((d) => ({Province: d.name, Region: regionName.get(d.parent), [`Hotspots, ${lo} to ${hi}`]: Math.round(d.total), "Per 100 km²": +d.density.toFixed(1), [`${MONTHS[endRow.m - 1]} ${endRow.year}`]: Math.round(d.end), [`Average ${MONTHS[endRow.m - 1]}${partial ? " (same days)" : ""}`]: Math.round(d.average)})),
+  {sort: byCount ? "Per 100 km²" : `${MONTHS[endRow.m - 1]} ${endRow.year}`, reverse: true, rows: 12, select: false}
+);
+```
+
+<div class="grid grid-cols-3 map-grid">
+  <div class="card grid-colspan-2">${mapFigure}</div>
+  <div class="card">${rankedList}</div>
+</div>
+
+<details class="all-provinces">
+  <summary>All 87 provinces as a table</summary>
+  ${provinceTable}
+</details>
+
+<p class="hint">Each shape is a province, ${byCount ? `coloured by hotspots per 100 km² from ${lo} to ${hi}, so large and small provinces can be compared fairly` : `coloured by how far ${MONTHS[endRow.m - 1]} ${endRow.year} sits above (red) or below (blue) the average of every complete ${MONTHS[endRow.m - 1]} in that province, as in the calendar`}. Click a province, or a name in the list, to open its calendar. The map shows data up to ${meta.lastDate}, refreshed by hand from NASA FIRMS; it is not live. For today's detections, see NASA's <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener">FIRMS Fire Map</a> (an external NASA site).</p>
 
 ## When does the year burn?
 
@@ -666,7 +666,6 @@ display(html`<div class="downloads">
 .map-grid .card { margin: 0; min-height: 420px; }
 .all-provinces { margin: 0.8rem 0; }
 .all-provinces summary { cursor: pointer; font-weight: 600; margin-bottom: 0.5rem; }
-.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #calendar:focus { outline: none; }
 #calendar:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 4px; }
 .hint a, .plain a, .explain a { text-decoration: underline; text-underline-offset: 2px; }
