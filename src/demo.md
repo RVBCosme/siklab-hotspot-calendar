@@ -135,7 +135,8 @@ addEventListener("keydown", (e) => {
 @page { size: 1000px 563px; margin: 0; }
 @media print {
   #observablehq-main, #observablehq-center { margin: 0 !important; padding: 0 !important; max-width: none !important; }
-  .slide { width: 1000px; height: 563px; aspect-ratio: auto; margin: 0; border: 0; border-radius: 0; break-after: page; page-break-after: always; }
-  .slide:last-of-type { break-after: auto; page-break-after: auto; }
+  #observablehq-main > :not(.slide) { display: none !important; }
+  .slide { width: 1000px; height: 563px; aspect-ratio: auto; margin: 0; border: 0; border-radius: 0; break-after: auto; page-break-after: auto; }
+  .slide ~ .slide { break-before: page; page-break-before: always; }
 }
 </style>
