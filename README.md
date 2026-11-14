@@ -5,7 +5,7 @@ A harmonised burning activity calendar for the Philippines, built from NASA FIRM
 MODIS and VIIRS count fire very differently: over the Philippines, VIIRS on Suomi NPP reports about ten hotspots for every one that MODIS on Aqua reports. This project converts the MODIS record (2003 to January 2012) onto the VIIRS scale with a factor per region, fitted on the years both satellites flew, so that one monthly series runs from January 2003 to the latest month for any of the 17 regions and 87 province-level areas (81 provinces, Metro Manila's four districts, Isabela City and Cotabato City), or for a box drawn on the map.
 
 - **Live application:** https://rvbcosme.github.io/siklab-hotspot-calendar/ (no login). **Demo, 7 slides:** https://rvbcosme.github.io/siklab-hotspot-calendar/demo, also as a PDF in `src/siklab-demo-slides.pdf`.
-- **Web application:** a static site built with Observable Framework (`src/`).
+- **Web application:** a static site built with Observable Framework (`src/`): the calendar, a province map of the same selection, a summary in plain words, charts, downloads, and links that reopen the same view. Screenshots are in `src/img/`.
 - **Data pipeline:** `pipeline/build-data.mjs` (Node.js, no dependencies) turns the FIRMS yearly country files into the files in `src/data/`, and runs the validation tests.
 - **Method and validation results:** `src/method.md`, shown on the site's "How it works and how well" page.
 

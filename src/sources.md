@@ -15,6 +15,7 @@ title: Sources and credits
 | NASA FIRMS area API, 2026 | MODIS (MODIS_SP, MODIS_NRT) and VIIRS Suomi NPP and NOAA-20 (VIIRS_SNPP_SP/NRT, VIIRS_NOAA20_SP/NRT) for a rectangle around the Philippines, 1 January 2026 to the latest day; standard quality where available, near real time after | https://firms.modaps.eosdis.nasa.gov/api/area/ (free map key) |
 | NASA FIRMS missing-data table | Days each satellite delivered no data | https://firms.modaps.eosdis.nasa.gov/api/missing_data/ |
 | NASA GIBS (Global Imagery Browse Services): Blue Marble shaded relief and bathymetry, and 15 m coastlines | Base map for the custom-area map | https://gibs.earthdata.nasa.gov/ |
+| NASA FIRMS Fire Map | Linked from the calendar page for today's detections; no data taken from it | https://firms.modaps.eosdis.nasa.gov/map/ |
 
 We acknowledge the use of data and imagery from NASA's Fire Information for Resource Management System (FIRMS), https://www.earthdata.nasa.gov/data/tools/firms, part of NASA's Earth Science Data and Information System (ESDIS).
 
@@ -22,7 +23,7 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 
 | Source | Use | Licence |
 |---|---|---|
-| geoBoundaries, Philippines ADM1 and ADM2 (2020), from NAMRIA, PSA and OCHA Philippines. Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866 | Placing hotspots in regions and provinces | CC BY 3.0 IGO, https://www.geoboundaries.org/ |
+| geoBoundaries, Philippines ADM1 and ADM2 (2020), from NAMRIA, PSA and OCHA Philippines. Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866 | Placing hotspots in regions and provinces; the province outlines on the calendar page's map (simplified to about 450 m) | CC BY 3.0 IGO, https://www.geoboundaries.org/ |
 | Chen, Y. and others (2026). GFED5 near-real-time. Earth System Science Data 18, 7535 | The family of method we follow (factors from the overlap years) | Open access, https://essd.copernicus.org/articles/18/7535/2026/ |
 | NASA FIRMS FAQ and attribute descriptions | Meaning of the type and confidence fields; satellite pass times | https://www.earthdata.nasa.gov/data/tools/firms/faq |
 | NASA Earthdata (2026). Suomi NPP Observations to Cease on November 2, 2026; and NASA Earthdata blog, Transitioning from Suomi NPP VIIRS & OMPS: What FIRMS Users Need to Know | The date and time Suomi NPP data stopped (13:00 UTC, 2 November 2026) | https://www.earthdata.nasa.gov/data/alerts-outages/suomi-npp-observations-cease-november-2-2026 ; https://www.earthdata.nasa.gov/news/blog/transitioning-from-suomi-npp-viirs-omps-what-firms-users-need-know |

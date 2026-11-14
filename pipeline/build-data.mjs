@@ -278,6 +278,9 @@ for (const p of keepPoints) {
   if (!use) continue;
   const satName = { aqua: "Aqua (MODIS)", snpp: "Suomi NPP (VIIRS)", n20: "NOAA-20 (VIIRS)" }[p.sat];
   stats.pointsInFiles = (stats.pointsInFiles || 0) + 1;
+  // FIRMS type 2 = "other static land source" (for example industrial heat), shown on the method page and the map.
+  if (p.type === "2") stats.pointsStaticSource = (stats.pointsStaticSource || 0) + 1;
+  if (rid === "r-ncr") { stats.pointsNcr = (stats.pointsNcr || 0) + 1; if (p.type === "2") stats.pointsNcrStaticSource = (stats.pointsNcrStaticSource || 0) + 1; }
   if (p.pi >= 0 && provinces[p.pi].parent !== rid) stats.pointsRegionNotProvinceParent = (stats.pointsRegionNotProvinceParent || 0) + 1;
   byRegion.get(p.ri).push([p.date, p.time, p.lat, p.lon, satName, p.conf, p.frp, p.type, p.pi >= 0 ? provinces[p.pi].id : "", Math.round(weight * 1000) / 1000]);
 }
@@ -294,6 +297,46 @@ const areas = [
   ...provinces.map((p) => ({ id: p.id, name: p.name === "Compostela Valley" ? "Davao de Oro (Compostela Valley in the 2020 boundaries)" : p.name, level: "province", parent: p.parent, k: kOf(p.id), f: fOf(p.id), bbox: p.bbox })),
 ];
 fs.writeFileSync(path.join(OUT, "areas.json"), JSON.stringify(areas));
+
+// ---------- province outlines for the map: simplified (Douglas-Peucker, ~0.004° ≈ 450 m), rounded, d3 winding ----------
+// d3-geo expects exterior rings clockwise and holes anticlockwise (in longitude/latitude), or a shape fills the globe.
+function simplifyRing(ring, tol) {
+  const keep = new Uint8Array(ring.length);
+  keep[0] = keep[ring.length - 1] = 1;
+  const stack = [[0, ring.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop();
+    let max = -1, idx = -1;
+    for (let i = a + 1; i < b; i++) { const d = segDist2(ring[i][0], ring[i][1], ring[a], ring[b]); if (d > max) { max = d; idx = i; } }
+    if (idx >= 0 && max > tol * tol) { keep[idx] = 1; stack.push([a, idx], [idx, b]); }
+  }
+  const out = [];
+  for (let i = 0; i < ring.length; i++) if (keep[i]) {
+    const p = [Math.round(ring[i][0] * 1000) / 1000, Math.round(ring[i][1] * 1000) / 1000];
+    if (!out.length || p[0] !== out[out.length - 1][0] || p[1] !== out[out.length - 1][1]) out.push(p);
+  }
+  return out.length >= 4 ? out : null;
+}
+const signedArea = (r) => { let s = 0; for (let i = 0; i + 1 < r.length; i++) s += r[i][0] * r[i + 1][1] - r[i + 1][0] * r[i][1]; return s; };
+const shapeName = new Map(areas.map((a) => [a.id, a.name]));
+const provinceShapes = {
+  type: "FeatureCollection",
+  features: provinces.map((p) => {
+    let polys = p.polys.map((rings) => rings.map((r, j) => {
+      const s = simplifyRing(r, 0.004);
+      if (!s) return null;
+      const exterior = j === 0;
+      return (exterior ? signedArea(s) > 0 : signedArea(s) < 0) ? s.reverse() : s;
+    })).filter((rings) => rings[0]).map((rings) => rings.filter(Boolean));
+    if (!polys.length) { // keep at least the largest outline, unsimplified, for very small areas
+      const big = p.polys.reduce((a, b) => (Math.abs(signedArea(b[0])) > Math.abs(signedArea(a[0])) ? b : a));
+      const r = big[0].map(([x, y]) => [Math.round(x * 1000) / 1000, Math.round(y * 1000) / 1000]);
+      polys = [[signedArea(r) > 0 ? r.reverse() : r]];
+    }
+    return { type: "Feature", properties: { id: p.id, name: shapeName.get(p.id), parent: p.parent }, geometry: { type: "MultiPolygon", coordinates: polys } };
+  })
+};
+fs.writeFileSync(path.join(OUT, "provinces.json"), JSON.stringify(provinceShapes));
 fs.writeFileSync(
   path.join(OUT, "meta.json"),
   JSON.stringify({ aiAssistance: AI_NOTE, builtAt: new Date().toISOString(), lastDate, recordStart: RECORD_START_MONTH, viirsStart: VIIRS_START_MONTH, fit: [FIT_START, FIT_END], n20Fit: [N20_FIT_START, N20_FIT_END], stats, factors, missingDays: Object.fromEntries(Object.entries(missing).map(([k, v]) => [k, v.size])) }, null, 1)

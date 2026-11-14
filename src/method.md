@@ -18,6 +18,10 @@ const pc = (x) => (x == null ? "n/a" : `${x}%`);
 const n = d3.format(",");
 ```
 
+## In plain words
+
+Satellites carrying heat-sensing cameras pass over the Philippines every day and mark spots on the ground that are much hotter than their surroundings, usually fires. An older camera, MODIS, has done this since 2000; a newer and sharper one, VIIRS, since 2012, and over the Philippines it marks about ${Math.round(meta.factors.ph.k)} spots for every one that MODIS marks. To make one fair record, we worked out for each region how many VIIRS spots match one MODIS spot in the years both cameras watched, and used that number to convert the older years. Then we tested it on years the conversion never saw: a region's yearly total came out within about ${pc(T1.harmonised.annualMedianAbsPctError)} of what the newer camera recorded, in a typical case. The rest of this page gives the details, the tests and the limits.
+
 ## The problem
 
 NASA's FIRMS archive holds two families of fire hotspots. MODIS, on the Terra and Aqua satellites, has watched since 2000 with pixels about 1 km wide. VIIRS, on Suomi NPP (2012 until its data stopped at 13:00 UTC on 2 November 2026, [NASA Earthdata](https://www.earthdata.nasa.gov/data/alerts-outages/suomi-npp-observations-cease-november-2-2026)), NOAA-20 (from 2018) and NOAA-21, uses pixels about 375 m wide and catches smaller fires. Over the Philippines, once both records are filtered the same way, Suomi NPP reports about **${meta.factors.ph.k.toFixed(1)} hotspots for every one** that MODIS Aqua reports. Laid end to end, the two records would show a jump in 2012 that is a change of instrument, not a change in burning.
@@ -94,7 +98,7 @@ In Benguet the three worst January–May seasons since 2003 are 2010, 2024 and 2
 - **No detection does not mean no fire.** FIRMS carries no cloud information. The wet season and cloudy years read low.
 - **Missing days** are marked with a dot on the calendar when a month lacks a week or more of data.
 - **Provinces** use their region's factor; a province's own factor would rest on too few hotspots.
-- **Metro Manila (NCR)** has so few fires that its factor rests on only ${n(meta.factors["r-ncr"].kAqua)} MODIS Aqua hotspots (2012–2020), against ${n(d3.min(Object.entries(meta.factors).filter(([id]) => id !== "ph" && id !== "r-ncr"), ([, f]) => f.kAqua))} or more for every other region. Read NCR's months before 2012 as very uncertain.
+- **Metro Manila (NCR)** has so few fires that its factor rests on only ${n(meta.factors["r-ncr"].kAqua)} MODIS Aqua hotspots (2012–2020), against ${n(d3.min(Object.entries(meta.factors).filter(([id]) => id !== "ph" && id !== "r-ncr"), ([, f]) => f.kAqua))} or more for every other region. Read NCR's months before 2012 as very uncertain. Also, ${Math.round((100 * meta.stats.pointsNcrStaticSource) / meta.stats.pointsNcr)}% of Metro Manila's hotspots are ones FIRMS flags as "other static land source", such as industrial heat, against ${((100 * meta.stats.pointsStaticSource) / meta.stats.pointsInFiles).toFixed(1)}% across the country, so its numbers say little about vegetation fires.
 - **The 87 provinces** are geoBoundaries' second level for 2020: 81 provinces, Metro Manila's four districts, Isabela City and Cotabato City.
 - **Dates** are FIRMS acquisition dates in UTC. The night pass, at about 01:30 Philippine time, is dated the day before, so a few hotspots at the turn of a month count in the earlier month.
 - **2026** comes from the FIRMS area API: standard quality up to the end of July (VIIRS) or August (MODIS), then near real time, which NASA later replaces with standard quality. Near-real-time rows carry no FIRMS type, so detections in the same or a neighbouring 0.02° cell (about 2 km) as any spot FIRMS flagged as an active volcano are dropped (${n(meta.stats.droppedNearVolcano)} rows). Offshore detections near the coast cannot be told apart and stay in from August 2026; in 2012–2025 they were 0.3–2.4% of a year's VIIRS hotspots. The current month holds only the days so far and is marked as such.
@@ -103,7 +107,7 @@ In Benguet the three worst January–May seasons since 2003 are 2010, 2024 and 2
 ## Factors by region
 
 ```js
-display(Inputs.table(areas.filter((a) => a.level !== "province").map((a) => ({Area: a.name, "k (VIIRS per MODIS Aqua hotspot)": +a.k.toFixed(2), "f (Suomi NPP per NOAA-20 hotspot)": +a.f.toFixed(3)})), {sort: "Area", rows: 20}));
+display(Inputs.table(areas.filter((a) => a.level !== "province").map((a) => ({Area: a.name, "k (VIIRS per MODIS Aqua hotspot)": +a.k.toFixed(2), "f (Suomi NPP per NOAA-20 hotspot)": +a.f.toFixed(3)})), {sort: "Area", rows: 20, select: false}));
 ```
 
 Built ${meta.builtAt.slice(0, 10)} from NASA FIRMS standard-quality yearly files for the Philippines (MODIS 2000–2025, used from ${meta.recordStart.slice(0, 4)}; VIIRS Suomi NPP 2012–2025, VIIRS NOAA-20 2018–2025) and the FIRMS area API for 2026 (1 January to ${meta.lastDate}).

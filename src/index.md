@@ -8,10 +8,26 @@ title: Calendar
 
 <p class="lede">How many fire hotspots did satellites see, month by month since 2003, in a Philippine region or province? MODIS and VIIRS count fire very differently, so this calendar puts both on one scale: the sensor that saw a fire no longer changes the number you read.</p>
 
+<ol class="how-to-read">
+  <li>Pick a place: the whole country, a region, a province, or a box you draw on a map. You can also click a province on the map further down.</li>
+  <li>Pick the months to look at with From and To.</li>
+  <li>Read the colours. Each square in the calendar is one month; the darker it is, the more fire hotspots the satellites saw.</li>
+</ol>
+
+<details class="explain">
+  <summary>Explain it simply: what is a hotspot, and why two kinds of satellite?</summary>
+  <p><b>What is a hotspot?</b> Satellites circle the Earth carrying cameras that sense heat. When a patch of ground is much hotter than the land around it, usually because something is burning, the satellite marks it. Each mark is a hotspot. One big fire can make many hotspots, and a fire under thick cloud makes none.</p>
+  <p><b>Why two kinds of satellite?</b> An older camera called MODIS has marked hotspots since 2000. A newer, sharper one called VIIRS started in 2012. It notices smaller fires, so over the Philippines it marks about ${Math.round(meta.factors.ph.k)} hotspots for every one that MODIS marks. Put end to end, the two records would make it look as if fires jumped in 2012, when only the camera changed.</p>
+  <p><b>What did we do about it?</b> For each region we counted how many VIIRS hotspots matched one MODIS hotspot in the years both cameras were watching (2012 to 2020), and used that number to convert the older years. Then we tested it on years the conversion never saw: a region's yearly total came out within about ${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}% of what VIIRS recorded, in a typical case. That conversion is what "harmonised" means on this site.</p>
+  <p><b>What it cannot tell you.</b> A hotspot count is not the number of fires or the area burned. Clouds hide fires, so rainy months read low. The calendar shows the past; it does not forecast.</p>
+</details>
+
 ```js
 const areas = FileAttachment("data/areas.json").json();
 const monthlyRaw = FileAttachment("data/monthly.csv").csv();
 const meta = FileAttachment("data/meta.json").json();
+const validation = FileAttachment("data/validation.json").json();
+const provinceShapes = FileAttachment("data/provinces.json").json();
 const pointFiles = {
   "r-armm": FileAttachment("data/points/r-armm.csv"),
   "r-bicol-region": FileAttachment("data/points/r-bicol-region.csv"),
@@ -34,6 +50,9 @@ const pointFiles = {
 ```
 
 ```js
+// Plot labels each layer of a chart (<g aria-label="cell">, "geo", "tip"), which axe flags and screen readers read out
+// without meaning; each chart's own label and description carry its content, so the layer labels are removed.
+const quiet = (node) => (node.querySelectorAll("g[aria-label]").forEach((g) => g.removeAttribute("aria-label")), node);
 // Parse the monthly table once and index it by area.
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const monthly = monthlyRaw.map((d) => ({
@@ -66,11 +85,45 @@ const label = (a) => (a.level === "custom" ? "Custom area: draw a box on the map
 <div class="card controls">
 
 ```js
-const area = view(Inputs.select(areaOptions, {label: "Area", format: label, value: areaOptions[0]}));
-const fromMonth = view(Inputs.select(allMonths, {label: "From", value: allMonths[0]}));
-const toMonth = view(Inputs.select(allMonths, {label: "To", value: allMonths[allMonths.length - 1]}));
-const colourBy = view(Inputs.radio(["Number of hotspots", "Difference from the average for that month"], {label: "Colour by", value: "Number of hotspots"}));
-const ramp = view(Inputs.select(new Map([["Yellow–orange–red (ColorBrewer, colour-blind safe)", "ylorrd"], ["Viridis (colour-blind safe)", "viridis"]]), {label: "Colour ramp"}));
+// The page address remembers the view (area, months, colours), so a link opens the same view.
+const startParams = new URLSearchParams(location.hash.slice(1));
+// A view link edited or pasted into this open tab reloads the page so the controls follow it (heading links are left alone).
+addEventListener("hashchange", () => { if (new URLSearchParams(location.hash.slice(1)).has("area")) location.reload(); });
+const startMonth = (key, fallback) => (allMonths.includes(startParams.get(key)) ? startParams.get(key) : fallback);
+const COLOUR_OPTIONS = ["Number of hotspots", "Difference from the average for that month"];
+const areaInput = Inputs.select(areaOptions, {label: "Area", format: label, value: areaOptions.find((a) => a.id === startParams.get("area")) ?? areaOptions[0]});
+const area = view(areaInput);
+const fromMonth = view(Inputs.select(allMonths, {label: "From", value: startMonth("from", allMonths[0])}));
+const toMonth = view(Inputs.select(allMonths, {label: "To", value: startMonth("to", allMonths[allMonths.length - 1])}));
+const colourBy = view(Inputs.radio(COLOUR_OPTIONS, {label: "Colour by", value: COLOUR_OPTIONS[startParams.get("colour") === "difference" ? 1 : 0]}));
+const ramp = view(Inputs.select(new Map([["Yellow–orange–red (ColorBrewer, colour-blind safe)", "ylorrd"], ["Viridis (colour-blind safe)", "viridis"]]), {label: "Colour ramp", value: startParams.get("ramp") === "viridis" ? "viridis" : "ylorrd"}));
+// Choosing a province on the map or in the list sets the Area control, then shows that province's calendar.
+function selectArea(id) {
+  const next = areaOptions.find((a) => a.id === id);
+  if (!next) return;
+  if (next !== areaInput.value) {
+    areaInput.value = next;
+    areaInput.dispatchEvent(new Event("input", {bubbles: true}));
+  }
+  // Move focus to the calendar heading too, so keyboard and screen-reader users land on the new calendar.
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  requestAnimationFrame(() => {
+    const heading = document.getElementById("calendar");
+    heading?.scrollIntoView({behavior: reduceMotion ? "auto" : "smooth", block: "start"});
+    heading?.focus({preventScroll: true});
+  });
+}
+const shareButton = html`<button type="button" class="share">Copy a link to this view</button>`;
+shareButton.onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(location.href);
+    shareButton.textContent = "Link copied";
+  } catch {
+    shareButton.textContent = "Copy the address from the address bar";
+  }
+  setTimeout(() => (shareButton.textContent = "Copy a link to this view"), 2500);
+};
+display(shareButton);
 ```
 
 </div>
@@ -170,7 +223,9 @@ async function pointsInBox(b) {
 ```
 
 ```js
-const picker = area.id === "custom" ? areaPicker({w: 120.4, s: 16.2, e: 121.0, n: 16.8}) : null;
+const startBox = Object.fromEntries(["w", "s", "e", "n"].map((k) => [k, Number(startParams.get(k))]));
+const linkedBox = ["w", "s", "e", "n"].every((k) => startParams.has(k) && Number.isFinite(startBox[k])) && startBox.e > startBox.w && startBox.n > startBox.s;
+const picker = area.id === "custom" ? areaPicker(linkedBox ? startBox : {w: 120.4, s: 16.2, e: 121.0, n: 16.8}) : null;
 const box = picker ? view(picker) : null;
 ```
 
@@ -186,7 +241,7 @@ if (picker && customPoints) {
   const shown = inRange.length > 12000 ? d3.shuffler(d3.randomLcg(1))(inRange.slice()).slice(0, 12000) : inRange;
   const renderer = L.canvas();
   for (const p of shown) L.circleMarker([p.lat, p.lon], {renderer, radius: 1.5, stroke: false, fillColor: p.month < "2012-02" ? "#fdae61" : "#ff3b1f", fillOpacity: 0.5}).addTo(picker.points);
-  display(html`<p class="hint">${fmt(inRange.length)} hotspots in this box from ${lo} to ${hi}${inRange.length > shown.length ? `; the map shows a random ${fmt(shown.length)} of them` : ""}. Light orange: MODIS Aqua (before February 2012); red: VIIRS.</p>`);
+  display(html`<p class="hint">${fmt(inRange.length)} hotspot detections in this box from ${lo} to ${hi}${inRange.length > shown.length ? `; the map shows a random ${fmt(shown.length)} of them` : ""}. On the VIIRS scale, where each MODIS detection counts as k, that is about ${fmt(d3.sum(inRange, (d) => d.w))}. Light orange: MODIS Aqua (before February 2012); red: VIIRS.</p>`);
 }
 ```
 
@@ -208,16 +263,178 @@ const sel = series.filter((d) => d.month >= lo && d.month <= hi).map((d) => ({..
 const years = [...new Set(sel.map((d) => d.year))].sort((a, b) => b - a).map(String);
 const fmt = d3.format(",.0f");
 const areaTitle = area.id === "custom" ? (box ? `custom area (W ${box.w}, S ${box.s}, E ${box.e}, N ${box.n})` : "custom area") : area.name;
+// Which conversion factor applies: the country adds up its regions, each with its own k; a province uses its region's k.
+const regionKs = areas.filter((a) => a.level === "region").map((a) => a.k);
+const factorText =
+  area.level === "country" ? `each region's own factor (k from ${d3.min(regionKs).toFixed(1)} to ${d3.max(regionKs).toFixed(1)})`
+  : area.level === "region" ? `this region's factor (k = ${area.k.toFixed(2)})`
+  : area.level === "province" ? `the factor of its region, ${regionName.get(area.parent)} (k = ${area.k.toFixed(2)})`
+  : "the factor of the region each hotspot is in";
 ```
 
-## Burning activity calendar: ${areaTitle}, ${lo} to ${hi}
+```js
+// Keep the page address in step with the view, so "Copy a link to this view" (or the address bar) reopens it.
+{
+  const p = new URLSearchParams({area: area.id, from: lo, to: hi});
+  if (colourBy !== COLOUR_OPTIONS[0]) p.set("colour", "difference");
+  if (ramp !== "ylorrd") p.set("ramp", ramp);
+  if (area.id === "custom" && box) for (const k of ["w", "s", "e", "n"]) p.set(k, box[k]);
+  history.replaceState(history.state, "", `#${p}`);
+}
+```
 
-<p class="hint">Each cell is one month. ${colourBy === "Number of hotspots" ? "Colour shows the number of hotspots on the VIIRS scale." : "Colour shows how far each month is above (red) or below (blue) the average for that calendar month over every complete month of the record; a month still in progress is compared with the same share of the average."} Cells before February 2012 come from MODIS Aqua converted with ${area.id === "custom" ? "the factor of the region each hotspot is in" : `this area's factor (k = ${area.k.toFixed(2)})`}; cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
+## In plain words
+
+```js
+// A short summary of the current view for readers who are not scientists. Every number comes from the same data as the charts below.
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const monthName = (ym) => `${MONTH_NAMES[+ym.slice(5, 7) - 1]} ${ym.slice(0, 4)}`;
+const placeName = area.level === "country" ? "the whole Philippines" : area.id === "custom" ? "the box you chose" : area.name;
+const periodTotal = d3.sum(sel, (d) => d.hotspots);
+const seasonMonths = profile.filter((d) => Number.isFinite(d.median));
+const seasonPeak = d3.max(seasonMonths, (d) => d.median);
+// Months as plain phrases: [2, 3, 4] → "from February to April"; [6] → "in June".
+const monthPhrase = (ms) => {
+  const runs = [];
+  for (const m of ms) runs.length && m === runs[runs.length - 1][1] + 1 ? (runs[runs.length - 1][1] = m) : runs.push([m, m]);
+  return runs.map(([a, b]) => (a === b ? `in ${MONTH_NAMES[a - 1]}` : `from ${MONTH_NAMES[a - 1]} to ${MONTH_NAMES[b - 1]}`)).join(" and ");
+};
+const busyMonths = seasonMonths.filter((d) => d.median >= 0.6 * seasonPeak).map((d) => d.m);
+const rareMonths = seasonMonths.filter((d) => d.median <= 0.1 * seasonPeak).map((d) => d.m);
+const busiestYear = d3.greatest(fullYears, (d) => d.total);
+const quietestYear = d3.least(fullYears, (d) => d.total);
+const endMonthName = MONTH_NAMES[endRow.m - 1];
+const times = (r) => (r >= 10 ? fmt(r) : r.toFixed(1));
+// "Usual" is the median of the same month in the other years (scaled to the days so far for a month in progress), as on the card below.
+const usual = `a usual ${endMonthName}${partial ? " at this point in the month" : ""} has about ${fmt(med)}`;
+const ratio = med > 0 ? endRow.hotspots / med : NaN;
+const latestComparison =
+  !(med > 0)
+    ? endRow.hotspots > 0
+      ? `In most years ${endMonthName} has almost none here, so this is more than usual.`
+      : `${endMonthName} usually has almost none here, and this one has none either.`
+    : ratio >= 1.5 && med >= 5
+      ? `That is about ${times(ratio)} times as many as usual: ${usual}.`
+      : ratio >= 1.15
+        ? `That is more than usual: ${usual}.`
+        : ratio > 0.85
+          ? `That is close to usual: ${usual}.`
+          : `That is fewer than usual: ${usual}.`;
+const kText =
+  area.level === "country" ? `each region's own number (about ${meta.factors.ph.k.toFixed(1)} across the country)`
+  : area.level === "region" ? `${area.k.toFixed(1)} (this region's number)`
+  : area.level === "province" ? `${area.k.toFixed(1)} (the number for its region, ${regionName.get(area.parent)})`
+  : "the number for the region each hotspot is in";
+display(html`<div class="plain">
+  <p>From ${monthName(lo)} to ${monthName(hi)}, satellites marked about <b>${fmt(periodTotal)} hotspots</b> in ${placeName}, counted on the newer camera's scale.</p>
+  ${seasonMonths.length === 12 && sel.length >= 24 ? html`<p>${seasonPeak > 0 ? `Burning is usually busiest ${monthPhrase(busyMonths)}${rareMonths.length ? `, and hotspots are rare ${monthPhrase(rareMonths)}` : ""}.` : "Hotspots are rare here in every month of the year."}</p>` : ""}
+  ${fullYears.length >= 2 ? html`<p>The busiest full year was ${busiestYear.year} (${fmt(busiestYear.total)} hotspots); the quietest was ${quietestYear.year} (${fmt(quietestYear.total)}).</p>` : ""}
+  <p>${monthName(hi)}${partial ? `, days 1 to ${endRow.days} so far` : ""}: <b>${fmt(endRow.hotspots)} hotspots</b>. ${latestComparison}${endRow.gap_days > 0 ? ` Some days had no satellite data, so this month reads low.` : ""}</p>
+  ${lo < "2012-02" ? html`<p>Months before February 2012 come from the older MODIS camera, which misses smaller fires. We multiplied its counts by ${kText} so they match the newer VIIRS camera.</p>` : ""}
+</div>`);
+```
+
+## Where was it burning?
+
+```js
+// Province map of the selection. Areas are in km² on the sphere (d3.geoArea × Earth's radius²).
+const EARTH_RADIUS_KM = 6371.0088;
+const provinceKm2 = new Map(provinceShapes.features.map((f) => [f.properties.id, d3.geoArea(f) * EARTH_RADIUS_KM ** 2]));
+```
+
+```js
+// Per province: hotspots over the period (and per 100 km², so large and small provinces compare fairly),
+// and the end month against that province's average for the same calendar month (as in the calendar).
+const provinceStats = provinceShapes.features.map((f) => {
+  const id = f.properties.id;
+  const rows = byArea.get(id) ?? [];
+  const total = d3.sum(rows, (d) => (d.month >= lo && d.month <= hi ? d.hotspots : 0));
+  const end = rows.find((d) => d.month === hi);
+  const average = d3.mean(rows.filter((d) => d.m === end.m && isFullMonth(d)), (d) => d.hotspots) * (end.days / daysIn(end));
+  return {id, name: f.properties.name, parent: f.properties.parent, total, density: (100 * total) / provinceKm2.get(id), end: end.hotspots, average, diff: end.hotspots - average};
+});
+// Metro Manila's hotspots are mostly industrial and other static heat sources, and its factor rests on few detections (method page, Limits).
+const ncrStaticPct = Math.round((100 * meta.stats.pointsNcrStaticSource) / meta.stats.pointsNcr);
+const ncrNote = `Metro Manila: ${ncrStaticPct}% of its hotspots are flagged by FIRMS as industrial or other static heat sources, not vegetation fires, and its numbers before 2012 rest on few detections`;
+const statById = new Map(provinceStats.map((d) => [d.id, d]));
+const mapValue = (id) => (byCount ? statById.get(id).density : statById.get(id).diff);
+function provinceMap(width) {
+  const features = provinceShapes.features;
+  const chosen = features.filter((f) => (area.level === "province" ? f.properties.id === area.id : area.level === "region" ? f.properties.parent === area.id : false));
+  const tipText = (f) => {
+    const s = statById.get(f.properties.id);
+    const caution = s.parent === "r-ncr" ? `\nAbout ${ncrStaticPct}% are industrial heat sources, not vegetation fires` : "";
+    return byCount
+      ? `${s.name}\n${fmt(s.total)} hotspots, ${lo} to ${hi}\n${s.density.toFixed(1)} per 100 km²${caution}\nClick to see its calendar`
+      : `${s.name}\n${MONTHS[endRow.m - 1]} ${endRow.year}: ${fmt(s.end)} hotspots\nAverage of every complete ${MONTHS[endRow.m - 1]}${partial ? " (same days)" : ""}: ${fmt(s.average)}${caution}\nClick to see its calendar`;
+  };
+  // Height from the islands' own shape at this width (Mercator), capped so the map fits a screen.
+  const [[, y0], [, y1]] = d3.geoPath(d3.geoMercator().fitWidth(width - 20, provinceShapes)).bounds(provinceShapes);
+  const plot = Plot.plot({
+    width,
+    height: Math.round(Math.min(y1 - y0 + 20, 720)),
+    projection: {type: "mercator", domain: provinceShapes, inset: 10},
+    ariaLabel: `Map of Philippine provinces, ${byCount ? `hotspots per 100 km² from ${lo} to ${hi}` : `${MONTHS[endRow.m - 1]} ${endRow.year} against each province's average`}`,
+    ariaDescription: "Each province is coloured by its value. The list next to the map names the top provinces with their values; choose one there to open its calendar.",
+    color: byCount
+      ? {type: "sqrt", scheme: ramp, zero: true, legend: true, label: "Hotspots per 100 km²", width: 300}
+      : {type: "diverging-sqrt", scheme: "rdbu", reverse: true, pivot: 0, legend: true, label: `${MONTHS[endRow.m - 1]} ${endRow.year}: above (+) or below (−) the average`, tickFormat: "+~s", width: 300},
+    marks: [
+      Plot.geo(features, {fill: (f) => mapValue(f.properties.id), stroke: "var(--theme-background)", strokeWidth: 0.4}),
+      Plot.geo(chosen, {stroke: "currentColor", strokeWidth: 2}),
+      area.id === "custom" && box ? Plot.line([[box.w, box.s], [box.e, box.s], [box.e, box.n], [box.w, box.n], [box.w, box.s]], {stroke: "currentColor", strokeWidth: 2}) : null,
+      Plot.tip(features, Plot.pointer(Plot.geoCentroid({title: tipText})))
+    ]
+  });
+  // A click opens the province named in the tip (the pointer's current value), so what the tip says is what opens.
+  plot.style.cursor = "pointer";
+  plot.addEventListener("click", () => { if (plot.value) selectArea(plot.value.properties.id); });
+  return quiet(plot);
+}
+const mapFigure = resize((width) => provinceMap(width));
+const ranking = provinceStats
+  .filter((d) => (byCount ? d.total > 0 : d.diff > 0))
+  .sort((a, b) => mapValue(b.id) - mapValue(a.id))
+  .slice(0, 10);
+const rankMax = d3.max(ranking, (d) => mapValue(d.id)) || 1;
+const rankedList = html`<div class="ranked">
+  <h3>${byCount ? "Most hotspots for their size (per 100 km²)" : `Most above their average, ${MONTHS[endRow.m - 1]} ${endRow.year} (hotspots)`}</h3>
+  ${ranking.length
+    ? html`<ol>${ranking.map((d) => html`<li><div class="row">
+        <span><button type="button" onclick=${() => selectArea(d.id)}>${d.name}</button>${d.parent === "r-ncr" ? html`<sup aria-hidden="true">†</sup><span class="visually-hidden"> (see the note below the list)</span>` : ""}</span>
+        <span class="num">${byCount ? d.density.toFixed(1) : `+${fmt(d.diff)}`}</span>
+        <span class="bar" style=${`width: ${(100 * mapValue(d.id)) / rankMax}%`}></span>
+      </div></li>`)}</ol>`
+    : html`<p class="hint">No province is above its average in ${MONTHS[endRow.m - 1]} ${endRow.year}.</p>`}
+  ${ranking.some((d) => d.parent === "r-ncr") ? html`<p class="hint">† ${ncrNote} (<a href="./method#limits">Limits</a>).</p>` : ""}
+</div>`;
+// Every province's value as a sortable table: the keyboard and screen-reader route to what the map shows by colour.
+const provinceTable = Inputs.table(
+  provinceStats.map((d) => ({Province: d.name, Region: regionName.get(d.parent), [`Hotspots, ${lo} to ${hi}`]: Math.round(d.total), "Per 100 km²": +d.density.toFixed(1), [`${MONTHS[endRow.m - 1]} ${endRow.year}`]: Math.round(d.end), [`Average ${MONTHS[endRow.m - 1]}${partial ? " (same days)" : ""}`]: Math.round(d.average)})),
+  {sort: byCount ? "Per 100 km²" : `${MONTHS[endRow.m - 1]} ${endRow.year}`, reverse: true, rows: 12, select: false}
+);
+```
+
+<div class="grid grid-cols-3 map-grid">
+  <div class="card grid-colspan-2">${mapFigure}</div>
+  <div class="card">${rankedList}</div>
+</div>
+
+<details class="all-provinces">
+  <summary>All 87 provinces as a table</summary>
+  ${provinceTable}
+</details>
+
+<p class="hint">Each shape is a province, ${byCount ? `coloured by hotspots per 100 km² from ${lo} to ${hi}, so large and small provinces can be compared fairly` : `coloured by how far ${MONTHS[endRow.m - 1]} ${endRow.year} sits above (red) or below (blue) the average of every complete ${MONTHS[endRow.m - 1]} in that province, as in the calendar`}. Click a province, or a name in the list, to open its calendar. The map shows data up to ${meta.lastDate}, refreshed by hand from NASA FIRMS; it is not live. For today's detections, see NASA's <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener">FIRMS Fire Map</a> (an external NASA site).</p>
+
+<h2 id="calendar" tabindex="-1">Burning activity calendar: ${areaTitle}, ${lo} to ${hi}</h2>
+
+<p class="hint">Each cell is one month. ${colourBy === "Number of hotspots" ? "Colour shows the number of hotspots on the VIIRS scale." : "Colour shows how far each month is above (red) or below (blue) the average for that calendar month over every complete month of the record; a month still in progress is compared with the same share of the average."} Cells before February 2012 come from MODIS Aqua converted with ${factorText}; cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
 
 ```js
 const byCount = colourBy === "Number of hotspots";
 function calendar(width) {
-  return Plot.plot({
+  return quiet(Plot.plot({
     width,
     height: 40 + years.length * 18,
     ariaLabel: `Burning activity calendar for ${areaTitle}, ${lo} to ${hi}`,
@@ -241,7 +458,7 @@ function calendar(width) {
       Plot.cell(sel.filter((d) => d.partial), {x: "m", y: (d) => String(d.year), inset: 0.5, stroke: "currentColor", strokeDasharray: "2,2", fill: "none"}),
       Plot.dot(sel.filter((d) => d.gap_days >= 7), {x: "m", y: (d) => String(d.year), r: 2.5, fill: "currentColor"})
     ]
-  });
+  }));
 }
 const calendarFigure = display(resize((width) => calendar(width)));
 ```
@@ -257,7 +474,13 @@ const partial = share < 1;
 const med = d3.median(sameMonth, (d) => d.hotspots) * share;
 const avg = d3.mean(sameMonth, (d) => d.hotspots) * share;
 const rank = 1 + sameMonth.filter((d) => d.hotspots * share > endRow.hotspots).length;
+// Years with the same count share the rank; a month with no hotspots is not called the busiest.
+const tied = sameMonth.filter((d) => Math.abs(d.hotspots * share - endRow.hotspots) < 0.05).length;
+const noneOthers = sameMonth.filter((d) => d.hotspots === 0).length;
 const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th");
+const rankCard = endRow.hotspots === 0
+  ? html`<span class="big">None</span><p>no hotspots${partial ? " so far" : ""}; ${noneOthers} of the ${sameMonth.length} other years had none in ${MONTHS[endRow.m - 1]} either</p>`
+  : html`<span class="big">${tied ? "joint " : ""}${ordinal(rank)}</span><p>busiest ${MONTHS[endRow.m - 1]} of ${sameMonth.length + 1} since ${series[0].year}${tied ? `, tied with ${tied} other year${tied > 1 ? "s" : ""}` : ""}${partial ? ", at the same point in the month" : ""}</p>`;
 ```
 
 <div class="grid grid-cols-3">
@@ -273,8 +496,7 @@ const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st",
   </div>
   <div class="card">
     <h2>Rank</h2>
-    <span class="big">${ordinal(rank)}</span>
-    <p>busiest ${MONTHS[endRow.m - 1]} of ${sameMonth.length + 1} since ${series[0].year}${partial ? ", at the same point in the month" : ""}</p>
+    ${rankCard}
   </div>
 </div>
 
@@ -288,7 +510,7 @@ const profile = d3.range(1, 13).map((m) => {
   return {m, median: d3.median(v), q1: d3.quantile(v, 0.25), q3: d3.quantile(v, 0.75), max: d3.max(v)};
 });
 const endYearRows = sel.filter((d) => d.year === endRow.year);
-const seasonFigure = display(resize((width) => Plot.plot({
+const seasonFigure = display(resize((width) => quiet(Plot.plot({
   width,
   height: 260,
   x: {domain: d3.range(1, 13), tickFormat: (m) => MONTHS[m - 1], label: null},
@@ -301,7 +523,7 @@ const seasonFigure = display(resize((width) => Plot.plot({
     Plot.lineY(endYearRows, {x: "m", y: "hotspots", stroke: "currentColor", strokeDasharray: "4,3", marker: "circle"}),
     Plot.ruleY([0])
   ]
-})));
+}))));
 ```
 
 <p class="hint">Solid line: median month across ${lo.slice(0, 4)}–${hi.slice(0, 4)}. Band: middle half of years. Dashed: ${endRow.year}.</p>
@@ -312,23 +534,23 @@ const seasonFigure = display(resize((width) => Plot.plot({
 const yearly = d3.rollups(sel, (v) => ({total: d3.sum(v, (d) => d.hotspots), months: v.length, source: v[0].source.startsWith("MODIS") ? "MODIS Aqua, converted" : "VIIRS"}), (d) => d.year).map(([year, o]) => ({year, ...o}));
 const fullYears = yearly.filter((d) => d.months === 12);
 const yearMean = d3.mean(fullYears, (d) => d.total);
-const yearsFigure = display(resize((width) => Plot.plot({
+const yearsFigure = display(resize((width) => quiet(Plot.plot({
   width,
   height: 260,
   x: {label: null, tickFormat: "d", interval: 1},
   y: {label: "Hotspots per year", grid: true},
   ariaLabel: `Hotspots per year in ${areaTitle}`,
-  ariaDescription: `Yearly totals on the VIIRS scale; years before 2012 are converted MODIS Aqua. Dashed line: the average full year, ${fmt(yearMean)}.`,
+  ariaDescription: `Yearly totals on the VIIRS scale; years before 2012 are converted MODIS Aqua.${fullYears.length ? ` Dashed line: the average full year, ${fmt(yearMean)}.` : ""}`,
   color: {domain: ["MODIS Aqua, converted", "VIIRS"], range: ["#fdae61", "#d7301f"], legend: true},
   marks: [
     Plot.barY(yearly, {x: "year", y: "total", fill: "source", tip: {format: {y: (v) => fmt(v)}}}),
-    Plot.ruleY([yearMean], {stroke: "currentColor", strokeDasharray: "4,3"}),
+    fullYears.length ? Plot.ruleY([yearMean], {stroke: "currentColor", strokeDasharray: "4,3"}) : null,
     Plot.ruleY([0])
   ]
-})));
+}))));
 ```
 
-<p class="hint">Dashed line: the average full year (${fmt(yearMean)}). Partial years in the selection are shorter bars, not quieter years.</p>
+<p class="hint">${fullYears.length ? `Dashed line: the average full year (${fmt(yearMean)}). ` : ""}Partial years in the selection are shorter bars, not quieter years.</p>
 
 ## What harmonisation changes
 
@@ -342,7 +564,7 @@ const cmp = overlap.flatMap((d) => [
   {month: new Date(d.month + "-15"), value: nationalAquaK ? nationalAquaK.get(d.month) : d.modis_aqua * area.k, series: "MODIS Aqua × k (on the VIIRS scale)"},
   ...(d.year >= 2012 ? [{month: new Date(d.month + "-15"), value: d.viirs_snpp, series: "VIIRS Suomi NPP, raw count"}] : [])
 ]);
-const harmonisationFigure = display(resize((width) => Plot.plot({
+const harmonisationFigure = display(resize((width) => quiet(Plot.plot({
   width,
   height: 260,
   x: {label: null},
@@ -351,7 +573,7 @@ const harmonisationFigure = display(resize((width) => Plot.plot({
   ariaDescription: "Monthly MODIS Aqua raw counts, MODIS Aqua multiplied by the conversion factor, and VIIRS Suomi NPP raw counts.",
   color: {legend: true, domain: ["MODIS Aqua, raw count", "MODIS Aqua × k (on the VIIRS scale)", "VIIRS Suomi NPP, raw count"], range: ["#999999", "#fdae61", "#d7301f"]},
   marks: [Plot.lineY(cmp, {x: "month", y: "value", stroke: "series", tip: true}), Plot.ruleY([0])]
-})));
+}))));
 ```
 
 <p class="hint">Raw MODIS counts sit far below VIIRS because VIIRS pixels are smaller and catch smaller fires. Scaled by k, the MODIS line tracks VIIRS in the years both flew. How closely it tracks is measured on the <a href="./method">method page</a>.</p>
@@ -383,7 +605,7 @@ function downloadButton(text, filename, makeBlob) {
 }
 const stem = area.id === "custom" && box ? `custom_${box.w}_${box.s}_${box.e}_${box.n}_${lo}_${hi}` : `${area.id}_${lo}_${hi}`;
 const custom = area.id === "custom";
-const analyticsCsv = () => new Blob([d3.csvFormat(sel.map((d) => ({area: areaTitle, month: d.month, hotspots_viirs_equivalent: d.hotspots, difference_from_month_average: d.anomaly, source: d.source, missing_days: d.gap_days, month_in_progress: d.partial ? "yes" : "", modis_aqua_raw: custom ? "" : d.modis_aqua, modis_terra_raw: custom ? "" : d.modis_terra, viirs_snpp_raw: custom ? "" : d.viirs_snpp, viirs_noaa20_raw: custom ? "" : d.viirs_noaa20, factor_k: custom ? "per region" : area.k})))], {type: "text/csv"});
+const analyticsCsv = () => new Blob([d3.csvFormat(sel.map((d) => ({area: areaTitle, month: d.month, hotspots_viirs_equivalent: d.hotspots, difference_from_month_average: d.anomaly, source: d.source, missing_days: d.gap_days, month_in_progress: d.partial ? "yes" : "", modis_aqua_raw: custom ? "" : d.modis_aqua, modis_terra_raw: custom ? "" : d.modis_terra, viirs_snpp_raw: custom ? "" : d.viirs_snpp, viirs_noaa20_raw: custom ? "" : d.viirs_noaa20, factor_k: custom || area.level === "country" ? "per region" : area.k})))], {type: "text/csv"});
 const HOTSPOT_COLUMNS = ["date", "time_utc", "latitude", "longitude", "satellite", "confidence", "frp", "firms_type", "province_id", "region_id", "weight_viirs_equivalent"];
 async function hotspotCsv() {
   let rows;
@@ -410,6 +632,7 @@ display(html`<div class="downloads">
   ${downloadButton("Season chart (SVG)", `season_${stem}.svg`, svgBlob(seasonFigure))}
   ${downloadButton("Yearly totals chart (SVG)", `years_${stem}.svg`, svgBlob(yearsFigure))}
   ${custom ? "" : downloadButton("Harmonisation chart (SVG)", `harmonisation_${stem}.svg`, svgBlob(harmonisationFigure))}
+  ${downloadButton("Province map (SVG)", `map_${stem}.svg`, svgBlob(mapFigure))}
 </div>`);
 ```
 
@@ -422,6 +645,8 @@ display(html`<div class="downloads">
 .hint { color: var(--theme-foreground-muted); font-size: 0.9rem; max-width: 60rem; }
 .big { font-size: 2.2rem; font-weight: 700; }
 .controls form { margin-bottom: 0.4rem; }
+.controls input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
+.controls form label { margin-right: 0.6rem; }
 .downloads { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .dl { padding: 0.5rem 0.9rem; font: inherit; cursor: pointer; }
 .picker .map { height: 420px; border-radius: 6px; margin-bottom: 0.6rem; }
@@ -429,4 +654,28 @@ display(html`<div class="downloads">
 .picker .coords input { width: 6.5rem; font: inherit; }
 .picker .coords button { font: inherit; padding: 0.35rem 0.7rem; cursor: pointer; }
 @media (max-width: 640px) { .picker .map { height: 320px; } .big { font-size: 1.8rem; } }
+.how-to-read { max-width: 60rem; padding-left: 1.4rem; line-height: 1.55; }
+.how-to-read li { margin: 0.2rem 0; }
+.explain { max-width: 60rem; margin: 0.6rem 0 1.2rem; border-left: 3px solid #fdae61; padding: 0.3rem 0 0.3rem 0.9rem; }
+.explain summary { cursor: pointer; font-weight: 600; }
+.explain p { line-height: 1.6; }
+.plain { max-width: 60rem; font-size: 1.08rem; line-height: 1.6; border-left: 3px solid #d7301f; padding: 0.1rem 0 0.1rem 1rem; }
+.plain p { margin: 0.45rem 0; max-width: none; }
+.share { margin-top: 0.5rem; padding: 0.35rem 0.8rem; font: inherit; cursor: pointer; }
+.map-grid { grid-auto-rows: auto; }
+.map-grid .card { margin: 0; min-height: 420px; }
+.all-provinces { margin: 0.8rem 0; }
+.all-provinces summary { cursor: pointer; font-weight: 600; margin-bottom: 0.5rem; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#calendar:focus { outline: none; }
+#calendar:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 4px; }
+.hint a, .plain a, .explain a { text-decoration: underline; text-underline-offset: 2px; }
+.ranked h3 { margin-top: 0; }
+.ranked ol { padding-left: 1.4rem; margin: 0; }
+.ranked li { margin: 0.25rem 0; }
+.ranked .row { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; padding: 0.1rem 0 0.45rem; }
+.ranked button { font: inherit; text-align: left; background: none; border: 0; padding: 0; color: var(--theme-foreground-focus); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; min-height: 1.6rem; }
+.ranked .num { white-space: nowrap; color: var(--theme-foreground-muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.ranked .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: #fdae61; border-radius: 2px; }
+button:focus-visible, summary:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 2px; }
 </style>

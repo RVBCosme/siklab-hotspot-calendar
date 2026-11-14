@@ -22,6 +22,8 @@ const ph = rows.filter((d) => d.id === "ph");
 const lastYear = d3.max(ph, (d) => d.year);
 const fmt = d3.format(",.0f");
 const T1 = v.T1_leaveOneYearOut_2012_2020;
+// Remove Plot's per-layer labels (<g aria-label="bar">); each chart is described by the slide text (as on the calendar page).
+const quiet = (node) => (node.querySelectorAll("g[aria-label]").forEach((g) => g.removeAttribute("aria-label")), node);
 ```
 
 <p class="deck-help"><a href="./siklab-demo-slides.pdf" download>Download these 7 slides as a PDF</a> · Arrow keys move between slides.</p>
@@ -41,7 +43,7 @@ const raw = ph.filter((d) => d.year >= 2008 && d.year <= 2016).flatMap((d) => [
   {t: new Date(d.month + "-15"), v: d.aqua, s: "MODIS Aqua (since 2002)"},
   ...(d.year >= 2012 ? [{t: new Date(d.month + "-15"), v: d.snpp, s: "VIIRS Suomi NPP (since 2012)"}] : [])
 ]);
-display(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSize: "14px"}, y: {label: "Hotspots per month, raw", grid: true}, x: {label: null}, color: {legend: true, range: ["#888", "#d7301f"]}, marks: [Plot.lineY(raw, {x: "t", y: "v", stroke: "s", strokeWidth: 2}), Plot.ruleY([0])]}));
+display(quiet(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSize: "14px"}, y: {label: "Hotspots per month, raw", grid: true}, x: {label: null}, color: {legend: true, range: ["#888", "#d7301f"]}, marks: [Plot.lineY(raw, {x: "t", y: "v", stroke: "s", strokeWidth: 2}), Plot.ruleY([0])]})));
 ```
 
   <p class="say">Same fires, two sensors: VIIRS counts about ${Math.round(meta.factors.ph.k)} hotspots for every one MODIS Aqua counts over the Philippines. Laid end to end, the record jumps in 2012 because the instrument changed, not the burning.</p>
@@ -51,8 +53,8 @@ display(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSize: "1
 <div class="slide">
   <h2>What we built: a harmonised burning activity calendar</h2>
   <div class="shot">
-    <img src="./img/app-calendar.png" alt="Screenshot of the live web application: Benguet selected from January 2003 to November 2026, and its burning activity calendar with one cell per month">
-    <p class="say">The live app, with Benguet selected: one cell per month since 2003. Pick the whole country, any of 17 regions or 87 province-level areas, or draw a box on a NASA map, and any period; download the numbers, the hotspots, the calendar and the charts.</p>
+    <img src="./img/app-calendar.png" alt="Screenshot of the live web application: the burning activity calendar for Benguet, January 2003 to November 2026, one cell per month">
+    <p class="say">The live app's calendar for Benguet, one cell per month since 2003. Choose the country, any of 17 regions or 87 province-level areas, a box on a NASA map, or click a province on the app's map. Each view is explained in plain words, and the numbers, hotspots and charts can be downloaded.</p>
   </div>
   <p class="slide-no">3 / 7</p>
 </div>
@@ -90,7 +92,7 @@ const feb24 = feb.find((d) => d.year === 2024).h;
 const febMedian = d3.median(feb.filter((d) => d.year !== 2024), (d) => d.h);
 const febRank = 1 + feb.filter((d) => d.h > feb24).length;
 const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th");
-display(Plot.plot({width: 900, height: 300, style: {fontSize: "13px"}, x: {label: null, tickFormat: "d", interval: 1}, y: {label: "Hotspots in February, Benguet", grid: true}, marks: [Plot.barY(feb, {x: "year", y: "h", fill: (d) => (d.year === 2024 ? "#d7301f" : "#fdae61")}), Plot.ruleY([febMedian], {stroke: "currentColor", strokeDasharray: "5,4"}), Plot.ruleY([0])]}));
+display(quiet(Plot.plot({width: 900, height: 300, style: {fontSize: "13px"}, x: {label: null, tickFormat: "d", interval: 1}, y: {label: "Hotspots in February, Benguet", grid: true}, marks: [Plot.barY(feb, {x: "year", y: "h", fill: (d) => (d.year === 2024 ? "#d7301f" : "#fdae61")}), Plot.ruleY([febMedian], {stroke: "currentColor", strokeDasharray: "5,4"}), Plot.ruleY([0])]})));
 ```
 
   <p class="say">February 2024 in Benguet: ${fmt(feb24)} hotspots against a median of ${fmt(febMedian)} in the other ${feb.length - 1} years (dashed), the ${ordinal(febRank)} busiest February since 2003. The question an emergency manager asks first; designed for fire officers, land managers, responders and researchers.</p>
