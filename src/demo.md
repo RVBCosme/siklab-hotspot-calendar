@@ -100,6 +100,7 @@ display(Plot.plot({width: 900, height: 320, style: {fontSize: "13px"}, x: {label
     <li>Next: a check with fire officers on the ground</li>
   </ul>
   <p class="who">Try it: rvbcosme.github.io/siklab-hotspot-calendar · Data: NASA FIRMS · Team Siklab</p>
+  <p class="ai-note">Code, charts and text made with AI assistance (Claude Code) and checked by the team; details on the Sources page. No AI-generated images.</p>
   <p class="slide-no">7 / 7</p>
 </div>
 
@@ -129,4 +130,12 @@ addEventListener("keydown", (e) => {
 .bignums { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 1rem; font-size: 1.1rem; }
 .bignums span { display: block; font-size: 2.6rem; font-weight: 700; color: #d7301f; }
 .future { font-size: 1.4rem; line-height: 1.8; }
+.ai-note { position: absolute; left: 2.5rem; bottom: 0.6rem; font-size: 0.8rem; color: var(--theme-foreground-muted); max-width: 80%; }
+/* Print or "Save as PDF": one slide per 16:9 page. */
+@page { size: 1000px 563px; margin: 0; }
+@media print {
+  #observablehq-main, #observablehq-center { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+  .slide { width: 1000px; height: 563px; aspect-ratio: auto; margin: 0; border: 0; border-radius: 0; break-after: page; page-break-after: always; }
+  .slide:last-of-type { break-after: auto; page-break-after: auto; }
+}
 </style>

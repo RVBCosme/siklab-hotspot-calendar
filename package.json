@@ -5,7 +5,7 @@
   "scripts": {
     "data": "node pipeline/build-data.mjs",
     "dev": "observable preview",
-    "build": "observable build",
+    "build": "observable build && node pipeline/set-lang.mjs",
     "clean": "rimraf src/.observablehq/cache"
   },
   "dependencies": {

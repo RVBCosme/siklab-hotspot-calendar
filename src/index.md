@@ -216,6 +216,8 @@ function calendar(width) {
   return Plot.plot({
     width,
     height: 40 + years.length * 18,
+    ariaLabel: `Burning activity calendar for ${areaTitle}, ${lo} to ${hi}`,
+    ariaDescription: `One cell per month, years as rows and months as columns, coloured by ${byCount ? "the number of hotspots on the VIIRS scale" : "the difference from the average for that month"}. Download the monthly analytics CSV below for the numbers.`,
     marginLeft: 44,
     padding: 0.06,
     x: {domain: d3.range(1, 13), tickFormat: (m) => MONTHS[m - 1], label: null, axis: "top"},
@@ -287,6 +289,8 @@ display(resize((width) => Plot.plot({
   height: 260,
   x: {domain: d3.range(1, 13), tickFormat: (m) => MONTHS[m - 1], label: null},
   y: {label: "Hotspots per month", grid: true},
+  ariaLabel: `When the year burns in ${areaTitle}`,
+  ariaDescription: `Median hotspots for each calendar month from ${lo} to ${hi}, the middle half of years as a band, and ${endRow.year} as a dashed line.`,
   marks: [
     Plot.areaY(profile, {x: "m", y1: "q1", y2: "q3", fill: "#fdae61", fillOpacity: 0.35, curve: "monotone-x"}),
     Plot.lineY(profile, {x: "m", y: "median", stroke: "#d7301f", strokeWidth: 2, curve: "monotone-x", tip: true}),
@@ -309,6 +313,8 @@ display(resize((width) => Plot.plot({
   height: 260,
   x: {label: null, tickFormat: "d", interval: 1},
   y: {label: "Hotspots per year", grid: true},
+  ariaLabel: `Hotspots per year in ${areaTitle}`,
+  ariaDescription: `Yearly totals on the VIIRS scale; years before 2012 are converted MODIS Aqua. Dashed line: the average full year, ${fmt(yearMean)}.`,
   color: {domain: ["MODIS Aqua, converted", "VIIRS"], range: ["#fdae61", "#d7301f"], legend: true},
   marks: [
     Plot.barY(yearly, {x: "year", y: "total", fill: "source", tip: {format: {y: (v) => fmt(v)}}}),
@@ -335,6 +341,8 @@ display(resize((width) => Plot.plot({
   height: 260,
   x: {label: null},
   y: {label: "Hotspots per month", grid: true},
+  ariaLabel: `Raw and converted counts in ${areaTitle} since 2010`,
+  ariaDescription: "Monthly MODIS Aqua raw counts, MODIS Aqua multiplied by the conversion factor, and VIIRS Suomi NPP raw counts.",
   color: {legend: true, domain: ["MODIS Aqua, raw count", "MODIS Aqua × k (on the VIIRS scale)", "VIIRS Suomi NPP, raw count"], range: ["#999999", "#fdae61", "#d7301f"]},
   marks: [Plot.lineY(cmp, {x: "month", y: "value", stroke: "series", tip: true}), Plot.ruleY([0])]
 })));
