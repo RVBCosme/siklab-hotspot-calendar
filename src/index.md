@@ -112,31 +112,35 @@ const calendarFigure = display(resize((width) => calendar(width)));
 // "How does the latest month compare?" — the selected end month against the same month in every other year of the record.
 const endRow = series.find((d) => d.month === hi);
 const sameMonth = series.filter((d) => d.m === endRow.m && d.year !== endRow.year);
-const med = d3.median(sameMonth, (d) => d.hotspots);
-const avg = d3.mean(sameMonth, (d) => d.hotspots);
-const rank = 1 + sameMonth.filter((d) => d.hotspots > endRow.hotspots).length;
+// A month still in progress holds only the days so far; compare it with the same share of a typical month.
+const daysInMonth = new Date(Date.UTC(endRow.year, endRow.m, 0)).getUTCDate();
+const share = endRow.days / daysInMonth;
+const partial = share < 1;
+const med = d3.median(sameMonth, (d) => d.hotspots) * share;
+const avg = d3.mean(sameMonth, (d) => d.hotspots) * share;
+const rank = 1 + sameMonth.filter((d) => d.hotspots * share > endRow.hotspots).length;
 const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th");
 ```
 
 <div class="grid grid-cols-3">
   <div class="card">
-    <h2>${MONTHS[endRow.m - 1]} ${endRow.year}</h2>
+    <h2>${MONTHS[endRow.m - 1]} ${endRow.year}${partial ? `, 1–${endRow.days} only` : ""}</h2>
     <span class="big">${fmt(endRow.hotspots)}</span>
-    <p>hotspots (VIIRS-equivalent) in ${area.name}</p>
+    <p>hotspots (VIIRS-equivalent) in ${area.name}${partial ? " so far this month" : ""}</p>
   </div>
   <div class="card">
     <h2>Against the historical median</h2>
     <span class="big">${med > 0 ? d3.format("+.0%")(endRow.hotspots / med - 1) : "n/a"}</span>
-    <p>median ${MONTHS[endRow.m - 1]}: ${fmt(med)} · mean: ${fmt(avg)} (${sameMonth.length} other years)</p>
+    <p>${partial ? `median for the first ${endRow.days} days of` : "median"} ${MONTHS[endRow.m - 1]}: ${fmt(med)} · mean: ${fmt(avg)} (${sameMonth.length} other years)</p>
   </div>
   <div class="card">
     <h2>Rank</h2>
     <span class="big">${ordinal(rank)}</span>
-    <p>busiest ${MONTHS[endRow.m - 1]} of ${sameMonth.length + 1} since ${series[0].year}</p>
+    <p>busiest ${MONTHS[endRow.m - 1]} of ${sameMonth.length + 1} since ${series[0].year}${partial ? ", at the same point in the month" : ""}</p>
   </div>
 </div>
 
-<p class="hint">${endRow.gap_days > 0 ? `Warning: ${endRow.gap_days} day(s) of ${MONTHS[endRow.m - 1]} ${endRow.year} have no satellite data, so this month reads low.` : ""} Change "To" to compare any other month.</p>
+<p class="hint">${partial ? `${MONTHS[endRow.m - 1]} ${endRow.year} is still in progress: the comparison scales other years' ${MONTHS[endRow.m - 1]} to its first ${endRow.days} days, assuming hotspots spread evenly through the month. ` : ""}${endRow.gap_days > 0 ? `Warning: ${endRow.gap_days} day(s) of ${MONTHS[endRow.m - 1]} ${endRow.year} have no satellite data, so this month reads low.` : ""} Change "To" to compare any other month.</p>
 
 ## When does the year burn?
 
