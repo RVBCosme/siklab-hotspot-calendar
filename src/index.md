@@ -26,7 +26,7 @@ title: Calendar
   <p><b>What is a hotspot?</b> Satellites circle the Earth carrying cameras that sense heat. When a patch of ground is much hotter than the land around it, usually because something is burning, the satellite marks it. Each mark is a hotspot. One big fire can make many hotspots, and a fire under thick cloud makes none.</p>
   <p><b>Why two kinds of satellite?</b> An older camera called MODIS has marked hotspots since 2000. A newer, sharper one called VIIRS started in 2012. It notices smaller fires, so over the Philippines it marks about ${Math.round(meta.factors.ph.k)} hotspots for every one that MODIS marks. Put end to end, the two records would make it look as if fires jumped in 2012, when only the camera changed.</p>
   <p><b>What did we do about it?</b> For each region we counted how many VIIRS hotspots matched one MODIS hotspot in the years both cameras were watching (2012 to 2020), and used that number to convert the older years. Then we tested it on years the conversion never saw: a region's yearly total came out within about ${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}% of what VIIRS recorded, in a typical case. That conversion is what "harmonised" means on this site.</p>
-  <p><b>What it cannot tell you.</b> A hotspot count is not the number of fires or the area burned. Clouds hide fires, so rainy months read low. The calendar shows the past; it does not forecast.</p>
+  <p><b>What it cannot tell you.</b> A hotspot count is not the number of fires or the area burned. Clouds hide fires, so rainy months read low. The calendar shows the past. The outlook further down is a range taken from past El Niño seasons, not a forecast model.</p>
 </details>
 
 ```js
@@ -36,6 +36,7 @@ const meta = FileAttachment("data/meta.json").json();
 const validation = FileAttachment("data/validation.json").json();
 const provinceShapes = FileAttachment("data/provinces.json").json();
 const elnino = FileAttachment("data/elnino.json").json();
+const outlook = FileAttachment("data/outlook.json").json();
 const seam = FileAttachment("data/seam.json").json();
 const pointFiles = {
   "r-armm": FileAttachment("data/points/r-armm.csv"),
@@ -429,6 +430,62 @@ const calendarFigure = display(resize((width) => calendar(width)));
 display(ninoLegend());
 ```
 
+<details class="cal3d">
+  <summary>See this calendar in 3D</summary>
+
+```js
+// The same calendar as columns on an isometric floor (months × years); column height = hotspots, colour as in the flat calendar.
+// Drawn back to front in plain SVG. The flat calendar above and the CSV give the exact values.
+const view3dInput = Inputs.radio(new Map([["From the south-west", 0], ["From the south-east", 1]]), {label: "Look", value: 0});
+const view3d = Generators.input(view3dInput);
+display(view3dInput);
+```
+
+```js
+function calendar3d(width, view) {
+  const yearsAsc = [...new Set(sel.map((d) => d.year))].sort(d3.ascending);
+  const nM = 12, nY = yearsAsc.length;
+  const cos = Math.cos(Math.PI / 6);
+  const u = Math.max(8, Math.min(26, (width - 120) / ((nM + nY) * cos)));
+  const H = u * 7;
+  const maxV = d3.max(sel, (d) => d.hotspots) || 1;
+  const colour = d3.scaleSequentialSqrt(ramp === "viridis" ? d3.interpolateViridis : d3.interpolateYlOrRd).domain([0, maxV]);
+  const P = (i, j, z) => [(i - j) * cos * u, (i + j) * 0.5 * u - z];
+  const ix = (m) => (view === 0 ? m - 1 : 12 - m);
+  const jx = (y) => nY - 1 - yearsAsc.indexOf(y);
+  const cells = sel.map((d) => ({...d, i: ix(d.m), j: jx(d.year)})).sort((a, b) => a.i + a.j - (b.i + b.j) || a.j - b.j);
+  const x0 = -nY * cos * u - 70, x1 = nM * cos * u + 50, y1 = (nM + nY) * 0.5 * u + 40;
+  const y0 = Math.min(-10, d3.min(cells, (d) => P(d.i, d.j, (H * d.hotspots) / maxV)[1]) ?? 0) - 12;
+  const svg = d3.create("svg").attr("width", width).attr("height", y1 - y0).attr("viewBox", [x0, y0, x1 - x0, y1 - y0]).attr("role", "img")
+    .attr("aria-label", `The calendar for ${areaTitle} in 3D, ${lo} to ${hi}`)
+    .attr("aria-description", "Each month is a column on a floor of months and years; taller and darker means more hotspots. The flat calendar above shows the same values.")
+    .style("max-width", "100%").style("height", "auto").style("font", "11px var(--sans-serif)");
+  const floor = [P(0, 0, 0), P(nM, 0, 0), P(nM, nY, 0), P(0, nY, 0)];
+  svg.append("polygon").attr("points", floor.join(" ")).attr("fill", "var(--theme-foreground-faintest)");
+  const poly = (pts, fill) => svg.append("polygon").attr("points", pts.map((p) => p.join(",")).join(" ")).attr("fill", fill).attr("stroke", "var(--theme-background)").attr("stroke-width", 0.4);
+  const e = 0.12;
+  for (const d of cells) {
+    const h = (H * d.hotspots) / maxV, c = d3.color(colour(d.hotspots));
+    const [a, b] = [d.i + e, d.i + 1 - e], [p, q] = [d.j + e, d.j + 1 - e];
+    const g = svg.append("g");
+    g.append("title").text(`${MONTHS[d.m - 1]} ${d.year}: ${fmt(d.hotspots)} hotspots${EL_NINO.has(d.year) ? " (El Niño year)" : ""}`);
+    if (h > 0.5) {
+      poly([P(b, p, 0), P(b, q, 0), P(b, q, h), P(b, p, h)], c.darker(0.9).formatHex());
+      poly([P(a, q, 0), P(b, q, 0), P(b, q, h), P(a, q, h)], c.darker(0.4).formatHex());
+    }
+    poly([P(a, p, h), P(b, p, h), P(b, q, h), P(a, q, h)], c.formatHex());
+  }
+  // Month labels along the front-right edge, year labels along the front-left edge (El Niño years with a diamond).
+  for (let m = 1; m <= 12; m++) { const [x, y] = P(ix(m) + 0.5, nY + 0.3, 0); svg.append("text").attr("x", x).attr("y", y + 10).attr("text-anchor", "middle").attr("fill", "currentColor").text(MONTHS[m - 1]); }
+  for (const y of yearsAsc) { if (nY > 12 && y % 2 && !EL_NINO.has(y)) continue; const [x, yy] = P(nM + 0.3, jx(y) + 0.5, 0); svg.append("text").attr("x", x + 6).attr("y", yy + 4).attr("fill", "currentColor").text(`${y}${EL_NINO.has(y) ? ` ${NINO_MARK}` : ""}`); }
+  return svg.node();
+}
+display(resize((width) => calendar3d(width, view3d)));
+```
+
+  <p class="hint">Column height: hotspots in the month (VIIRS scale), on a straight scale; colour as in the flat calendar. ${NINO_MARK}: El Niño year. Columns can hide the ones behind them, so turn the view, or read the exact numbers in the flat calendar above or the monthly CSV.</p>
+</details>
+
 ```js
 // "How does the latest month compare?" — the selected end month against the same month in every other year of the record.
 const endRow = series.find((d) => d.month === hi);
@@ -623,6 +680,49 @@ const ninoPanel = html`<div class="nino-panel">
 
 <p class="hint">Each shape is a province, ${mapMode === "density" ? `coloured by hotspots per 100 km² from ${lo} to ${hi}, so large and small provinces can be compared fairly` : mapMode === "month" ? `coloured by how far ${MONTHS[endRow.m - 1]} ${endRow.year} sits above (red) or below (blue) the average of every complete ${MONTHS[endRow.m - 1]} in that province, as in the calendar` : `coloured by how many times more hotspots its ${word(elnino.elNinoYears.length)} El Niño seasons (${seasonLabel}, median) had than its other seasons, ${elnino.years[0]}–${elnino.years[1]}: red above 1×, blue below. Grey: too few fires to tell (${untestedCount} provinces whose other seasons have a median below ${elnino.minOtherMedian} hotspots). This map does not change with From and To`}. Click a province, or a name in the list, to open its calendar. The map shows data up to ${meta.lastDate}, refreshed by hand from NASA FIRMS; it is not live. For today's detections, see NASA's <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener">FIRMS Fire Map</a> (an external NASA site).</p>
 
+## Outlook: January–May ${outlook.nextYear} if El Niño holds
+
+```js
+// Outlook for the next January–May season if it is an El Niño season (pipeline, outlook.json, with its test on past seasons).
+// A drawn box is computed here from its own seasons, without the test.
+const OUT_YEARS = d3.range(elnino.years[0], outlook.checkYear + 1);
+const outSeasons = OUT_YEARS.map((year) => ({year, nino: EL_NINO.has(year), total: d3.sum(series, (d) => (d.year === year && elnino.seasonMonths.includes(d.m) ? d.hotspots : 0))}));
+const outArea = area.id === "custom" ? (nino.testable ? {median: nino.ninoMedian, low: nino.ninoMin, high: nino.ninoMax, otherMedian: nino.otherMedian} : null) : outlook.areas[area.id] ?? null;
+const checkSeason = outSeasons.find((d) => d.year === outlook.checkYear);
+const otherPast = outSeasons.filter((d) => !d.nino && d.year <= elnino.years[1]).map((d) => d.total);
+const NEXT = String(outlook.nextYear);
+const pct = (x) => `${Math.round(100 * x)}%`;
+const outlookChart = (width) => quiet(Plot.plot({
+  width,
+  height: 250,
+  marginLeft: 56,
+  x: {domain: [...OUT_YEARS.map(String), NEXT], label: null, ticks: [...OUT_YEARS.filter((y) => y % 5 === 0).map(String), NEXT], tickFormat: (y) => (y === NEXT ? `${NEXT}?` : y)},
+  y: {label: `${seasonLabel} hotspots`, grid: true, tickFormat: "~s"},
+  ariaLabel: `${seasonLabel} hotspots in ${ninoPlace} each year from ${OUT_YEARS[0]} to ${outlook.checkYear}, and the ${NEXT} outlook if El Niño holds`,
+  ariaDescription: outArea ? `Bars: each season; El Niño seasons marked with a diamond. ${NEXT}: a range from ${fmt(outArea.low)} to ${fmt(outArea.high)} with a median of ${fmt(outArea.median)}. Dashed line: the usual season without El Niño, ${fmt(outArea.otherMedian)}.` : "Bars: each season; El Niño seasons marked with a diamond. Too few fires here for an outlook.",
+  marks: [
+    Plot.barY(outSeasons, {x: (d) => String(d.year), y: "total", fill: (d) => (d.nino ? "#d7301f" : d.year === outlook.checkYear ? "#9a9a9a" : "#fdae61"), channels: {Season: (d) => `${seasonLabel} ${d.year}${d.nino ? ", El Niño" : ""}`}, tip: {format: {x: false, y: (v) => fmt(v), fill: false}}}),
+    Plot.text(outSeasons.filter((d) => d.nino), {x: (d) => String(d.year), y: "total", text: () => NINO_MARK, dy: -9, fontSize: 13, fill: "currentColor"}),
+    outArea ? Plot.ruleY([outArea.otherMedian], {stroke: "currentColor", strokeDasharray: "4,3"}) : null,
+    outArea ? Plot.barY([outArea], {x: () => NEXT, y1: "low", y2: "high", fill: "#d7301f", fillOpacity: 0.28, stroke: "#d7301f", strokeDasharray: "3,2"}) : null,
+    outArea ? Plot.tickY([outArea], {x: () => NEXT, y: "median", stroke: "#d7301f", strokeWidth: 3}) : null,
+    Plot.ruleY([0])
+  ]
+}));
+```
+
+<div class="grid grid-cols-3 outlook-grid">
+  <div class="card grid-colspan-2">${resize((width) => outlookChart(width))}</div>
+  <div class="card outlook">
+    ${outArea ? html`<p class="outlook-lead">If January–May ${NEXT} is an El Niño season, as PAGASA expects, past El Niño seasons put ${ninoPlace} at about <b>${fmt(outArea.median)} hotspots</b>, between ${fmt(outArea.low)} and ${fmt(outArea.high)}. A season without El Niño has usually had about ${fmt(outArea.otherMedian)}.</p>` : html`<p class="outlook-lead">Too few fires here for an outlook: the seasons without El Niño have a median below ${elnino.minOtherMedian} hotspots.</p>`}
+    ${outArea && area.id !== "custom" ? html`<p>Tested on the past: predicting each El Niño season from the other ${word(outArea.ofSeasons - 1)} missed by a median of ${pct(outArea.errorElNinoAnalogues)}, against ${pct(outArea.errorIgnoringElNino)} when El Niño was ignored. ${word(outArea.insideRange).replace(/^./, (c) => c.toUpperCase())} of the ${word(outArea.ofSeasons)} El Niño seasons fell inside the range of the others.</p>` : ""}
+    ${outArea && area.id === "custom" ? html`<p class="hint">For a drawn box this comes from the box's own seasons; the test on past seasons is run for the country, regions and provinces only.</p>` : ""}
+    ${outArea && checkSeason ? html`<p>A season it never saw: January–May ${outlook.checkYear}, not an El Niño season, had ${fmt(checkSeason.total)} hotspots, ${checkSeason.total > d3.max(otherPast) ? `above every past season without El Niño (highest ${fmt(d3.max(otherPast))})` : checkSeason.total < d3.min(otherPast) ? `below every past season without El Niño (lowest ${fmt(d3.min(otherPast))})` : `inside the range of past seasons without El Niño (${fmt(d3.min(otherPast))} to ${fmt(d3.max(otherPast))})`}${checkSeason.total > 1.5 * outArea.otherMedian ? ", and well above their usual level: a season can run high without El Niño" : ""}.</p>` : ""}
+  </div>
+</div>
+
+<p class="hint">A range drawn from past seasons, not a forecast model. It assumes El Niño holds into early ${NEXT} (PAGASA's El Niño Advisory No. 6, 3 November 2026, expects it to last into the first half of ${NEXT}), rests on ${word(elnino.elNinoYears.length)} El Niño seasons, and mixes more burning with clearer skies. Weather, land use and fire control in ${NEXT} decide what actually burns. Red bars with ${NINO_MARK}: El Niño seasons; grey: ${outlook.checkYear}; dashed line: the usual season without El Niño; shaded bar: the ${NEXT} range from past El Niño seasons, with a stroke at its median.</p>
+
 ## When does the year burn?
 
 ```js
@@ -680,6 +780,94 @@ display(ninoLegend());
 ```
 
 <p class="hint">${fullYears.length ? `Dashed line: the average full year (${fmt(yearMean)}). ` : ""}Partial years in the selection are shorter bars, not quieter years. ${modisYears.length ? (showYearErr ? `The thin bars on the converted MODIS years show ±${Math.round(YEAR_ERR * 100)}%: the typical error of a region's yearly total in the held-out test (median); not a confidence interval.` : `Converted MODIS years carry an error: a region's yearly total is typically off by about ${Math.round(YEAR_ERR * 100)}% in the held-out test, and the error is larger for small areas such as a province or a drawn box.`) : ""}</p>
+
+## How intense were the fires?
+
+```js
+// Fire intensity: fire radiative power (FRP, MW) of the VIIRS hotspots in the harmonised record (pipeline, intensity.csv),
+// loaded when this section scrolls into view. MODIS FRP is not comparable (larger pixels) and is not converted.
+const intensityRaw = visibility().then(() => FileAttachment("data/intensity.csv").csv());
+```
+
+```js
+// A drawn box: the same sums from its own VIIRS hotspots (each weighted as in the calendar).
+function frpFromPoints(points) {
+  const viirs = points.filter((p) => p.month >= meta.viirsStart && /VIIRS/.test(p.satellite) && p.frp !== "");
+  return d3.rollups(viirs, (v) => ({n: d3.sum(v, (p) => p.w), frp: d3.sum(v, (p) => +p.frp * p.w), median: d3.median(v, (p) => +p.frp)}), (p) => p.month).map(([month, o]) => ({month, ...o}));
+}
+const frpMonthly = (area.id === "custom" ? (customPoints ? frpFromPoints(customPoints) : []) : intensityRaw.filter((d) => d.area_id === area.id).map((d) => ({month: d.month, n: +d.viirs_hotspots, frp: +d.frp_total_mw, median: +d.frp_median_mw})))
+  .filter((d) => d.month >= lo && d.month <= hi)
+  .map((d) => ({...d, date: new Date(d.month + "-15"), year: +d.month.slice(0, 4)}))
+  .sort((a, b) => d3.ascending(a.month, b.month));
+const frpYearly = d3.rollups(frpMonthly, (v) => ({frp: d3.sum(v, (d) => d.frp), n: d3.sum(v, (d) => d.n), months: v.length}), (d) => d.year).map(([year, o]) => ({year, ...o, perHotspot: o.n > 0 ? o.frp / o.n : NaN}));
+const frpPeak = d3.greatest(frpMonthly, (d) => d.frp);
+const MW = d3.format(",.0f");
+const intensityCharts = frpMonthly.length
+  ? html`<div class="grid grid-cols-2">
+      <div class="card">${resize((width) => quiet(Plot.plot({
+        width, height: 230, marginLeft: 60,
+        x: {label: null, type: "utc"},
+        y: {label: "Fire radiative power, MW (sum)", grid: true, tickFormat: "~s"},
+        ariaLabel: `Total fire radiative power per month in ${areaTitle}, VIIRS, ${frpMonthly[0].month} to ${frpMonthly[frpMonthly.length - 1].month}`,
+        ariaDescription: `One bar per month: the fire radiative power of every VIIRS hotspot added up.${frpPeak ? ` The highest is ${frpPeak.month}, ${MW(frpPeak.frp)} MW.` : ""}`,
+        marks: [Plot.rectY(frpMonthly, {x: "date", interval: "month", y: "frp", fill: "#d7301f", tip: {format: {x: (d) => d3.utcFormat("%b %Y")(d), y: (v) => `${MW(v)} MW`}}}), Plot.ruleY([0])]
+      })))}<p class="hint">Fire radiative power of every VIIRS hotspot in the month, added up: it grows with both the number of fires and their heat.</p></div>
+      <div class="card">${resize((width) => quiet(Plot.plot({
+        width, height: 230, marginLeft: 50,
+        x: {label: null, tickFormat: "d", interval: 1},
+        y: {label: "MW per hotspot (average)", grid: true, zero: true},
+        ariaLabel: `Average fire radiative power per hotspot, each year, ${areaTitle}`,
+        ariaDescription: "One bar per year: total fire radiative power divided by the number of VIIRS hotspots. El Niño years are marked with a diamond.",
+        marks: [
+          Plot.barY(frpYearly, {x: "year", y: "perHotspot", fill: (d) => (d.months === 12 ? "#fdae61" : "#d9d9d9"), tip: {format: {y: (v) => `${v.toFixed(1)} MW`, fill: false}}}),
+          Plot.text(frpYearly.filter((d) => EL_NINO.has(d.year)), {x: "year", y: "perHotspot", text: () => NINO_MARK, dy: -9, fontSize: 13, fill: "currentColor"}),
+          Plot.ruleY([0])
+        ]
+      })))}<p class="hint">How hot a typical detection was: total fire radiative power ÷ hotspots, per year. ${NINO_MARK}: El Niño year; pale bars: years only partly in the selection.</p></div>
+    </div>`
+  : html`<p class="hint">No VIIRS hotspots in this selection (VIIRS starts in February 2012).</p>`;
+display(intensityCharts);
+```
+
+<p class="hint">Fire radiative power (FRP) is the heat a fire gives off at the moment the satellite passes, in megawatts, as reported by NASA FIRMS for each hotspot. Shown for VIIRS only, from February 2012: MODIS measures it over pixels several times larger, so its values are not comparable and are not converted here. NOAA-20 hotspots that stand in for Suomi NPP are weighted as in the calendar. A satellite sees each fire for a moment, twice a day, so this is a snapshot of intensity, not the energy a fire released.</p>
+
+## Day by day
+
+```js
+// Daily harmonised hotspots (pipeline, daily.csv: days with hotspots; other days are 0), loaded when this section scrolls into view.
+const dailyRaw = visibility().then(() => FileAttachment("data/daily.csv").csv());
+```
+
+```js
+// Window: the To month and the two months before it, up to the last day of data.
+const dayEndIso = hi === allMonths[allMonths.length - 1] ? meta.lastDate : new Date(Date.UTC(+hi.slice(0, 4), +hi.slice(5, 7), 0)).toISOString().slice(0, 10);
+const dayStartDate = new Date(Date.UTC(+hi.slice(0, 4), +hi.slice(5, 7) - 3, 1));
+const windowDays = d3.utcDay.range(dayStartDate, new Date(new Date(dayEndIso + "T00:00:00Z").getTime() + 864e5)).map((d) => d.toISOString().slice(0, 10)).filter((d) => d >= `${meta.recordStart}-01`);
+const dayMap = area.id === "custom"
+  ? d3.rollup(customPoints ?? [], (v) => d3.sum(v, (p) => p.w), (p) => p.date)
+  : new Map(dailyRaw.filter((d) => d.area_id === area.id).map((d) => [d.date, +d.hotspots_harmonised]));
+const gapSet = new Set(meta.gapDates);
+// "A usual day": the median of the same calendar day over the full years of the record (the window's own year left out), smoothed over 7 days.
+const isRealDay = (x) => !Number.isNaN(Date.parse(x + "T00:00:00Z")) && new Date(x + "T00:00:00Z").toISOString().slice(0, 10) === x;
+const usualRaw = windowDays.map((d) => d3.median(d3.range(elnino.years[0], elnino.years[1] + 1).filter((y) => y !== +d.slice(0, 4)).map((y) => `${y}${d.slice(4)}`).filter((x) => isRealDay(x) && !gapSet.has(x)), (x) => dayMap.get(x) ?? 0));
+const dayRows = windowDays.map((d, i) => ({date: new Date(d + "T00:00:00Z"), iso: d, hotspots: Math.round((dayMap.get(d) ?? 0) * 10) / 10, gap: gapSet.has(d), usual: d3.mean(usualRaw.slice(Math.max(0, i - 3), i + 4))}));
+const dayPeak = d3.greatest(dayRows, (d) => d.hotspots);
+display(windowDays.length ? html`<div class="card">${resize((width) => quiet(Plot.plot({
+  width, height: 240, marginLeft: 50,
+  x: {type: "utc", label: null},
+  y: {label: "Hotspots per day (VIIRS-equivalent)", grid: true},
+  ariaLabel: `Hotspots per day in ${areaTitle}, ${windowDays[0]} to ${windowDays[windowDays.length - 1]}`,
+  ariaDescription: `One bar per day; the dashed line is a usual day: the median of the same day in ${elnino.years[0]}–${elnino.years[1]}, smoothed over a week.${dayPeak && dayPeak.hotspots > 0 ? ` The busiest day was ${dayPeak.iso}, ${fmt(dayPeak.hotspots)} hotspots.` : ""}`,
+  marks: [
+    Plot.rectY(dayRows, {x: "date", interval: "day", y: "hotspots", fill: "#d7301f", tip: {format: {x: (d) => d3.utcFormat("%a %d %b %Y")(d), y: (v) => fmt(v)}}}),
+    Plot.lineY(dayRows, {x: "date", y: "usual", stroke: "currentColor", strokeDasharray: "4,3", strokeWidth: 1.5}),
+    Plot.text(dayRows.filter((d) => d.gap), {x: "date", y: 0, text: () => "×", dy: -6, fill: "currentColor"}),
+    Plot.ruleY([0])
+  ]
+})))}</div>` : html`<p class="hint">No days in this window.</p>`);
+```
+
+<p class="hint">Each bar is one day, on the same VIIRS scale as the calendar (a month's bars add up to its calendar cell). Dashed line: a usual day, the median of the same calendar day over ${elnino.years[0]}–${elnino.years[1]}, smoothed over a week. × marks a day with no satellite data. Days are FIRMS acquisition dates in UTC. Change "To" to move the window; single days are noisy, so read the run of days, not one day.</p>
 
 ## What harmonisation changes
 
@@ -767,7 +955,7 @@ display(html`<div class="downloads">
 
 <p class="hint">The hotspot file lists every detection that makes up the harmonised record for this area and period, with a weight that puts it on the VIIRS scale (1 for Suomi NPP, k for MODIS Aqua, f for NOAA-20 on the days it stands in for Suomi NPP). Summing the weights by month gives the calendar. ${area.level === "country" ? "For the whole country this file is large (up to about 30 MB)." : ""}</p>
 
-<p class="hint">Data run from ${meta.recordStart} to ${meta.lastDate}. Designed for provincial fire officers (Bureau of Fire Protection), DENR forestry offices and local disaster risk reduction and management offices. It describes the past and does not forecast.</p>
+<p class="hint">Data run from ${meta.recordStart} to ${meta.lastDate}. Designed for provincial fire officers (Bureau of Fire Protection), DENR forestry offices and local disaster risk reduction and management offices. The calendar describes the past; the El Niño outlook is a range from past seasons, not a forecast model.</p>
 
 ## Tell us what to fix
 
@@ -851,6 +1039,12 @@ a.strip-item span { text-decoration: underline; text-underline-offset: 2px; text
 .nino-panel .too-few { font-size: 1.5rem; color: inherit; }
 .nino-caution { font-size: 0.9rem; border-left: 3px solid #fdae61; }
 .nino-caution p { margin: 0; }
+.outlook-grid .card { margin: 0; }
+.outlook p { margin: 0.45rem 0; }
+.outlook-lead { font-size: 1.05rem; }
+.cal3d { margin: 0.4rem 0 1rem; }
+.cal3d summary { cursor: pointer; font-weight: 600; }
+.cal3d input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
 .nino-legend { font-size: 0.85rem; color: var(--theme-foreground-muted); margin: 0.2rem 0 0.8rem; max-width: 60rem; }
 .all-provinces { margin: 0.8rem 0; }
 .all-provinces summary { cursor: pointer; font-weight: 600; margin-bottom: 0.5rem; }

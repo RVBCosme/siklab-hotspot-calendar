@@ -200,6 +200,29 @@ display(html`<table>
 
 **Cautions.** El Niño years are also less cloudy, so satellites see more of what burns: the ratio mixes more burning with better visibility, and FIRMS carries no cloud information to separate the two. The record holds only ${nWord(nNino)} El Niño seasons. The chance test treats the years as interchangeable, so it does not allow for a slow trend or for runs of dry years. With ${NS.provincesTestable} provinces tested, a few will pass by chance alone. Metro Manila's hotspots are mostly industrial heat (see Limits). This describes past seasons; it is not a forecast.
 
+## Outlook for the next El Niño season
+
+```js
+const out = FileAttachment("data/outlook.json").json();
+```
+
+```js
+const OP = out.areas.ph, OS = out.summary;
+const opc = (x) => `${Math.round(100 * x)}%`;
+const of0 = d3.format(",.0f");
+```
+
+PAGASA expects the El Niño of late 2026 to last into the first half of ${out.nextYear}. The calendar page turns the past El Niño seasons into a simple outlook for January–May ${out.nextYear}: if that season is an El Niño season, the range of the ${nWord(nNino)} past El Niño seasons (country: median ${of0(OP.median)} hotspots, from ${of0(OP.low)} to ${of0(OP.high)}). This is an analogue range, not a forecast model: it says what past El Niño seasons looked like, not what will burn.
+
+- **Tested on the past.** Each El Niño season was predicted from the other ${nWord(nNino - 1)} (their median) and compared with ignoring El Niño (the median of all other seasons). For the country the median miss was ${opc(OP.errorElNinoAnalogues)} against ${opc(OP.errorIgnoringElNino)}; ${nWord(OP.insideRange)} of the ${nWord(OP.ofSeasons)} El Niño seasons fell inside the range of the others. Of ${OS.provincesWithOutlook} provinces with enough fires, the El Niño seasons were closer in ${OS.provincesAnaloguesBetter}.
+- **A season it never saw.** January–May ${out.checkYear} was not an El Niño season. The country had ${of0(OP.check.value)} hotspots: inside the range of past seasons without El Niño (${of0(OP.check.otherLow)} to ${of0(OP.check.otherHigh)}), but far above their median (${of0(OP.otherMedian)}). In ${OS.provincesWithOutlook - OS.provincesCheckOtherMedianBetter} of the ${OS.provincesWithOutlook} provinces, the usual season without El Niño was a worse guess for ${out.checkYear} than the median of all seasons. So a busy season can come without El Niño, and the outlook is a range, not a promise.
+- **Cautions.** It holds only if El Niño holds. It rests on ${nWord(nNino)} seasons, mixes more burning with clearer skies, and cannot know ${out.nextYear}'s weather, land use or fire control.
+
+## Daily counts and fire intensity
+
+- **Day by day.** The pipeline also keeps the harmonised count of every day (\`daily.csv\`), built the same way as the months, so a month's days add up to its calendar value. The calendar page shows the To month and the two months before it, against a usual day: the median of the same calendar day over ${nino.years.join("–")}, smoothed over a week. Single days are noisy; dates are UTC.
+- **Fire intensity.** Each FIRMS hotspot carries its fire radiative power (FRP, in megawatts): the heat the fire gave off when the satellite passed. The page adds it up by month and divides by the number of hotspots for a typical detection (\`intensity.csv\`). It uses VIIRS only, from ${meta.viirsStart}: MODIS measures FRP over pixels several times larger, and converting it would need its own test, which we have not done. NOAA-20 hotspots that stand in for Suomi NPP are weighted as in the calendar. FRP is a snapshot at the overpass, not the energy a fire released over its life.
+
 ## Limits
 
 - **A hotspot is not a fire.** One fire can make many hotspots, and small or short fires, or fires under cloud, make none. The counts compare like with like across years; they are not a count of fires or of area burned.
@@ -210,7 +233,7 @@ display(html`<table>
 - **The 87 provinces** are geoBoundaries' second level for 2020: 81 provinces, Metro Manila's four districts, Isabela City and Cotabato City.
 - **Dates** are FIRMS acquisition dates in UTC. The night pass, at about 01:30 Philippine time, is dated the day before, so a few hotspots at the turn of a month count in the earlier month.
 - **2026** comes from the FIRMS area API: standard quality up to the end of July (VIIRS) or August (MODIS), then near real time, which NASA later replaces with standard quality. Near-real-time rows carry no FIRMS type, so detections in the same or a neighbouring 0.02° cell (about 2 km) as any spot FIRMS flagged as an active volcano are dropped (${n(meta.stats.droppedNearVolcano)} rows). Offshore detections near the coast cannot be told apart and stay in from August 2026; in 2012–2025 they were 0.3–2.4% of a year's VIIRS hotspots. The current month holds only the days so far and is marked as such.
-- The record describes the past. It does not forecast.
+- The record describes the past. The El Niño outlook is a range from past El Niño seasons, not a forecast model (see above).
 
 ## Factors by region
 
