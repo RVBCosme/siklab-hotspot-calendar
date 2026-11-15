@@ -4,18 +4,25 @@ title: Calendar
 
 <!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README. -->
 
-# Philippine burning activity calendar
-
-<p class="lede">How many fire hotspots did satellites see, month by month since 2003, in a Philippine region or province? MODIS and VIIRS count fire very differently, so this calendar puts both on one scale: the sensor that saw a fire no longer changes the number you read.</p>
-
-<ol class="how-to-read">
-  <li>Pick a place: the whole country, a region, a province, or a box you draw on a map. You can also click a province on the map further down.</li>
-  <li>Pick the months to look at with From and To.</li>
-  <li>Read the colours. Each square in the calendar is one month; the darker it is, the more fire hotspots the satellites saw.</li>
-</ol>
+<header class="band">
+  <h1>Siklab hotspot calendar</h1>
+  <p class="tagline">When and where the Philippines burns, and how El Niño changes it</p>
+  <ul class="band-figures">
+    <li><b>${elnino.areas.ph.ratio.toFixed(1)}×</b> <span>as many hotspots in El Niño fire seasons (${MONTHS[elnino.seasonMonths[0] - 1]}–${MONTHS[elnino.seasonMonths[elnino.seasonMonths.length - 1] - 1]}) as in other years: whole country, medians of ${elnino.years[0]}–${elnino.years[1]}</span></li>
+    <li><b>${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}%</b> <span>typical error of a region's yearly total, tested on years the conversion never saw</span></li>
+    <li><b>${fmt(allMonths.length)}</b> <span>months of MODIS and VIIRS on one scale, ${monthName(allMonths[0])} to ${meta.lastDate.slice(8, 10).replace(/^0/, "")} ${monthName(meta.lastDate.slice(0, 7))}</span></li>
+  </ul>
+  ${seasonRibbon}
+</header>
 
 <details class="explain">
-  <summary>Explain it simply: what is a hotspot, and why two kinds of satellite?</summary>
+  <summary>Explain it simply: how to read this page, what a hotspot is, and why two kinds of satellite</summary>
+  <p><b>How to read this page.</b></p>
+  <ol class="how-to-read">
+    <li>Pick a place: the whole country, a region, a province, or a box you draw on a map. You can also click a province on the map further down.</li>
+    <li>Pick the months to look at with From and To.</li>
+    <li>Read the colours. Each square in the calendar is one month; the darker it is, the more fire hotspots the satellites saw.</li>
+  </ol>
   <p><b>What is a hotspot?</b> Satellites circle the Earth carrying cameras that sense heat. When a patch of ground is much hotter than the land around it, usually because something is burning, the satellite marks it. Each mark is a hotspot. One big fire can make many hotspots, and a fire under thick cloud makes none.</p>
   <p><b>Why two kinds of satellite?</b> An older camera called MODIS has marked hotspots since 2000. A newer, sharper one called VIIRS started in 2012. It notices smaller fires, so over the Philippines it marks about ${Math.round(meta.factors.ph.k)} hotspots for every one that MODIS marks. Put end to end, the two records would make it look as if fires jumped in 2012, when only the camera changed.</p>
   <p><b>What did we do about it?</b> For each region we counted how many VIIRS hotspots matched one MODIS hotspot in the years both cameras were watching (2012 to 2020), and used that number to convert the older years. Then we tested it on years the conversion never saw: a region's yearly total came out within about ${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}% of what VIIRS recorded, in a typical case. That conversion is what "harmonised" means on this site.</p>
@@ -29,6 +36,7 @@ const meta = FileAttachment("data/meta.json").json();
 const validation = FileAttachment("data/validation.json").json();
 const provinceShapes = FileAttachment("data/provinces.json").json();
 const elnino = FileAttachment("data/elnino.json").json();
+const seam = FileAttachment("data/seam.json").json();
 const pointFiles = {
   "r-armm": FileAttachment("data/points/r-armm.csv"),
   "r-bicol-region": FileAttachment("data/points/r-bicol-region.csv"),
@@ -133,6 +141,49 @@ display(shareButton);
 ```
 
 </div>
+
+```js
+// Header ribbon: the country's median month over the full years of the El Niño analysis, coloured like the calendar.
+const ribbonMedian = d3.range(1, 13).map((m) => d3.median(byArea.get("ph").filter((d) => d.m === m && d.year >= elnino.years[0] && d.year <= elnino.years[1]), (d) => d.hotspots));
+const ribbonColour = d3.scaleSequentialSqrt(d3.interpolateYlOrRd).domain([0, d3.max(ribbonMedian)]);
+const ribbonPeak = ribbonMedian.indexOf(d3.max(ribbonMedian));
+const seasonRibbon = html`<figure class="ribbon" role="img" aria-label=${`The country's median month, ${elnino.years[0]} to ${elnino.years[1]}, coloured from light (few hotspots) to dark red (many). The peak is ${MONTH_NAMES[ribbonPeak]}.`}>
+  <div class="cells">${ribbonMedian.map((v) => html`<span style=${`background: ${ribbonColour(v)}`}></span>`)}</div>
+  <div class="months" aria-hidden="true">${MONTHS.map((m) => html`<span>${m}</span>`)}</div>
+  <figcaption aria-hidden="true">The country's median month, ${elnino.years[0]}–${elnino.years[1]}: the fire season peaks in ${MONTH_NAMES[ribbonPeak]}</figcaption>
+</figure>`;
+```
+
+```js
+// "What the record shows" for the selected area, over the whole record (From and To do not change it).
+const recordRows = series.filter((d) => d.year >= elnino.years[0] && d.year <= elnino.years[1]);
+const monthTotals = d3.range(1, 13).map((m) => d3.sum(recordRows, (d) => (d.m === m ? d.hotspots : 0)));
+const recordTotal = d3.sum(monthTotals);
+// The three busiest consecutive calendar months (December–February counts as consecutive).
+const peak3 = d3.greatest(d3.range(12).map((i) => ({start: i, share: (monthTotals[i] + monthTotals[(i + 1) % 12] + monthTotals[(i + 2) % 12]) / recordTotal})), (d) => d.share);
+const yearSumOf = (y, f) => d3.sum(series, (d) => (d.year === y ? f(d) : 0));
+const stepOf = (fBefore, fAfter) => {
+  const b = d3.mean(d3.range(seam.before[0], seam.before[1] + 1), (y) => yearSumOf(y, fBefore));
+  const a = d3.mean(d3.range(seam.after[0], seam.after[1] + 1), (y) => yearSumOf(y, fAfter));
+  return b > 0 ? a / b : NaN;
+};
+const stepHarmonised = stepOf((d) => d.hotspots, (d) => d.hotspots);
+const stepRaw = stepOf((d) => d.modis_aqua, (d) => d.viirs_snpp);
+const goToPanel = (event) => {
+  event.preventDefault(); // keep the view link in the address bar
+  const panel = document.getElementById("el-nino");
+  panel?.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
+  panel?.focus({preventScroll: true});
+};
+display(html`<section class="strip" aria-labelledby="strip-title">
+  <h2 id="strip-title">What the record shows: ${placeName}, ${elnino.years[0]}–${elnino.years[1]}</h2>
+  <div class="strip-items">
+    <a class="strip-item" href="#el-nino" onclick=${goToPanel}><b>${nino.testable ? `${nino.ratio.toFixed(1)}×` : "Too few fires to tell"}</b><span>${nino.testable ? `as many hotspots in El Niño fire seasons (${seasonLabel}) as in other years.` : "for a comparison of El Niño fire seasons."} See the El Niño panel</span></a>
+    <div class="strip-item"><b>${recordTotal > 0 ? `${Math.round(100 * peak3.share)}%` : "None"}</b><span>${recordTotal > 0 ? `of the year's hotspots fall from ${MONTH_NAMES[peak3.start]} to ${MONTH_NAMES[(peak3.start + 2) % 12]}, the three busiest months in a row` : "no hotspots in the record here"}</span></div>
+    <div class="strip-item"><b>${Number.isFinite(stepHarmonised) ? `${stepHarmonised.toFixed(2)}×` : "n/a"}</b><span>change at ${seam.after[0]}, when the satellites changed, in the harmonised record${Number.isFinite(stepRaw) ? ` (${stepRaw.toFixed(2)}× in the raw record)` : "; raw counts are not kept for a drawn box"}</span></div>
+  </div>
+</section>`);
+```
 
 ```js
 // Custom area: a box drawn on a NASA GIBS base map, or typed as coordinates.
@@ -403,6 +454,7 @@ const rankCard = endRow.hotspots === 0
     <h2>${MONTHS[endRow.m - 1]} ${endRow.year}${partial ? `, 1–${endRow.days} only` : ""}</h2>
     <span class="big">${fmt(endRow.hotspots)}</span>
     <p>hotspots (VIIRS-equivalent) in ${areaTitle}${partial ? " so far this month" : ""}</p>
+    ${hi < meta.viirsStart ? html`<p class="hint">Converted from MODIS; a single month is typically off by about a third (${Math.round(validation.T1_leaveOneYearOut_2012_2020.harmonised.monthlyMedianAbsPctError)}% in the held-out test).</p>` : ""}
   </div>
   <div class="card">
     <h2>Against the historical median</h2>
@@ -558,7 +610,7 @@ const ninoPanel = html`<div class="nino-panel">
 <div class="grid grid-cols-3 map-grid">
   <div class="card grid-colspan-2">${mapInput}${mapFigure}</div>
   <div class="map-side">
-    <div class="card" id="el-nino">${ninoPanel}</div>
+    <div class="card" id="el-nino" tabindex="-1">${ninoPanel}</div>
     <div class="card nino-caution"><p>PAGASA's <a href="https://pubfiles.pagasa.dost.gov.ph/pagasaweb/files/climate/elninolanina/ENSO_Advisory6_OS.pdf" target="_blank" rel="noopener">El Niño Advisory No. 6</a> (3 November 2026) reports a very strong El Niño, expected to last into the first half of 2027. This describes past seasons; it is not a forecast. El Niño years are also less cloudy, so satellites see more of what burns: the ratio mixes more burning with better visibility. The record holds only ${word(elnino.elNinoYears.length)} El Niño seasons.</p></div>
     <div class="card">${rankedList}</div>
   </div>
@@ -603,6 +655,10 @@ const seasonFigure = display(resize((width) => quiet(Plot.plot({
 const yearly = d3.rollups(sel, (v) => ({total: d3.sum(v, (d) => d.hotspots), months: v.length, source: v[0].source.startsWith("MODIS") ? "MODIS Aqua, converted" : "VIIRS"}), (d) => d.year).map(([year, o]) => ({year, ...o}));
 const fullYears = yearly.filter((d) => d.months === 12);
 const yearMean = d3.mean(fullYears, (d) => d.total);
+// Error marks on converted MODIS years (country and regions only), sized by the held-out test's median error of a region's yearly total.
+const YEAR_ERR = validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError / 100;
+const showYearErr = area.level === "country" || area.level === "region";
+const modisYears = yearly.filter((d) => d.year < +meta.viirsStart.slice(0, 4) && d.months === 12);
 const yearsFigure = display(resize((width) => quiet(Plot.plot({
   width,
   height: 260,
@@ -613,7 +669,9 @@ const yearsFigure = display(resize((width) => quiet(Plot.plot({
   color: {domain: ["MODIS Aqua, converted", "VIIRS"], range: ["#fdae61", "#d7301f"], legend: true},
   marks: [
     Plot.barY(yearly, {x: "year", y: "total", fill: "source", tip: {format: {y: (v) => fmt(v)}}}),
-    Plot.text(yearly.filter((d) => EL_NINO.has(d.year)), {x: "year", y: "total", text: () => NINO_MARK, dy: -9, fontSize: 13, fill: "currentColor"}),
+    showYearErr ? Plot.ruleX(modisYears, {x: "year", y1: (d) => d.total * (1 - YEAR_ERR), y2: (d) => d.total * (1 + YEAR_ERR), stroke: "currentColor", strokeWidth: 1.5}) : null,
+    showYearErr ? Plot.tickY(modisYears.flatMap((d) => [{year: d.year, y: d.total * (1 - YEAR_ERR)}, {year: d.year, y: d.total * (1 + YEAR_ERR)}]), {x: "year", y: "y", stroke: "currentColor", strokeWidth: 1.5, inset: 8}) : null,
+    Plot.text(yearly.filter((d) => EL_NINO.has(d.year)), {x: "year", y: (d) => (showYearErr && d.year < +meta.viirsStart.slice(0, 4) ? d.total * (1 + YEAR_ERR) : d.total), text: () => NINO_MARK, dy: -9, fontSize: 13, fill: "currentColor"}),
     fullYears.length ? Plot.ruleY([yearMean], {stroke: "currentColor", strokeDasharray: "4,3"}) : null,
     Plot.ruleY([0])
   ]
@@ -621,7 +679,7 @@ const yearsFigure = display(resize((width) => quiet(Plot.plot({
 display(ninoLegend());
 ```
 
-<p class="hint">${fullYears.length ? `Dashed line: the average full year (${fmt(yearMean)}). ` : ""}Partial years in the selection are shorter bars, not quieter years.</p>
+<p class="hint">${fullYears.length ? `Dashed line: the average full year (${fmt(yearMean)}). ` : ""}Partial years in the selection are shorter bars, not quieter years. ${modisYears.length ? (showYearErr ? `The thin bars on the converted MODIS years show ±${Math.round(YEAR_ERR * 100)}%: the typical error of a region's yearly total in the held-out test (median); not a confidence interval.` : `Converted MODIS years carry an error: a region's yearly total is typically off by about ${Math.round(YEAR_ERR * 100)}% in the held-out test, and the error is larger for small areas such as a province or a drawn box.`) : ""}</p>
 
 ## What harmonisation changes
 
@@ -736,10 +794,35 @@ display(feedbackLink);
 ```
 
 <style>
-.lede { font-size: 1.1rem; max-width: 60rem; }
+.band { margin: 0.2rem 0 1rem; }
+.band h1 { font-size: 2.7rem; line-height: 1.05; margin: 0; max-width: none; letter-spacing: -0.01em; }
+.tagline { font-size: 1.25rem; line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 46rem; color: var(--theme-foreground-muted); }
+.band-figures { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; max-width: 72rem; }
+.band-figures li { display: flex; align-items: baseline; gap: 0.6rem; margin: 0; }
+.band-figures b { font-size: 2.1rem; line-height: 1; color: #d7301f; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.band-figures span { font-size: 0.9rem; line-height: 1.35; }
+.ribbon { margin: 0; max-width: 72rem; }
+.ribbon .cells, .ribbon .months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
+.ribbon .cells span { height: 12px; }
+.ribbon .cells span:first-child { border-radius: 3px 0 0 3px; }
+.ribbon .cells span:last-child { border-radius: 0 3px 3px 0; }
+.ribbon .months span { font-size: 0.72rem; line-height: 1.5; text-align: center; color: var(--theme-foreground-muted); }
+.ribbon figcaption { font-size: 0.8rem; color: var(--theme-foreground-muted); }
+.strip { margin: 0.2rem 0 1.4rem; max-width: 72rem; }
+.strip h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+.strip-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; }
+.strip-item { display: flex; align-items: baseline; gap: 0.6rem; color: inherit; }
+#observablehq-main a.strip-item { text-decoration: none; }
+a.strip-item span { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--theme-foreground-faint); }
+.strip-item b { font-size: 1.6rem; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.strip-item span { font-size: 0.88rem; line-height: 1.35; }
+#el-nino:focus { outline: none; }
+#el-nino:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 2px; }
+@media (max-width: 640px) { .band h1 { font-size: 2.1rem; } .band-figures, .strip-items { grid-template-columns: 1fr; } }
 .hint { color: var(--theme-foreground-muted); font-size: 0.9rem; max-width: 60rem; }
 .big { font-size: 2.2rem; font-weight: 700; }
 .controls form { margin-bottom: 0.4rem; }
+@media (min-width: 900px) { .controls > .observablehq { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; column-gap: 2rem; align-items: start; } .controls .share { justify-self: start; } }
 .controls input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
 .controls form label { margin-right: 0.6rem; }
 .downloads { display: flex; gap: 0.6rem; flex-wrap: wrap; }
