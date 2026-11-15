@@ -117,28 +117,29 @@ const yearSum = (id, y, f) => { let s = 0; for (let m = 1; m <= 12; m++) s += f(
 const BEFORE = [2007, 2008, 2009, 2010, 2011], AFTER = [2012, 2013, 2014, 2015, 2016];
 function step(id, fBefore, fAfter) {
   const b = mean(BEFORE.map((y) => yearSum(id, y, fBefore))), a = mean(AFTER.map((y) => yearSum(id, y, fAfter)));
-  return b > 0 ? r4(a / b) : null;
+  return b > 0 ? a / b : null;
 }
-const seam = {};
+const seamExact = {}; // unrounded, for the summary; seam.json stores 4 decimals
 for (const a of areas.filter((x) => x.level !== "province")) {
-  seam[a.id] = {
+  seamExact[a.id] = {
     raw: step(a.id, (r) => r.aqua, (r) => r.snpp),
     harmonised: step(a.id, (r) => r.h, (r) => r.h),
     aquaAlone: step(a.id, (r) => r.aqua, (r) => r.aqua),
   };
 }
+const seam = Object.fromEntries(Object.entries(seamExact).map(([id, o]) => [id, { raw: r4(o.raw), harmonised: r4(o.harmonised), aquaAlone: r4(o.aquaAlone) }]));
 const regionIds = areas.filter((a) => a.level === "region").map((a) => a.id);
-const offs = regionIds.map((id) => ({ id, off: Math.abs(seam[id].harmonised / seam[id].aquaAlone - 1) }));
+const offs = regionIds.map((id) => ({ id, off: Math.abs(seamExact[id].harmonised / seamExact[id].aquaAlone - 1) }));
 fs.writeFileSync(path.join(OUT, "seam.json"), JSON.stringify({
   aiAssistance: AI_NOTE,
   rules: `Step = mean yearly total ${AFTER[0]}-${AFTER[AFTER.length - 1]} / mean yearly total ${BEFORE[0]}-${BEFORE[BEFORE.length - 1]}, from monthly.csv. raw: MODIS Aqua count to 2011, VIIRS Suomi NPP count from 2012. harmonised: hotspots_harmonised. aquaAlone: MODIS Aqua count in both periods.`,
   before: [BEFORE[0], BEFORE[BEFORE.length - 1]], after: [AFTER[0], AFTER[AFTER.length - 1]],
   summary: {
-    regionsRawMedian: r4(median(regionIds.map((id) => seam[id].raw))),
-    regionsRawMin: r4(Math.min(...regionIds.map((id) => seam[id].raw))),
-    regionsRawMax: r4(Math.max(...regionIds.map((id) => seam[id].raw))),
-    regionsHarmonisedVsAquaMedianOff: r3(median(offs.map((d) => d.off))),
-    regionsHarmonisedVsAquaOff: Object.fromEntries(offs.map((d) => [d.id, r3(d.off)])),
+    regionsRawMedian: r4(median(regionIds.map((id) => seamExact[id].raw))),
+    regionsRawMin: r4(Math.min(...regionIds.map((id) => seamExact[id].raw))),
+    regionsRawMax: r4(Math.max(...regionIds.map((id) => seamExact[id].raw))),
+    regionsHarmonisedVsAquaMedianOff: r4(median(offs.map((d) => d.off))),
+    regionsHarmonisedVsAquaOff: Object.fromEntries(offs.map((d) => [d.id, r4(d.off)])),
   },
   areas: seam,
 }, null, 1));

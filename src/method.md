@@ -63,6 +63,71 @@ The tests and thresholds below were written into the code before the first run, 
 - After 2021, when the MODIS satellites drifted, the error doubles, and one national factor does slightly better than per-region factors. Before February 2012 the calendar uses MODIS, and those years fall before the drift.
 - Pooling Terra with Aqua gave a slightly lower error in the held-out test, counted on the days all three satellites delivered data (${pc(v.comparison_TerraPlusAqua_T1.annualMedianAbsPctError)} against ${pc(T1.harmonised.annualMedianAbsPctError)} for annual totals). We kept Aqua alone, as decided before the run, and record this as an open question.
 
+```js
+const seam = FileAttachment("data/seam.json").json();
+const heldout = FileAttachment("data/heldout.json").json();
+```
+
+```js
+const SP = seam.areas.ph, SS = seam.summary;
+const step = (x) => `${x.toFixed(2)}×`;
+const nameOf = new Map(areas.map((a) => [a.id, a.name.replace(" (ARMM in the 2020 boundaries)", "")]));
+const weakest = Object.entries(SS.regionsHarmonisedVsAquaOff).sort((a, b) => b[1] - a[1]).slice(0, 2);
+const STEP_KINDS = ["Raw record stitched at 2012 (MODIS Aqua, then VIIRS)", "Harmonised record", "MODIS Aqua alone, both periods"];
+const stepRows = Object.entries(seam.areas).flatMap(([id, s]) => [
+  {id, name: nameOf.get(id), kind: STEP_KINDS[0], value: s.raw},
+  {id, name: nameOf.get(id), kind: STEP_KINDS[1], value: s.harmonised},
+  {id, name: nameOf.get(id), kind: STEP_KINDS[2], value: s.aquaAlone}
+]);
+const stepOrder = Object.entries(seam.areas).sort((a, b) => (a[0] === "ph" ? -1 : b[0] === "ph" ? 1 : b[1].raw - a[1].raw)).map(([id]) => nameOf.get(id));
+const quietM = (node) => (node.querySelectorAll("g[aria-label]").forEach((g) => g.removeAttribute("aria-label")), node);
+```
+
+### Does the sensor still matter? The step at ${seam.after[0]}
+
+A second test of the conversion, on the whole record rather than single years. Compare the average year after the change of sensor (${seam.after.join("–")}) with the average year before it (${seam.before.join("–")}). Measured three ways for the whole country:
+
+- **Raw record, stitched at 2012** (MODIS Aqua counts up to 2011, VIIRS counts from 2012): **${step(SP.raw)}**, a step made by the change of instrument.
+- **Harmonised record** (what the calendar shows): **${step(SP.harmonised)}**.
+- **MODIS Aqua alone**, the one satellite that flew through both periods, so its step is not touched by a change of sensor: **${step(SP.aquaAlone)}**.
+
+Across the change of sensor the harmonised record moves the way a single satellite saw it move; the ${Math.round(SP.raw)}-fold step is gone. Region by region, the raw step has a median of ${step(SS.regionsRawMedian)} (from ${step(SS.regionsRawMin)} to ${step(SS.regionsRawMax)}), and the harmonised step differs from MODIS Aqua's own by a median of ${Math.round(100 * SS.regionsHarmonisedVsAquaMedianOff)}%. The conversion is not exact: the two weak spots are ${weakest.map(([id, off]) => `${nameOf.get(id)} (${Math.round(100 * off)}% off)`).join(" and ")}. Metro Manila has very few fires and its factor rests on few MODIS Aqua hotspots (see Limits).
+
+```js
+display(resize((width) => quietM(Plot.plot({
+  width,
+  height: 26 * stepOrder.length + 70,
+  marginLeft: Math.min(170, width * 0.38),
+  x: {type: "log", label: `Mean year ${seam.after.join("–")} ÷ mean year ${seam.before.join("–")} (log scale)`, grid: true, domain: [0.4, 25], tickFormat: (d) => `${d}×`, ticks: [0.5, 1, 2, 5, 10, 20]},
+  y: {domain: stepOrder, label: null},
+  color: {domain: STEP_KINDS, range: ["#888888", "#d7301f", "#fdae61"], legend: true},
+  symbol: {domain: STEP_KINDS, range: ["circle", "diamond", "square"]},
+  ariaLabel: "The step across the change of sensor, by region, three ways",
+  ariaDescription: `For the country and each region: the raw stitched record jumps about ${Math.round(SP.raw)}-fold at 2012; the harmonised record and MODIS Aqua alone stay near 1. Values are in seam.json and in the text above.`,
+  marks: [
+    Plot.ruleX([1], {stroke: "currentColor", strokeOpacity: 0.5}),
+    Plot.dot(stepRows, {x: "value", y: "name", stroke: "kind", fill: "kind", symbol: "kind", r: 4.5, fillOpacity: 0.85, tip: {format: {x: (d) => `${d.toFixed(2)}×`, y: true, stroke: false, fill: false}}})
+  ]
+}))));
+```
+
+**The held-out test, point by point.** Each point is one region in one year from ${d3.min(heldout.pairs, (d) => d.year)} to ${d3.max(heldout.pairs, (d) => d.year)}: the converted MODIS count, with the factor refitted without that year, against what VIIRS counted (${heldout.pairs.length} region-years with at least 100 VIIRS hotspots, the headline test in the table above). Points on the line are exact.
+
+```js
+display(resize((width) => quietM(Plot.plot({
+  width: Math.min(width, 560),
+  height: Math.min(width, 560),
+  x: {type: "log", label: "VIIRS hotspots, observed (log scale)", grid: true, tickFormat: "~s"},
+  y: {type: "log", label: "Converted MODIS, predicted (log scale)", grid: true, tickFormat: "~s"},
+  ariaLabel: "Converted MODIS against VIIRS, one point per region-year in the held-out test",
+  ariaDescription: `${heldout.pairs.length} points around the one-to-one line; the median error is ${T1.harmonised.annualMedianAbsPctError}%.`,
+  marks: [
+    Plot.line([[d3.min(heldout.pairs, (d) => Math.min(d.observed, d.predicted)), d3.min(heldout.pairs, (d) => Math.min(d.observed, d.predicted))], [d3.max(heldout.pairs, (d) => Math.max(d.observed, d.predicted)), d3.max(heldout.pairs, (d) => Math.max(d.observed, d.predicted))]], {stroke: "currentColor", strokeDasharray: "4,3"}),
+    Plot.dot(heldout.pairs, {x: "observed", y: "predicted", fill: "#d7301f", fillOpacity: 0.6, r: 3.5, channels: {Region: (d) => nameOf.get(d.region), Year: "year"}, tip: {format: {x: (v) => d3.format(",.0f")(v), y: (v) => d3.format(",.0f")(v)}}})
+  ]
+}))));
+```
+
 ## Check against fire seasons reported on the ground
 
 A second, independent check: do seasons that local news reported as bad fire seasons stand out in the calendar? The three below are every Cordillera fire surge our research found a published report of, with a place and a period; none was left out. Season totals and ranks are computed live from the calendar's data, over the full years 2003–2025.
