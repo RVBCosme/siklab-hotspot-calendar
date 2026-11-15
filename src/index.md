@@ -822,7 +822,7 @@ a.strip-item span { text-decoration: underline; text-underline-offset: 2px; text
 .hint { color: var(--theme-foreground-muted); font-size: 0.9rem; max-width: 60rem; }
 .big { font-size: 2.2rem; font-weight: 700; }
 .controls form { margin-bottom: 0.4rem; }
-@media (min-width: 900px) { .controls > .observablehq { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; column-gap: 2rem; align-items: start; } .controls .share { justify-self: start; } }
+@media (min-width: 1280px) { .controls > .observablehq { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; column-gap: 2rem; align-items: start; } .controls .share { justify-self: start; } }
 .controls input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
 .controls form label { margin-right: 0.6rem; }
 .downloads { display: flex; gap: 0.6rem; flex-wrap: wrap; }
