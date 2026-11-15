@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "data": "node pipeline/build-data.mjs",
+    "data": "node pipeline/build-data.mjs && node pipeline/build-findings.mjs",
     "dev": "observable preview",
     "build": "observable build && node pipeline/set-lang.mjs",
     "clean": "rimraf src/.observablehq/cache"

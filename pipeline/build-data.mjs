@@ -370,7 +370,7 @@ for (const id of ["ph", ...regionIdsV]) {
 }
 const sumYears = (id, years, fa, fb) => { let a = 0, b = 0; for (const y of years) for (const mo in aligned[id][y] || {}) { a += aligned[id][y][mo][fa]; b += aligned[id][y][mo][fb]; } return b > 0 ? a / b : null; };
 const FITY = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020], DRIFTY = [2021, 2022, 2023, 2024, 2025];
-function evaluate(testYears, factorFor, num = "V", den = "A") {
+function evaluate(testYears, factorFor, num = "V", den = "A", pairs = null) {
   const ann = [], mon = [], peak = [], peak1 = [];
   for (const id of regionIdsV) for (const y of testYears) {
     const k = factorFor(id, y);
@@ -385,6 +385,7 @@ function evaluate(testYears, factorFor, num = "V", den = "A") {
     }
     if (V >= 100) {
       ann.push(Math.abs(P - V) / V);
+      pairs?.push({ region: id, year: y, predicted: Math.round(P * 10) / 10, observed: V });
       const ap = pm.indexOf(Math.max(...pm)), av = vm.indexOf(Math.max(...vm));
       peak.push(ap === av ? 1 : 0);
       peak1.push(Math.min(Math.abs(ap - av), 12 - Math.abs(ap - av)) <= 1 ? 1 : 0);
@@ -405,6 +406,10 @@ const validation = {
   M4_viirsContinuity_noaa20_vs_snpp_2018_2025: evaluate([2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], (id, y) => sumYears(id, [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025].filter((x) => x !== y), "S", "N20"), "S", "N20"),
 };
 fs.writeFileSync(path.join(OUT, "validation.json"), JSON.stringify(validation, null, 1));
+// The region-years behind T1's headline number: converted MODIS Aqua (predicted) against VIIRS Suomi NPP (observed), for the method page.
+const heldOutPairs = [];
+evaluate(FITY, loyo, "V", "A", heldOutPairs);
+fs.writeFileSync(path.join(OUT, "heldout.json"), JSON.stringify({ aiAssistance: AI_NOTE, rules: "T1 (leave-one-year-out, 2012-2020), region-years with >= 100 VIIRS hotspots: predicted = MODIS Aqua x k refitted without that year; observed = VIIRS Suomi NPP; both on days with data from both satellites.", pairs: heldOutPairs }, null, 1));
 console.log("validation", JSON.stringify(validation, null, 1));
 
 console.log("factors ph", factors.ph, "\nstats", stats, "\nlastDate", lastDate, "\nprovinces without parent", provinces.filter((p) => !p.parent).map((p) => p.name));
