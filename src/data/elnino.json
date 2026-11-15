@@ -64,6 +64,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.377,
+   "hits": 7,
    "p": 0.004,
    "ratioModisYears": 2.251,
    "ratioViirsYears": 2.19
@@ -77,6 +78,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.951,
+   "hits": 0,
    "p": 0.0005,
    "ratioModisYears": 2.232,
    "ratioViirsYears": 6.123
@@ -90,6 +92,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.956,
+   "hits": 6,
    "p": 0.0035,
    "ratioModisYears": 2.085,
    "ratioViirsYears": 2.205
@@ -103,6 +106,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.013,
+   "hits": 256,
    "p": 0.1284,
    "ratioModisYears": 1.6,
    "ratioViirsYears": 2.121
@@ -116,6 +120,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.289,
+   "hits": 26,
    "p": 0.0135,
    "ratioModisYears": 1.923,
    "ratioViirsYears": 1.123
@@ -129,6 +134,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.488,
+   "hits": 125,
    "p": 0.063,
    "ratioModisYears": 2.076,
    "ratioViirsYears": 1.568
@@ -142,6 +148,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.462,
+   "hits": 32,
    "p": 0.0165,
    "ratioModisYears": 1.363,
    "ratioViirsYears": 1.165
@@ -155,6 +162,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.501,
+   "hits": 116,
    "p": 0.0585,
    "ratioModisYears": 1.657,
    "ratioViirsYears": 1.629
@@ -168,6 +176,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 1.816,
+   "hits": 6,
    "p": 0.0035,
    "ratioModisYears": 1.703,
    "ratioViirsYears": 1.926
@@ -181,6 +190,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 6.375,
+   "hits": 0,
    "p": 0.0005,
    "ratioModisYears": 6.032,
    "ratioViirsYears": 5.101
@@ -194,6 +204,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.493,
+   "hits": 54,
    "p": 0.0275,
    "ratioModisYears": 2.963,
    "ratioViirsYears": 2.008
@@ -207,6 +218,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 2.364,
+   "hits": 7,
    "p": 0.004,
    "ratioModisYears": 1.861,
    "ratioViirsYears": 2.597
@@ -220,6 +232,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.667,
+   "hits": 5,
    "p": 0.003,
    "ratioModisYears": 2.276,
    "ratioViirsYears": 3.602
@@ -233,6 +246,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.468,
+   "hits": 6,
    "p": 0.0035,
    "ratioModisYears": 2.927,
    "ratioViirsYears": 2.93
@@ -246,6 +260,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.64,
+   "hits": 0,
    "p": 0.0005,
    "ratioModisYears": 2.4,
    "ratioViirsYears": 5.078
@@ -259,6 +274,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.613,
+   "hits": 1,
    "p": 0.001,
    "ratioModisYears": 1.841,
    "ratioViirsYears": 4.381
@@ -272,6 +288,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.07,
+   "hits": 0,
    "p": 0.0005,
    "ratioModisYears": 2.657,
    "ratioViirsYears": 5.283
@@ -285,6 +302,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 4.224,
+   "hits": 3,
    "p": 0.002,
    "ratioModisYears": 4.772,
    "ratioViirsYears": 3.256
@@ -298,6 +316,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 1.787,
+   "hits": 15,
    "p": 0.008
   },
   "p-agusan-del-norte": {
@@ -309,6 +328,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 4.374,
+   "hits": 2,
    "p": 0.0015
   },
   "p-agusan-del-sur": {
@@ -320,6 +340,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 4.098,
+   "hits": 2,
    "p": 0.0015
   },
   "p-aklan": {
@@ -331,6 +352,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 2.607,
+   "hits": 43,
    "p": 0.022
   },
   "p-albay": {
@@ -342,6 +364,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-antique": {
@@ -353,6 +376,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.216,
+   "hits": 1,
    "p": 0.001
   },
   "p-apayao": {
@@ -364,6 +388,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.132,
+   "hits": 579,
    "p": 0.2899
   },
   "p-aurora": {
@@ -375,6 +400,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 0.942,
+   "hits": 1146,
    "p": 0.5732
   },
   "p-basilan": {
@@ -386,6 +412,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-bataan": {
@@ -397,6 +424,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 1.691,
+   "hits": 158,
    "p": 0.0795
   },
   "p-batanes": {
@@ -408,6 +436,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-batangas": {
@@ -419,6 +448,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.434,
+   "hits": 9,
    "p": 0.005
   },
   "p-benguet": {
@@ -430,6 +460,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 4.301,
+   "hits": 4,
    "p": 0.0025
   },
   "p-biliran": {
@@ -441,6 +472,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-bohol": {
@@ -452,6 +484,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.791,
+   "hits": 17,
    "p": 0.009
   },
   "p-bukidnon": {
@@ -463,6 +496,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.389,
+   "hits": 0,
    "p": 0.0005
   },
   "p-bulacan": {
@@ -474,6 +508,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 1.322,
+   "hits": 53,
    "p": 0.027
   },
   "p-cagayan": {
@@ -485,6 +520,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.604,
+   "hits": 137,
    "p": 0.069
   },
   "p-camarines-norte": {
@@ -496,6 +532,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.931,
+   "hits": 34,
    "p": 0.0175
   },
   "p-camarines-sur": {
@@ -507,6 +544,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.686,
+   "hits": 16,
    "p": 0.0085
   },
   "p-camiguin": {
@@ -518,6 +556,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-capiz": {
@@ -529,6 +568,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 2.571,
+   "hits": 7,
    "p": 0.004
   },
   "p-catanduanes": {
@@ -540,6 +580,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-cavite": {
@@ -551,6 +592,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.269,
+   "hits": 37,
    "p": 0.019
   },
   "p-cebu": {
@@ -562,6 +604,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.125,
+   "hits": 3,
    "p": 0.002
   },
   "p-city-of-isabela": {
@@ -573,6 +616,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-compostela-valley": {
@@ -584,6 +628,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 7.582,
+   "hits": 3,
    "p": 0.002
   },
   "p-cotabato": {
@@ -595,6 +640,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.371,
+   "hits": 1,
    "p": 0.001
   },
   "p-cotabato-city": {
@@ -606,6 +652,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-davao-del-norte": {
@@ -617,6 +664,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.091,
+   "hits": 5,
    "p": 0.003
   },
   "p-davao-del-sur": {
@@ -628,6 +676,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.8,
+   "hits": 4,
    "p": 0.0025
   },
   "p-davao-occidental": {
@@ -639,6 +688,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 2.632,
+   "hits": 15,
    "p": 0.008
   },
   "p-davao-oriental": {
@@ -650,6 +700,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.897,
+   "hits": 0,
    "p": 0.0005
   },
   "p-dinagat-islands": {
@@ -661,6 +712,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-eastern-samar": {
@@ -672,6 +724,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 4.196,
+   "hits": 38,
    "p": 0.0195
   },
   "p-guimaras": {
@@ -683,6 +736,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-ifugao": {
@@ -694,6 +748,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.809,
+   "hits": 19,
    "p": 0.01
   },
   "p-ilocos-norte": {
@@ -705,6 +760,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 1.125,
+   "hits": 544,
    "p": 0.2724
   },
   "p-ilocos-sur": {
@@ -716,6 +772,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.098,
+   "hits": 40,
    "p": 0.0205
   },
   "p-iloilo": {
@@ -727,6 +784,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.242,
+   "hits": 4,
    "p": 0.0025
   },
   "p-isabela": {
@@ -738,6 +796,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.477,
+   "hits": 92,
    "p": 0.0465
   },
   "p-kalinga": {
@@ -749,6 +808,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.182,
+   "hits": 77,
    "p": 0.039
   },
   "p-la-union": {
@@ -760,6 +820,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.705,
+   "hits": 141,
    "p": 0.071
   },
   "p-laguna": {
@@ -771,6 +832,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.835,
+   "hits": 17,
    "p": 0.009
   },
   "p-lanao-del-norte": {
@@ -782,6 +844,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-lanao-del-sur": {
@@ -793,6 +856,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 4.394,
+   "hits": 0,
    "p": 0.0005
   },
   "p-leyte": {
@@ -804,6 +868,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.567,
+   "hits": 4,
    "p": 0.0025
   },
   "p-maguindanao": {
@@ -815,6 +880,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.045,
+   "hits": 0,
    "p": 0.0005
   },
   "p-marinduque": {
@@ -826,6 +892,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-masbate": {
@@ -837,6 +904,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.361,
+   "hits": 5,
    "p": 0.003
   },
   "p-misamis-occidental": {
@@ -848,6 +916,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-misamis-oriental": {
@@ -859,6 +928,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.995,
+   "hits": 0,
    "p": 0.0005
   },
   "p-mountain-province": {
@@ -870,6 +940,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 4.38,
+   "hits": 2,
    "p": 0.0015
   },
   "p-ncr-city-of-manila-first-district": {
@@ -881,6 +952,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-ncr-fourth-district": {
@@ -892,6 +964,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-ncr-second-district": {
@@ -903,6 +976,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-ncr-third-district": {
@@ -914,6 +988,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-negros-occidental": {
@@ -925,6 +1000,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.03,
+   "hits": 0,
    "p": 0.0005
   },
   "p-negros-oriental": {
@@ -936,6 +1012,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.902,
+   "hits": 4,
    "p": 0.0025
   },
   "p-northern-samar": {
@@ -947,6 +1024,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-nueva-ecija": {
@@ -958,6 +1036,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.578,
+   "hits": 19,
    "p": 0.01
   },
   "p-nueva-vizcaya": {
@@ -969,6 +1048,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.848,
+   "hits": 18,
    "p": 0.0095
   },
   "p-occidental-mindoro": {
@@ -980,6 +1060,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.654,
+   "hits": 7,
    "p": 0.004
   },
   "p-oriental-mindoro": {
@@ -991,6 +1072,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.313,
+   "hits": 2,
    "p": 0.0015
   },
   "p-palawan": {
@@ -1002,6 +1084,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 2.271,
+   "hits": 5,
    "p": 0.003
   },
   "p-pampanga": {
@@ -1013,6 +1096,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.489,
+   "hits": 14,
    "p": 0.0075
   },
   "p-pangasinan": {
@@ -1024,6 +1108,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.501,
+   "hits": 2,
    "p": 0.0015
   },
   "p-quezon": {
@@ -1035,6 +1120,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.442,
+   "hits": 107,
    "p": 0.054
   },
   "p-quirino": {
@@ -1046,6 +1132,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.35,
+   "hits": 103,
    "p": 0.052
   },
   "p-rizal": {
@@ -1057,6 +1144,7 @@
    "busiestSeasonElNino": false,
    "testable": true,
    "ratio": 1.359,
+   "hits": 369,
    "p": 0.1849
   },
   "p-romblon": {
@@ -1068,6 +1156,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.266,
+   "hits": 12,
    "p": 0.0065
   },
   "p-samar": {
@@ -1079,6 +1168,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.449,
+   "hits": 13,
    "p": 0.007
   },
   "p-sarangani": {
@@ -1090,6 +1180,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.018,
+   "hits": 1,
    "p": 0.001
   },
   "p-siquijor": {
@@ -1101,6 +1192,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-sorsogon": {
@@ -1112,6 +1204,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-south-cotabato": {
@@ -1123,6 +1216,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.909,
+   "hits": 5,
    "p": 0.003
   },
   "p-southern-leyte": {
@@ -1134,6 +1228,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-sultan-kudarat": {
@@ -1145,6 +1240,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 3.57,
+   "hits": 0,
    "p": 0.0005
   },
   "p-sulu": {
@@ -1156,6 +1252,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-surigao-del-norte": {
@@ -1167,6 +1264,7 @@
    "busiestSeasonElNino": false,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-surigao-del-sur": {
@@ -1178,6 +1276,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 2.914,
+   "hits": 9,
    "p": 0.005
   },
   "p-tarlac": {
@@ -1189,6 +1288,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.249,
+   "hits": 215,
    "p": 0.1079
   },
   "p-tawi-tawi": {
@@ -1200,6 +1300,7 @@
    "busiestSeasonElNino": true,
    "testable": false,
    "ratio": null,
+   "hits": null,
    "p": null
   },
   "p-zambales": {
@@ -1211,6 +1312,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 1.365,
+   "hits": 6,
    "p": 0.0035
   },
   "p-zamboanga-del-norte": {
@@ -1222,6 +1324,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 7.271,
+   "hits": 0,
    "p": 0.0005
   },
   "p-zamboanga-del-sur": {
@@ -1233,6 +1336,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 7.663,
+   "hits": 0,
    "p": 0.0005
   },
   "p-zamboanga-sibugay": {
@@ -1244,6 +1348,7 @@
    "busiestSeasonElNino": true,
    "testable": true,
    "ratio": 5.509,
+   "hits": 0,
    "p": 0.0005
   }
  }

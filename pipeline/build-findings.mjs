@@ -67,7 +67,7 @@ function elNino(id) {
   const { nino, ninoMedian, otherMedian } = response(values, YEARS);
   const busiest = YEARS[values.indexOf(Math.max(...values))];
   const out = { ninoMedian: r1(ninoMedian), otherMedian: r1(otherMedian), ninoMin: r1(Math.min(...nino)), ninoMax: r1(Math.max(...nino)), busiestSeason: busiest, busiestSeasonElNino: EL_NINO_YEARS.includes(busiest) && Math.max(...values) > 0 };
-  if (!(otherMedian >= MIN_OTHER_MEDIAN)) return { ...out, testable: false, ratio: null, p: null };
+  if (!(otherMedian >= MIN_OTHER_MEDIAN)) return { ...out, testable: false, ratio: null, hits: null, p: null };
   const ratio = ninoMedian / otherMedian;
   // One-sided: how often does a random choice of 8 years give a ratio at least as large? p = (hits + 1) / (shuffles + 1).
   let hits = 0;
@@ -77,7 +77,7 @@ function elNino(id) {
     const mb = median(b);
     if (mb > 0 && median(a) / mb >= ratio - 1e-12) hits++;
   }
-  return { ...out, testable: true, ratio: r3(ratio), p: r4((hits + 1) / (SHUFFLES + 1)) };
+  return { ...out, testable: true, ratio: r3(ratio), hits, p: r4((hits + 1) / (SHUFFLES + 1)) };
 }
 function subRatio(id, years) {
   const { ninoMedian, otherMedian } = response(years.map((y) => season(id, y)), years);
