@@ -5,7 +5,7 @@ title: Calendar
 <!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README. -->
 
 <header class="band">
-  <h1>Siklab hotspot calendar</h1>
+  <div class="band-top"><h1>Siklab hotspot calendar</h1><div class="jump-slot">${jumpBar([["El Niño map", "where-it-burns"], ["2027 outlook", "outlook"], ["Calendar", "calendar"], ["Seasons and years", "when"], ["Downloads", "download"]], "Jump to")}</div></div>
   <p class="tagline">When and where the Philippines burns, and how El Niño years compare</p>
   <ul class="band-figures">
     <li><b>${elnino.areas.ph.ratio.toFixed(1)}×</b> <span>as many hotspots in El Niño fire seasons (${MONTHS[elnino.seasonMonths[0] - 1]}–${MONTHS[elnino.seasonMonths[elnino.seasonMonths.length - 1] - 1]}) as in other years: whole country, medians of ${elnino.years[0]}–${elnino.years[1]}</span></li>
@@ -13,19 +13,22 @@ title: Calendar
     <li><b>${fmt(allMonths.length)}</b> <span>months of MODIS and VIIRS on one scale, ${monthName(allMonths[0])} to ${meta.lastDate.slice(8, 10).replace(/^0/, "")} ${monthName(meta.lastDate.slice(0, 7))}</span></li>
   </ul>
   <div class="ribbon-slot">${seasonRibbon}</div>
+  <div class="start-slot">${startHere}</div>
 </header>
 
 <details class="explain">
-  <summary>Explain it simply: how to read this page, what a hotspot is, and why two kinds of satellite</summary>
+  <summary>Explain it simply: how to read this page, and what its words mean</summary>
   <p><b>How to read this page.</b></p>
   <ol class="how-to-read">
     <li>Pick a place: the whole country, a region, a province, or a box you draw on a map. You can also click a province on the map further down.</li>
     <li>Pick the months to look at with From and To.</li>
     <li>Read the colours. Each square in the calendar is one month; the darker it is, the more fire hotspots the satellites saw.</li>
   </ol>
-  <p><b>What is a hotspot?</b> Satellites circle the Earth carrying cameras that sense heat. When a patch of ground is much hotter than the land around it, usually because something is burning, the satellite marks it. Each mark is a hotspot. One big fire can make many hotspots, and a fire under thick cloud makes none.</p>
-  <p><b>Why two kinds of satellite?</b> An older camera called MODIS has marked hotspots since 2000. A newer, sharper one called VIIRS started in 2012. It notices smaller fires, so over the Philippines it marks about ${Math.round(meta.factors.ph.k)} hotspots for every one that MODIS marks. Put end to end, the two records would make it look as if fires jumped in 2012, when only the camera changed.</p>
-  <p><b>What did we do about it?</b> For each region we counted how many VIIRS hotspots matched one MODIS hotspot in the years both cameras were watching (2012 to 2020), and used that number to convert the older years. Then we tested it on years the conversion never saw: a region's yearly total came out within about ${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}% of what VIIRS recorded, in a typical case. That conversion is what "harmonised" means on this site.</p>
+  <p><b>What is a <dfn>hotspot</dfn>?</b> Satellites circle the Earth carrying cameras that sense heat. When a patch of ground is much hotter than the land around it, usually because something is burning, the satellite marks it. Each mark is a hotspot. One big fire can make many hotspots, and a fire under thick cloud makes none.</p>
+  <p><b>Why two kinds of satellite?</b> An older camera called <dfn>MODIS</dfn> has marked hotspots since 2000. A newer, sharper one called <dfn>VIIRS</dfn> started in 2012. It notices smaller fires, so over the Philippines it marks about ${Math.round(meta.factors.ph.k)} hotspots for every one that MODIS marks. Put end to end, the two records would make it look as if fires jumped in 2012, when only the camera changed.</p>
+  <p><b>What did we do about it?</b> For each region we counted how many VIIRS hotspots matched one MODIS hotspot in the years both cameras were watching (2012 to 2020), and used that number to convert the older years. Then we tested it on years the conversion never saw: a region's yearly total came out within about ${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}% of what VIIRS recorded, in a typical case. That conversion is what "<dfn>harmonised</dfn>" means on this site.</p>
+  <p><b>What is <dfn>El Niño</dfn>?</b> A warming of the surface of the tropical Pacific Ocean, every few years, that usually brings the Philippines less rain than normal. Here a year counts as an El Niño year when NOAA's Oceanic Niño Index for January to March is +0.5 or more: ${elnino.elNinoYears.join(", ")}.</p>
+  <p><b>What is <dfn>fire radiative power</dfn>?</b> The heat and light a fire gives off at the moment the satellite passes, in megawatts. NASA reports it for every hotspot; it is a snapshot of how intense the burning was, not how much burned.</p>
   <p><b>What it cannot tell you.</b> A hotspot count is not the number of fires or the area burned. Clouds hide fires, so rainy months read low. The calendar shows the past. The outlook further down is a range taken from past El Niño seasons, not a forecast model.</p>
 </details>
 
@@ -147,6 +150,34 @@ display(shareButton);
 // Header ribbon (shared with the other pages): the country's median month over the full years of the El Niño analysis.
 import {seasonRibbon as ribbonOf, jumpBar, jumpTo} from "./components/band.js";
 const seasonRibbon = ribbonOf(monthlyRaw, elnino.years);
+```
+
+```js
+// "Start here": four ready-made views, each a small story with its number, all computed from the data files.
+// Each link is a view link plus go=<section>, which scrolls to that section once the page has drawn it.
+const benguetRows = byArea.get("p-benguet");
+const benguetFebs = benguetRows.filter((d) => d.m === 2 && isFullMonth(d));
+const feb2024 = benguetRows.find((d) => d.month === "2024-02");
+const feb2024Rank = 1 + benguetFebs.filter((d) => d.hotspots > feb2024.hotspots).length;
+const ordinal = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+const phSeason = (y) => d3.sum(byArea.get("ph"), (d) => (d.year === y && elnino.seasonMonths.includes(d.m) ? d.hotspots : 0));
+const pastSeasons = d3.range(elnino.years[0], elnino.years[1] + 1).map((y) => ({y, v: phSeason(y)}));
+const season2010 = pastSeasons.find((d) => d.y === 2010);
+const season2010Rank = 1 + pastSeasons.filter((d) => d.v > season2010.v).length;
+const startHere = html`<nav class="start" aria-label="Start here: ready-made views"><span class="start-label">Start here:</span>
+  <a href="#area=p-benguet&from=2003-01&to=2024-02&go=calendar">Benguet, Feb 2024: <b>${fmt(feb2024.hotspots)}</b> hotspots</a>
+  <a href="#area=p-zamboanga-del-sur&go=where-it-burns">Zamboanga del Sur: <b>${elnino.areas["p-zamboanga-del-sur"].ratio.toFixed(1)}×</b> in El Niño seasons</a>
+  <a href="#area=ph&from=2010-01&to=2010-05&go=calendar">Jan–May 2010: <b>${fmt(season2010.v)}</b>, ${season2010Rank === 1 ? "the most" : `${ordinal(season2010Rank)} most`}</a>
+  <a href="#area=ph&from=2008-01&to=2016-12&go=harmonisation">${seam.after[0]}: <b>${seam.areas.ph.raw.toFixed(2)}×</b> raw, ${seam.areas.ph.harmonised.toFixed(2)}× harmonised</a>
+</nav>`;
+```
+
+```js
+// Open at the section a "Start here" link names (the view link itself is restored by the controls; go= is then dropped from the address).
+{
+  const go = startParams.get("go");
+  if (/^[a-z-]+$/.test(go ?? "")) setTimeout(() => { const el = document.getElementById(go); if (el) { el.scrollIntoView({block: "start"}); if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1"); el.focus({preventScroll: true}); } }, 1500);
+}
 ```
 
 ```js
@@ -424,6 +455,15 @@ const calendarFigure = display(resize((width) => calendar(width)));
 display(ninoLegend());
 ```
 
+<p class="read">each row is a year and each column a month; ${colourBy === "Number of hotspots" ? "the darker the cell, the more hotspots" : "red cells were above that month's average and blue cells below"}. Hover or tap a cell for its numbers.</p>
+
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>Quantity:</b> harmonised monthly count of NASA FIRMS active fire detections, in VIIRS-equivalent hotspots. From ${meta.viirsStart}: VIIRS Suomi NPP 375 m (VNP14IMGML; near real time VNP14IMGTDL_NRT), with NOAA-20 (VJ114IMGML) × f on days Suomi NPP has no data and from 2 November 2026. Before: MODIS Aqua (MCD14ML) × k, k fitted per region.</p>
+  <p><b>Filter:</b> FIRMS type 0 or 2 (active volcano and offshore dropped); MODIS confidence 30 or more, VIIRS nominal or high; inside a Philippine region (geoBoundaries 2020). <b>Dates:</b> FIRMS acquisition dates, UTC. <b>Difference colouring:</b> the month minus the mean of the same calendar month over the area's complete months.</p>
+  <p><b>Numbers:</b> src/data/monthly.csv, column hotspots_harmonised; the monthly analytics download below. Definitions in the <a href="./method#data-dictionary">data dictionary</a>.</p>
+</details>
+
 <details class="cal3d">
   <summary>See this calendar in 3D</summary>
 
@@ -520,7 +560,19 @@ const rankCard = endRow.hotspots === 0
 
 <p class="hint">${partial ? `${MONTHS[endRow.m - 1]} ${endRow.year} is still in progress: the comparison scales other years' ${MONTHS[endRow.m - 1]} to its first ${endRow.days} days, assuming hotspots spread evenly through the month. ` : ""}${endRow.gap_days > 0 ? `Warning: ${endRow.gap_days} day(s) of ${MONTHS[endRow.m - 1]} ${endRow.year} have no satellite data, so this month reads low.` : ""} Change "To" to compare any other month.</p>
 
-## Where it burned, and where El Niño matters most
+<h2 id="where-it-burns">Where does it burn, and where do El Niño years matter most?</h2>
+
+```js
+// The answer under the heading: the country's El Niño ratio and the median ratio of the regions in each island group
+// (as on the method page; Mimaropa and Bicol belong to the Luzon group).
+const ISLAND_GROUPS = [
+  ["Luzon", ["r-car", "r-ncr", "r-ilocos-region", "r-cagayan-valley", "r-central-luzon", "r-calabarzon", "r-mimaropa", "r-bicol-region"]],
+  ["the Visayas", ["r-western-visayas", "r-central-visayas", "r-eastern-visayas"]],
+  ["Mindanao", ["r-zamboanga-peninsula", "r-northern-mindanao", "r-davao-region", "r-soccsksargen", "r-caraga", "r-armm"]]
+];
+const groupRatios = ISLAND_GROUPS.map(([g, ids]) => [g, d3.median(ids, (id) => elnino.areas[id].ratio)]);
+display(html`<p class="answer">In the whole country, El Niño fire seasons (${seasonLabel}) had <b>${elnino.areas.ph.ratio.toFixed(1)}×</b> the hotspots of other years, and the rise grows from north to south: the regions' median is ${groupRatios.map(([g, r]) => `${r.toFixed(1)}× in ${g}`).join(", ").replace(/, ([^,]*)$/, " and $1")}. Click a province to open its calendar.</p>`);
+```
 
 ```js
 // Province map of the selection. Areas are in km² on the sphere (d3.geoArea × Earth's radius²).
@@ -674,7 +726,15 @@ const ninoPanel = html`<div class="nino-panel">
 
 <p class="hint">Each shape is a province, ${mapMode === "density" ? `coloured by hotspots per 100 km² from ${lo} to ${hi}, so large and small provinces can be compared fairly` : mapMode === "month" ? `coloured by how far ${MONTHS[endRow.m - 1]} ${endRow.year} sits above (red) or below (blue) the average of every complete ${MONTHS[endRow.m - 1]} in that province, as in the calendar` : `coloured by how many times more hotspots its ${word(elnino.elNinoYears.length)} El Niño seasons (${seasonLabel}, median) had than its other seasons, ${elnino.years[0]}–${elnino.years[1]}: red above 1×, blue below. Grey: too few fires to tell (${untestedCount} provinces whose other seasons have a median below ${elnino.minOtherMedian} hotspots). This map does not change with From and To`}. Click a province, or a name in the list, to open its calendar. The map shows data up to ${meta.lastDate}, refreshed by hand from NASA FIRMS; it is not live. For today's detections, see NASA's <a href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener">FIRMS Fire Map</a> (an external NASA site).</p>
 
-## Outlook: January–May ${outlook.nextYear} if El Niño holds
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>El Niño response:</b> ratio of medians of January–May harmonised totals, El Niño years (NOAA Oceanic Niño Index, January–March value of +0.5 or more: ${elnino.elNinoYears.join(", ")}) against the other full years of ${elnino.years.join("–")}. Chance probability: one-sided permutation test, ${d3.format(",")(elnino.shuffles)} random choices of ${elnino.elNinoYears.length} of the ${elnino.years[1] - elnino.years[0] + 1} years (seed ${elnino.seed}), p = (hits + 1) / (shuffles + 1). Areas whose other seasons have a median below ${elnino.minOtherMedian} hotspots are not tested (grey).</p>
+  <p><b>Other map modes:</b> hotspots per 100 km² over From–To (province area on the sphere, geoBoundaries 2020); the end month minus that province's mean for the same calendar month. <b>Numbers:</b> src/data/elnino.json (ratio, p, ninoMedian, otherMedian per area) and monthly.csv.</p>
+</details>
+
+<h2 id="outlook">What could January to May ${outlook.nextYear} look like?</h2>
+
+<p class="answer">${outArea ? html`If El Niño holds into ${outlook.nextYear}, as PAGASA expects, past El Niño seasons put ${ninoPlace} at <b>${fmt(outArea.low)} to ${fmt(outArea.high)}</b> hotspots from January to May. That is a range drawn from past seasons, not a forecast.` : "Too few fires here to draw a range from past El Niño seasons."}</p>
 
 ```js
 // Outlook for the next January–May season if it is an El Niño season (pipeline, outlook.json, with its test on past seasons).
@@ -718,7 +778,15 @@ const outlookChart = (width) => quiet(Plot.plot({
 
 <p class="hint">A range drawn from past seasons, not a forecast model. It assumes El Niño holds into early ${NEXT} (PAGASA's El Niño Advisory No. 6, 3 November 2026, expects it to last into the first half of ${NEXT}), rests on ${word(elnino.elNinoYears.length)} El Niño seasons (so even by chance a new season falls outside their range about 2 times in ${elnino.elNinoYears.length + 1}), and mixes more burning with clearer skies. Weather, land use and fire control in ${NEXT} decide what actually burns. Red bars with ${NINO_MARK}: El Niño seasons; grey: ${outlook.checkYear}; dashed line: the usual season without El Niño; shaded bar: the ${NEXT} range from past El Niño seasons, with a stroke at its median.</p>
 
-## When does the year burn?
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>Outlook:</b> the median, lowest and highest January–May total of the area's past El Niño seasons (VIIRS-equivalent hotspots), shown for ${outlook.nextYear} on the assumption that El Niño holds (PAGASA El Niño Advisory No. 6, 3 November 2026). Not a model of next season's weather or burning.</p>
+  <p><b>Test:</b> leave one out over the El Niño seasons: each predicted by the median of the other El Niño seasons, against the median of all other seasons; median absolute percentage error. <b>Check:</b> January–May ${outlook.checkYear}, not an El Niño season, against past seasons without El Niño. <b>Numbers:</b> src/data/outlook.json.</p>
+</details>
+
+<h2 id="when">When does ${area.level === "country" ? "the Philippines" : placeName} burn?</h2>
+
+<p class="answer">${seasonMonths.length === 12 && seasonPeak > 0 ? html`Burning is usually busiest <b>${monthPhrase(busyMonths)}</b>${rareMonths.length ? `, and hotspots are rare ${monthPhrase(rareMonths)}` : ""}, judged by the median month from ${lo.slice(0, 4)} to ${hi.slice(0, 4)}.` : "Choose at least a full year to see the shape of the fire season."}</p>
 
 ```js
 const profile = d3.range(1, 13).map((m) => {
@@ -742,9 +810,16 @@ const seasonFigure = display(resize((width) => quiet(Plot.plot({
 }))));
 ```
 
-<p class="hint">Solid line: median month across ${lo.slice(0, 4)}–${hi.slice(0, 4)}. Band: middle half of years. Dashed: ${endRow.year}.</p>
+<p class="read">the red line is the median month across ${lo.slice(0, 4)}–${hi.slice(0, 4)}; the shaded band holds the middle half of years; the dashed line is ${endRow.year}.</p>
 
-## Which years burned most?
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>Quantity:</b> for each calendar month, the median of the area's monthly harmonised counts over the selected months, with the 25th to 75th percentile as the band; the dashed line is the To year. <b>Numbers:</b> src/data/monthly.csv (hotspots_harmonised).</p>
+</details>
+
+<h2 id="years">Which years burned most?</h2>
+
+<p class="answer">${fullYears.length >= 2 ? html`The busiest full year was <b>${busiestYear.year}</b>, with ${fmt(busiestYear.total)} hotspots; the quietest was ${quietestYear.year}, with ${fmt(quietestYear.total)}.` : "Choose at least two full years to compare years."}</p>
 
 ```js
 const yearly = d3.rollups(sel, (v) => ({total: d3.sum(v, (d) => d.hotspots), months: v.length, source: v[0].source.startsWith("MODIS") ? "MODIS Aqua, converted" : "VIIRS"}), (d) => d.year).map(([year, o]) => ({year, ...o}));
@@ -774,9 +849,18 @@ const yearsFigure = display(resize((width) => quiet(Plot.plot({
 display(ninoLegend());
 ```
 
+<p class="read">each bar is one year on the VIIRS scale: orange bars are converted MODIS years, red bars are VIIRS years, and ${NINO_MARK} marks an El Niño year.</p>
+
 <p class="hint">${fullYears.length ? `Dashed line: the average full year (${fmt(yearMean)}). ` : ""}Partial years in the selection are shorter bars, not quieter years. ${modisYears.length ? (showYearErr ? `The thin bars on the converted MODIS years show ±${Math.round(YEAR_ERR * 100)}%: the typical error of a region's yearly total in the held-out test (median); not a confidence interval.` : `Converted MODIS years carry an error: a region's yearly total is typically off by about ${Math.round(YEAR_ERR * 100)}% in the held-out test, and the error is larger for small areas such as a province or a drawn box.`) : ""}</p>
 
-## Fire intensity at the hotspots
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>Quantity:</b> sums of monthly harmonised counts by calendar year; a year is full when all twelve months are in the selection. Converted MODIS years carry ±${Math.round(YEAR_ERR * 100)}%, the median absolute error of a region's yearly total in the leave-one-year-out test, 2012–2020 (src/data/validation.json, T1); it is not a confidence interval. <b>Numbers:</b> src/data/monthly.csv.</p>
+</details>
+
+<h2 id="intensity">How intense was the burning at the hotspots?</h2>
+
+<p class="answer">${frpMonthly.length && frpPeak ? html`The month with the most <dfn>fire radiative power</dfn>, the heat and light fires give off as the satellite passes, was <b>${monthName(frpPeak.month)}</b>: ${MW(frpPeak.frp)} megawatts from all its VIIRS hotspots together.` : "No VIIRS hotspots in this selection, so no fire radiative power to show."}</p>
 
 ```js
 // Fire intensity: fire radiative power (FRP, MW) of the VIIRS hotspots in the harmonised record (pipeline, intensity.csv),
@@ -829,7 +913,15 @@ display(intensityCharts);
 
 <p class="hint">Fire radiative power (FRP) is the power a fire radiates, as heat and light, at the moment the satellite passes, in megawatts, as reported by NASA FIRMS for each hotspot. Shown for VIIRS only, from February 2012: MODIS measures it over pixels several times larger, so its values are not comparable and are not converted here. NOAA-20 hotspots that stand in for Suomi NPP are weighted as in the calendar. A satellite sees each fire for a moment, twice a day, so this is a snapshot of intensity, not the energy a fire released.</p>
 
-## Day by day
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>Quantity:</b> fire radiative power (FRP, MW) from the FIRMS <code>frp</code> field of VIIRS detections only, from ${meta.viirsStart}; monthly sum of FRP × weight (NOAA-20 fill detections weighted by f), and per year that sum ÷ the weighted count. MODIS FRP is not used: it is measured over larger pixels and would need its own conversion. FRP is instantaneous at overpass, not fire radiative energy.</p>
+  <p><b>Numbers:</b> src/data/intensity.csv (viirs_hotspots, frp_total_mw, frp_median_mw).</p>
+</details>
+
+<h2 id="daily">What happened day by day?</h2>
+
+<p class="answer">${dayPeak && dayPeak.hotspots > 0 ? html`In the three months to ${monthName(hi)}, the busiest day was <b>${dayPeak.iso}</b>, with ${fmt(dayPeak.hotspots)} hotspots.` : "No hotspots in these three months."}</p>
 
 ```js
 // Daily harmonised hotspots (pipeline, daily.csv: days with hotspots; other days are 0), loaded when this section scrolls into view.
@@ -867,7 +959,14 @@ display(windowDays.length ? html`<div class="card">${resize((width) => quiet(Plo
 
 <p class="hint">Each bar is one day, on the same VIIRS scale as the calendar (a month's bars add up to its calendar cell). Dashed line: a usual day, the median of the same calendar day over ${elnino.years[0]}–${elnino.years[1]}, smoothed over a week. × marks a day with no satellite data. Days are FIRMS acquisition dates in UTC. Change "To" to move the window; single days are noisy, so read the run of days, not one day.</p>
 
-## What harmonisation changes
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>Quantity:</b> daily harmonised count, built as the months are (a month's days add up to its calendar value), UTC dates. Usual day: median of the same calendar day over ${elnino.years[0]}–${elnino.years[1]}, leaving out the window's own year and days without satellite data, then a 7-day centred mean. <b>Numbers:</b> src/data/daily.csv (days above zero only); days without data in meta.json, gapDates.</p>
+</details>
+
+<h2 id="harmonisation">Did changing satellites change the answer?</h2>
+
+<p class="answer">${Number.isFinite(stepRaw) && Number.isFinite(stepHarmonised) ? html`Laid end to end, the raw record for ${placeName} jumps <b>${stepRaw.toFixed(2)}×</b> at ${seam.after[0]}, when VIIRS took over; in the harmonised record the step is ${stepHarmonised.toFixed(2)}× (average year ${seam.after.join("–")} against ${seam.before.join("–")}).` : "For a drawn box the raw counts of each sensor are not kept; choose a region or province to compare them."}</p>
 
 ```js
 if (area.id === "custom") display(html`<p class="hint">For a custom area the raw counts of each sensor are not kept; choose a region or province to see this chart.</p>`);
@@ -891,7 +990,14 @@ const harmonisationFigure = display(resize((width) => quiet(Plot.plot({
 }))));
 ```
 
+<p class="read">grey is MODIS Aqua as counted, orange is MODIS Aqua converted with k, red is VIIRS; where orange follows red, the conversion works.</p>
+
 <p class="hint">Raw MODIS counts sit far below VIIRS because VIIRS pixels are smaller and catch smaller fires. Scaled by k, the MODIS line tracks VIIRS in the years both flew. How closely it tracks is measured on the <a href="./method">method page</a>.</p>
+
+<details class="sci">
+  <summary>For scientists</summary>
+  <p><b>Quantity:</b> monthly raw counts after the filter: MODIS Aqua, MODIS Aqua × k (for the country, each region converted with its own k and summed), and VIIRS Suomi NPP. k = Suomi NPP ÷ MODIS Aqua detections, 20 January 2012 to 31 December 2020, on days both satellites delivered data (k = ${meta.factors.ph.k.toFixed(2)} for the country). <b>Numbers:</b> src/data/monthly.csv (modis_aqua, viirs_snpp), areas.json and meta.json (k and f per region); tests on the <a href="./method#how-well-it-works">method page</a>.</p>
+</details>
 
 ## Download
 

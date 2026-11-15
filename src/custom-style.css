@@ -31,7 +31,7 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 
 /* ---- Type: section headings ask a question; the first line under them answers it. */
 :where(#observablehq-main) h2 { margin-top: 2rem; padding-top: 0.8rem; border-top: 1px solid var(--theme-foreground-faintest); }
-:where(#observablehq-main) h2.no-rule { border-top: 0; padding-top: 0; margin-top: 0; }
+:where(#observablehq-main) h2.no-rule, .slide h2 { border-top: 0; padding-top: 0; margin-top: 0; }
 .answer { font-size: 1.12rem; line-height: 1.55; margin: 0.4rem 0 0.9rem; }
 .answer b { color: var(--fire); font-variant-numeric: tabular-nums; }
 .read { font-size: 0.86rem; color: var(--theme-foreground-muted); margin: 0.3rem 0 1rem; }
@@ -45,13 +45,17 @@ dfn { font-style: normal; font-weight: 600; }
 .band h1 { font-size: 2.7rem; line-height: 1.05; margin: 0; max-width: none; letter-spacing: -0.01em; }
 .band .band-project { margin: 0 0 0.3rem; font-size: 0.95rem; max-width: none; }
 .band .band-project a { color: var(--theme-foreground-muted); }
-.tagline { font-size: 1.25rem; line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 46rem; color: var(--theme-foreground-muted); }
-.band-figures { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; max-width: var(--content); }
+.tagline { font-size: 1.25rem; line-height: 1.4; margin: 0.3rem 0 0.8rem; max-width: 46rem; color: var(--theme-foreground-muted); }
+.band-figures { list-style: none; padding: 0; margin: 0 0 0.7rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; max-width: var(--content); }
 .band-figures li { display: flex; align-items: baseline; gap: 0.6rem; margin: 0; }
 .band-figures b { font-size: 2.1rem; line-height: 1; color: var(--fire); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .band-figures span { font-size: 0.9rem; line-height: 1.35; }
 .ribbon { margin: 0; max-width: var(--content); }
-.ribbon-slot { min-height: 3.1rem; } /* reserves the ribbon's height while the data loads */
+.ribbon-slot { min-height: 3.1rem; }
+.band-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.2rem 2rem; }
+.band-top .jump { margin: 0; }
+.jump-slot { min-height: 1.5rem; }
+.start-slot { min-height: 1.5rem; } /* reserves the ribbon's height while the data loads */
 .ribbon .cells, .ribbon .months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
 .ribbon .cells span { height: 12px; }
 .ribbon .cells span:first-child { border-radius: 3px 0 0 3px; }
@@ -61,12 +65,12 @@ dfn { font-style: normal; font-weight: 600; }
 @media (max-width: 640px) { .band h1 { font-size: 2.1rem; } .band-figures { grid-template-columns: 1fr; } }
 
 /* ---- Jump bar and "Start here" row, under the band */
-.jump, .start { font-size: 0.9rem; line-height: 1.6; margin: 0.5rem 0 0; max-width: var(--content); display: flex; flex-wrap: wrap; gap: 0.1rem 1.1rem; align-items: baseline; }
+.jump, .start { font-size: 0.86rem; line-height: 1.6; margin: 0.45rem 0 0; max-width: var(--content); display: flex; flex-wrap: wrap; gap: 0.1rem 0.9rem; align-items: baseline; }
 .jump-label, .start-label { font-weight: 600; }
 .start a b { color: var(--fire); font-variant-numeric: tabular-nums; }
 
 /* ---- Cards, details and blocks */
-.explain { max-width: 60rem; margin: 0.6rem 0 1.2rem; border-left: 3px solid var(--ember); padding: 0.3rem 0 0.3rem 0.9rem; }
+.explain { max-width: 60rem; margin: 0.5rem 0 0.9rem; border-left: 3px solid var(--ember); padding: 0.3rem 0 0.3rem 0.9rem; }
 .explain summary, .sci summary, .cal3d summary, .all-provinces summary { cursor: pointer; font-weight: 600; }
 .explain p { line-height: 1.6; }
 .sci { margin: 0.4rem 0 1.2rem; font-size: 0.9rem; border-left: 1px solid var(--theme-foreground-faint); padding: 0.1rem 0 0.1rem 0.8rem; max-width: var(--measure); }
@@ -105,7 +109,7 @@ dfn { font-style: normal; font-weight: 600; }
 :where(#observablehq-main) :is(p, li, dd) { overflow-wrap: break-word; }
 
 /* ---- Calendar page */
-.strip { margin: 0.2rem 0 1.4rem; max-width: var(--content); }
+.strip { margin: 0.2rem 0 1.1rem; max-width: var(--content); }
 .strip h2 { font-size: 1rem; margin: 0 0 0.5rem; border-top: 0; padding-top: 0; }
 .strip-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; }
 .strip-item { display: flex; align-items: baseline; gap: 0.6rem; color: inherit; }
