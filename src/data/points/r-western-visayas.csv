@@ -27750,3 +27750,4 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-13,520,10.82248,123.00581,NOAA-20 (VIIRS),n,2.08,,p-negros-occidental,0.997
 2026-11-13,520,12.10415,121.37558,NOAA-20 (VIIRS),n,4.99,,p-antique,0.997
 2026-11-13,1753,10.34848,123.13023,NOAA-20 (VIIRS),n,1.26,,p-negros-occidental,0.997
+2026-11-14,1734,12.10369,121.37425,NOAA-20 (VIIRS),n,0.75,,p-antique,0.997

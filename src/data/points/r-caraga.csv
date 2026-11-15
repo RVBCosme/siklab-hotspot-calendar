@@ -14825,3 +14825,4 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-04,446,8.50703,126.14436,NOAA-20 (VIIRS),n,2.81,,p-surigao-del-sur,0.938
 2026-11-04,448,10.10013,125.6126,NOAA-20 (VIIRS),n,4.15,,p-dinagat-islands,0.938
 2026-11-05,427,8.05287,125.51466,NOAA-20 (VIIRS),n,1.93,,p-agusan-del-sur,0.938
+2026-11-14,459,9.02523,125.52273,NOAA-20 (VIIRS),n,1.65,,p-agusan-del-norte,0.938

@@ -29078,3 +29078,5 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-08,512,6.82934,124.81364,NOAA-20 (VIIRS),n,2.6,,p-cotabato,0.969
 2026-11-09,453,5.93721,124.97865,NOAA-20 (VIIRS),n,9.28,,p-sarangani,0.969
 2026-11-09,453,5.97036,124.91842,NOAA-20 (VIIRS),n,2.54,,p-sarangani,0.969
+2026-11-14,457,6.20512,125.43993,NOAA-20 (VIIRS),n,2.66,,p-sarangani,0.969
+2026-11-14,457,6.39671,124.66855,NOAA-20 (VIIRS),n,3.8,,p-sultan-kudarat,0.969

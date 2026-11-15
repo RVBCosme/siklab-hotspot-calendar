@@ -43468,3 +43468,4 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-13,520,17.16783,121.64545,NOAA-20 (VIIRS),n,2.54,,p-isabela,0.996
 2026-11-13,522,17.25241,121.56296,NOAA-20 (VIIRS),n,6.15,,p-isabela,0.996
 2026-11-13,1751,17.70441,121.56985,NOAA-20 (VIIRS),n,0.7,,p-cagayan,0.996
+2026-11-14,501,17.81883,121.89612,NOAA-20 (VIIRS),n,3.51,,p-cagayan,0.996

@@ -8430,3 +8430,4 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-10,1711,10.16398,123.69806,NOAA-20 (VIIRS),n,1.18,,p-cebu,0.93
 2026-11-10,1711,10.16469,123.69687,NOAA-20 (VIIRS),n,0.89,,p-cebu,0.93
 2026-11-11,1652,10.24562,123.58551,NOAA-20 (VIIRS),n,0.2,,p-cebu,0.93
+2026-11-14,1736,9.37264,122.85842,NOAA-20 (VIIRS),n,0.46,,p-negros-oriental,0.93

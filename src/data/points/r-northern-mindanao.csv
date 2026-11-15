@@ -26648,3 +26648,5 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-04,446,8.49366,124.90723,NOAA-20 (VIIRS),n,2.69,,p-bukidnon,0.973
 2026-11-08,512,8.48202,124.38822,NOAA-20 (VIIRS),n,2.67,,p-misamis-oriental,0.973
 2026-11-09,455,7.89198,125.21685,NOAA-20 (VIIRS),n,6.08,,p-bukidnon,0.973
+2026-11-14,459,7.75364,125.16695,NOAA-20 (VIIRS),n,3.88,,p-bukidnon,0.973
+2026-11-14,459,8.55287,124.3942,NOAA-20 (VIIRS),n,3.28,,p-misamis-oriental,0.973

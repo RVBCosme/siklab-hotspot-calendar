@@ -13580,3 +13580,6 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-13,1751,14.58749,121.20929,NOAA-20 (VIIRS),n,0.6,,p-rizal,0.959
 2026-11-13,1753,13.62466,121.07925,NOAA-20 (VIIRS),n,3.13,,p-batangas,0.959
 2026-11-13,1753,13.62484,121.08197,NOAA-20 (VIIRS),n,2.71,,p-batangas,0.959
+2026-11-14,1734,13.62625,121.07936,NOAA-20 (VIIRS),n,2.59,,p-batangas,0.959
+2026-11-14,1734,13.83803,121.39655,NOAA-20 (VIIRS),n,0.67,,p-batangas,0.959
+2026-11-14,1734,14.588,121.21038,NOAA-20 (VIIRS),n,0.48,,p-rizal,0.959

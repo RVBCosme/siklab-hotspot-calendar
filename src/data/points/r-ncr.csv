@@ -1384,3 +1384,4 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-03,508,14.72565,120.93824,NOAA-20 (VIIRS),n,3.31,,p-ncr-third-district,0.999
 2026-11-08,1745,14.71006,121.01096,NOAA-20 (VIIRS),n,1.32,,p-ncr-third-district,0.999
 2026-11-09,1728,14.70956,121.01075,NOAA-20 (VIIRS),n,1.09,,p-ncr-third-district,0.999
+2026-11-14,1734,14.70727,121.01037,NOAA-20 (VIIRS),n,0.78,,p-ncr-third-district,0.999

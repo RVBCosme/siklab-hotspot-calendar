@@ -21089,3 +21089,5 @@ date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id
 2026-11-12,540,16.11108,119.88392,NOAA-20 (VIIRS),n,4.16,,p-pangasinan,1.017
 2026-11-13,520,16.08026,120.64115,NOAA-20 (VIIRS),n,2.65,,p-pangasinan,1.017
 2026-11-13,1751,16.01399,120.6176,NOAA-20 (VIIRS),n,0.53,,p-pangasinan,1.017
+2026-11-14,501,17.53254,120.43286,NOAA-20 (VIIRS),n,6.11,,p-ilocos-sur,1.017
+2026-11-14,1734,16.16818,120.56665,NOAA-20 (VIIRS),n,1.03,,p-pangasinan,1.017
