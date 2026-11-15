@@ -208,14 +208,14 @@ const out = FileAttachment("data/outlook.json").json();
 
 ```js
 const OP = out.areas.ph, OS = out.summary;
-const opc = (x) => `${Math.round(100 * x)}%`;
+const opc = (x) => `${(100 * x).toFixed(1)}%`; // one decimal: the errors are stored to 3 decimals, so a whole percent would round twice
 const of0 = d3.format(",.0f");
 ```
 
 PAGASA expects the El Niño of late 2026 to last into the first half of ${out.nextYear}. The calendar page turns the past El Niño seasons into a simple outlook for January–May ${out.nextYear}: if that season is an El Niño season, the range of the ${nWord(nNino)} past El Niño seasons (country: median ${of0(OP.median)} hotspots, from ${of0(OP.low)} to ${of0(OP.high)}). This is an analogue range, not a forecast model: it says what past El Niño seasons looked like, not what will burn.
 
 - **Tested on the past.** Each El Niño season was predicted from the other ${nWord(nNino - 1)} (their median) and compared with ignoring El Niño (the median of all other seasons). For the country the median miss was ${opc(OP.errorElNinoAnalogues)} against ${opc(OP.errorIgnoringElNino)}. Of ${OS.provincesWithOutlook} provinces with enough fires, the El Niño seasons were closer in ${OS.provincesAnaloguesBetter}.
-- **A season it never saw.** January–May ${out.checkYear} was not an El Niño season. The country had ${of0(OP.check.value)} hotspots: inside the range of past seasons without El Niño (${of0(OP.check.otherLow)} to ${of0(OP.check.otherHigh)}), but far above their median (${of0(OP.otherMedian)}). In ${OS.provincesWithOutlook - OS.provincesCheckOtherMedianBetter} of the ${OS.provincesWithOutlook} provinces, the usual season without El Niño was a worse guess for ${out.checkYear} than the median of all seasons. So a busy season can come without El Niño, and the outlook is a range, not a promise.
+- **A season it never saw.** January–May ${out.checkYear} was not an El Niño season. The country had ${of0(OP.check.value)} hotspots: inside the range of past seasons without El Niño (${of0(OP.check.otherLow)} to ${of0(OP.check.otherHigh)}), but far above their median (${of0(OP.otherMedian)}). In ${OS.provincesWithOutlook - OS.provincesCheckOtherMedianBetter} of the ${OS.provincesWithOutlook} provinces, the usual season without El Niño was no better a guess for ${out.checkYear} than the median of all seasons. So a busy season can come without El Niño, and the outlook is a range, not a promise.
 - **Cautions.** It holds only if El Niño holds. It rests on ${nWord(nNino)} seasons (so even by chance a new season falls outside their range about 2 times in ${nNino + 1}), mixes more burning with clearer skies, and cannot know ${out.nextYear}'s weather, land use or fire control.
 
 ## Daily counts and fire intensity

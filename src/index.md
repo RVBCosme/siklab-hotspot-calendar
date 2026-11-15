@@ -458,7 +458,7 @@ function calendar3d(width, view) {
   const y0 = Math.min(-10, d3.min(cells, (d) => P(d.i, d.j, (H * d.hotspots) / maxV)[1]) ?? 0) - 12;
   const svg = d3.create("svg").attr("width", width).attr("height", y1 - y0).attr("viewBox", [x0, y0, x1 - x0, y1 - y0]).attr("role", "img")
     .attr("aria-label", `The calendar for ${areaTitle} in 3D, ${lo} to ${hi}`)
-    .attr("aria-description", "Each month is a column on a floor of months and years; taller and darker means more hotspots. The flat calendar above shows the same values.")
+    .attr("aria-description", "Each month is a column on a floor of months and years; taller means more hotspots, and the colour follows the flat calendar's count ramp. The flat calendar above shows the same values.")
     .style("max-width", "100%").style("height", "auto").style("font", "11px var(--sans-serif)");
   const floor = [P(0, 0, 0), P(nM, 0, 0), P(nM, nY, 0), P(0, nY, 0)];
   svg.append("polygon").attr("points", floor.join(" ")).attr("fill", "var(--theme-foreground-faintest)");
@@ -691,7 +691,8 @@ const outArea = area.id === "custom" ? (nino.testable ? {median: nino.ninoMedian
 const checkSeason = outSeasons.find((d) => d.year === outlook.checkYear);
 const otherPast = outSeasons.filter((d) => !d.nino && d.year <= elnino.years[1]).map((d) => d.total);
 const NEXT = String(outlook.nextYear);
-const pct = (x) => `${Math.round(100 * x)}%`;
+// One decimal: outlook.json stores the errors to 3 decimals, so a whole percent would round twice.
+const pct = (x) => `${(100 * x).toFixed(1)}%`;
 const outlookChart = (width) => quiet(Plot.plot({
   width,
   height: 250,
@@ -715,7 +716,7 @@ const outlookChart = (width) => quiet(Plot.plot({
   <div class="card grid-colspan-2">${resize((width) => outlookChart(width))}</div>
   <div class="card outlook">
     ${outArea ? html`<p class="outlook-lead">If January–May ${NEXT} is an El Niño season, as PAGASA expects, past El Niño seasons put ${ninoPlace} at about <b>${fmt(outArea.median)} hotspots</b>, between ${fmt(outArea.low)} and ${fmt(outArea.high)}. A season without El Niño has usually had about ${fmt(outArea.otherMedian)}.</p>` : html`<p class="outlook-lead">Too few fires here for an outlook: the seasons without El Niño have a median below ${elnino.minOtherMedian} hotspots.</p>`}
-    ${outArea && area.id !== "custom" ? html`<p>Tested on the past: predicting each El Niño season from the other ${word(elnino.elNinoYears.length - 1)} missed by a median of ${pct(outArea.errorElNinoAnalogues)}, against ${pct(outArea.errorIgnoringElNino)} when El Niño was ignored.</p>` : ""}
+    ${outArea && area.id !== "custom" ? html`<p>Tested on the past: predicting each El Niño season${outArea.ofSeasons < elnino.elNinoYears.length ? ` with hotspots (${word(outArea.ofSeasons)} of ${word(elnino.elNinoYears.length)}; a season with none cannot be scored)` : ""} from the other ${word(elnino.elNinoYears.length - 1)} missed by a median of ${pct(outArea.errorElNinoAnalogues)}, against ${pct(outArea.errorIgnoringElNino)} when El Niño was ignored.</p>` : ""}
     ${outArea && area.id === "custom" ? html`<p class="hint">For a drawn box this comes from the box's own seasons; the test on past seasons is run for the country, regions and provinces only.</p>` : ""}
     ${outArea && checkSeason ? html`<p>A season it never saw: January–May ${outlook.checkYear}, not an El Niño season, had ${fmt(checkSeason.total)} hotspots, ${checkSeason.total > d3.max(otherPast) ? `above every past season without El Niño (highest ${fmt(d3.max(otherPast))})` : checkSeason.total < d3.min(otherPast) ? `below every past season without El Niño (lowest ${fmt(d3.min(otherPast))})` : `inside the range of past seasons without El Niño (${fmt(d3.min(otherPast))} to ${fmt(d3.max(otherPast))})`}${checkSeason.total > 1.5 * outArea.otherMedian ? ", and well above their usual level: a season can run high without El Niño" : ""}.</p>` : ""}
   </div>
@@ -781,7 +782,7 @@ display(ninoLegend());
 
 <p class="hint">${fullYears.length ? `Dashed line: the average full year (${fmt(yearMean)}). ` : ""}Partial years in the selection are shorter bars, not quieter years. ${modisYears.length ? (showYearErr ? `The thin bars on the converted MODIS years show ±${Math.round(YEAR_ERR * 100)}%: the typical error of a region's yearly total in the held-out test (median); not a confidence interval.` : `Converted MODIS years carry an error: a region's yearly total is typically off by about ${Math.round(YEAR_ERR * 100)}% in the held-out test, and the error is larger for small areas such as a province or a drawn box.`) : ""}</p>
 
-## How intense were the fires?
+## Fire intensity at the hotspots
 
 ```js
 // Fire intensity: fire radiative power (FRP, MW) of the VIIRS hotspots in the harmonised record (pipeline, intensity.csv),
@@ -1042,6 +1043,7 @@ a.strip-item span { text-decoration: underline; text-underline-offset: 2px; text
 .nino-panel .too-few { font-size: 1.5rem; color: inherit; }
 .nino-caution { font-size: 0.9rem; border-left: 3px solid #fdae61; }
 .nino-caution p { margin: 0; }
+.outlook-grid { grid-auto-rows: auto; }
 .outlook-grid .card { margin: 0; }
 .outlook p { margin: 0.45rem 0; }
 .outlook-lead { font-size: 1.05rem; }
