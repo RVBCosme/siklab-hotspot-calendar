@@ -1,5 +1,7 @@
 # Siklab hotspot calendar
 
+![The calendar page: the header band with the El Niño ratio, the test error and the length of the record, the fire-season ribbon, ready-made views and the controls](src/img/app-home.png)
+
 A harmonised burning activity calendar for the Philippines, built from NASA FIRMS active fire hotspots during the NASA Space Apps Challenge 2026 (14–15 November 2026, Manila local event, challenge "Harmonization of MODIS and VIIRS Hot Spots") by team Siklab.
 
 MODIS and VIIRS count fire very differently: over the Philippines, VIIRS on Suomi NPP reports about ten hotspots for every one that MODIS on Aqua reports. This project converts the MODIS record (2003 to January 2012) onto the VIIRS scale with a factor per region, fitted on the years both satellites flew, so that one monthly series runs from January 2003 to the latest month for any of the 17 regions and 87 province-level areas (81 provinces, Metro Manila's four districts, Isabela City and Cotabato City), or for a box drawn on the map.
