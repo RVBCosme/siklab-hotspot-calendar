@@ -12,7 +12,7 @@ title: Calendar
     <li><b>${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}%</b> <span>typical error of a region's yearly total, tested on years the conversion never saw</span></li>
     <li><b>${fmt(allMonths.length)}</b> <span>months of MODIS and VIIRS on one scale, ${monthName(allMonths[0])} to ${meta.lastDate.slice(8, 10).replace(/^0/, "")} ${monthName(meta.lastDate.slice(0, 7))}</span></li>
   </ul>
-  ${seasonRibbon}
+  <div class="ribbon-slot">${seasonRibbon}</div>
 </header>
 
 <details class="explain">
@@ -144,15 +144,9 @@ display(shareButton);
 </div>
 
 ```js
-// Header ribbon: the country's median month over the full years of the El Niño analysis, coloured like the calendar.
-const ribbonMedian = d3.range(1, 13).map((m) => d3.median(byArea.get("ph").filter((d) => d.m === m && d.year >= elnino.years[0] && d.year <= elnino.years[1]), (d) => d.hotspots));
-const ribbonColour = d3.scaleSequentialSqrt(d3.interpolateYlOrRd).domain([0, d3.max(ribbonMedian)]);
-const ribbonPeak = ribbonMedian.indexOf(d3.max(ribbonMedian));
-const seasonRibbon = html`<figure class="ribbon" role="img" aria-label=${`The country's median month, ${elnino.years[0]} to ${elnino.years[1]}, coloured from light (few hotspots) to dark red (many). The peak is ${MONTH_NAMES[ribbonPeak]}.`}>
-  <div class="cells">${ribbonMedian.map((v) => html`<span style=${`background: ${ribbonColour(v)}`}></span>`)}</div>
-  <div class="months" aria-hidden="true">${MONTHS.map((m) => html`<span>${m}</span>`)}</div>
-  <figcaption aria-hidden="true">The country's median month, ${elnino.years[0]}–${elnino.years[1]}: the fire season peaks in ${MONTH_NAMES[ribbonPeak]}</figcaption>
-</figure>`;
+// Header ribbon (shared with the other pages): the country's median month over the full years of the El Niño analysis.
+import {seasonRibbon as ribbonOf, jumpBar, jumpTo} from "./components/band.js";
+const seasonRibbon = ribbonOf(monthlyRaw, elnino.years);
 ```
 
 ```js
@@ -342,7 +336,7 @@ const factorText =
 }
 ```
 
-## In plain words
+<h2 id="in-plain-words" class="no-rule">In plain words</h2>
 
 ```js
 // A short summary of the current view for readers who are not scientists. Every number comes from the same data as the charts below.
@@ -393,7 +387,7 @@ display(html`<div class="plain">
 </div>`);
 ```
 
-<h2 id="calendar" tabindex="-1">Burning activity calendar: ${areaTitle}, ${lo} to ${hi}</h2>
+<h2 id="calendar" class="no-rule" tabindex="-1">Burning activity calendar: ${areaTitle}, ${lo} to ${hi}</h2>
 
 <p class="hint">Each cell is one month. ${colourBy === "Number of hotspots" ? "Colour shows the number of hotspots on the VIIRS scale." : "Colour shows how far each month is above (red) or below (blue) the average for that calendar month over every complete month of the record; a month still in progress is compared with the same share of the average."} Cells before February 2012 come from MODIS Aqua converted with ${factorText}; cells from February 2012 come from VIIRS. A dot marks a month with a week or more of missing satellite data, which reads lower than it was.</p>
 
@@ -984,84 +978,3 @@ What would you use this for?
 };
 display(feedbackLink);
 ```
-
-<style>
-.band { margin: 0.2rem 0 1rem; }
-.band h1 { font-size: 2.7rem; line-height: 1.05; margin: 0; max-width: none; letter-spacing: -0.01em; }
-.tagline { font-size: 1.25rem; line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 46rem; color: var(--theme-foreground-muted); }
-.band-figures { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; max-width: 72rem; }
-.band-figures li { display: flex; align-items: baseline; gap: 0.6rem; margin: 0; }
-.band-figures b { font-size: 2.1rem; line-height: 1; color: #d7301f; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.band-figures span { font-size: 0.9rem; line-height: 1.35; }
-.ribbon { margin: 0; max-width: 72rem; }
-.ribbon .cells, .ribbon .months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
-.ribbon .cells span { height: 12px; }
-.ribbon .cells span:first-child { border-radius: 3px 0 0 3px; }
-.ribbon .cells span:last-child { border-radius: 0 3px 3px 0; }
-.ribbon .months span { font-size: 0.72rem; line-height: 1.5; text-align: center; color: var(--theme-foreground-muted); }
-.ribbon figcaption { font-size: 0.8rem; color: var(--theme-foreground-muted); }
-.strip { margin: 0.2rem 0 1.4rem; max-width: 72rem; }
-.strip h2 { font-size: 1rem; margin: 0 0 0.5rem; }
-.strip-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; }
-.strip-item { display: flex; align-items: baseline; gap: 0.6rem; color: inherit; }
-#observablehq-main a.strip-item { text-decoration: none; }
-a.strip-item span { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--theme-foreground-faint); }
-.strip-item b { font-size: 1.6rem; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.strip-item span { font-size: 0.88rem; line-height: 1.35; }
-#el-nino:focus { outline: none; }
-#el-nino:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 2px; }
-@media (max-width: 640px) { .band h1 { font-size: 2.1rem; } .band-figures, .strip-items { grid-template-columns: 1fr; } }
-.hint { color: var(--theme-foreground-muted); font-size: 0.9rem; max-width: 60rem; }
-.big { font-size: 2.2rem; font-weight: 700; }
-.controls form { margin-bottom: 0.4rem; }
-@media (min-width: 1280px) { .controls > .observablehq { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; column-gap: 2rem; align-items: start; } .controls .share { justify-self: start; } }
-.controls input[type="radio"], .map-grid input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
-.controls form label { margin-right: 0.6rem; }
-.downloads { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.dl { padding: 0.5rem 0.9rem; font: inherit; cursor: pointer; }
-.picker .map { height: 420px; border-radius: 6px; margin-bottom: 0.6rem; }
-.picker .coords { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; }
-.picker .coords input { width: 6.5rem; font: inherit; }
-.picker .coords button { font: inherit; padding: 0.35rem 0.7rem; cursor: pointer; }
-@media (max-width: 640px) { .picker .map { height: 320px; } .big { font-size: 1.8rem; } }
-.how-to-read { max-width: 60rem; padding-left: 1.4rem; line-height: 1.55; }
-.how-to-read li { margin: 0.2rem 0; }
-.explain { max-width: 60rem; margin: 0.6rem 0 1.2rem; border-left: 3px solid #fdae61; padding: 0.3rem 0 0.3rem 0.9rem; }
-.explain summary { cursor: pointer; font-weight: 600; }
-.explain p { line-height: 1.6; }
-.plain { max-width: 60rem; font-size: 1.08rem; line-height: 1.6; border-left: 3px solid #d7301f; padding: 0.1rem 0 0.1rem 1rem; }
-.plain p { margin: 0.45rem 0; max-width: none; }
-.feedback { display: inline-block; margin: 0.2rem 0 1rem; font-weight: 600; }
-.share { margin-top: 0.5rem; padding: 0.35rem 0.8rem; font: inherit; cursor: pointer; }
-.map-grid { grid-auto-rows: auto; }
-.map-grid .card { margin: 0; }
-.map-grid > .card { min-height: 420px; }
-.map-side { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
-.nino-panel h3 { margin: 0 0 0.2rem; }
-.nino-panel p { margin: 0.4rem 0; }
-.nino-panel .big { color: #d7301f; margin-right: 0.3rem; }
-.nino-panel .too-few { font-size: 1.5rem; color: inherit; }
-.nino-caution { font-size: 0.9rem; border-left: 3px solid #fdae61; }
-.nino-caution p { margin: 0; }
-.outlook-grid { grid-auto-rows: auto; }
-.outlook-grid .card { margin: 0; }
-.outlook p { margin: 0.45rem 0; }
-.outlook-lead { font-size: 1.05rem; }
-.cal3d { margin: 0.4rem 0 1rem; }
-.cal3d summary { cursor: pointer; font-weight: 600; }
-.cal3d input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
-.nino-legend { font-size: 0.85rem; color: var(--theme-foreground-muted); margin: 0.2rem 0 0.8rem; max-width: 60rem; }
-.all-provinces { margin: 0.8rem 0; }
-.all-provinces summary { cursor: pointer; font-weight: 600; margin-bottom: 0.5rem; }
-#calendar:focus { outline: none; }
-#calendar:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 4px; }
-.hint a, .plain a, .explain a { text-decoration: underline; text-underline-offset: 2px; }
-.ranked h3 { margin-top: 0; }
-.ranked ol { padding-left: 1.4rem; margin: 0; }
-.ranked li { margin: 0.25rem 0; }
-.ranked .row { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; padding: 0.1rem 0 0.45rem; }
-.ranked button { font: inherit; text-align: left; background: none; border: 0; padding: 0; color: var(--theme-foreground-focus); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; min-height: 1.6rem; }
-.ranked .num { white-space: nowrap; color: var(--theme-foreground-muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
-.ranked .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: #fdae61; border-radius: 2px; }
-button:focus-visible, summary:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 2px; }
-</style>

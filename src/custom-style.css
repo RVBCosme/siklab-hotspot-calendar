@@ -1,0 +1,178 @@
+/* Written with an AI assistant (Claude Code) during the hackathon, 15 Nov 2026; see README.
+   One stylesheet for every page: Framework's default styles and its default light and dark themes
+   (the same pair the "theme" option would give), then this site's band, type, colours, cards, tables and footer. */
+@import url("observablehq:default.css");
+@import url("observablehq:theme-air.css") (prefers-color-scheme: light);
+@import url("observablehq:theme-near-midnight.css") (prefers-color-scheme: dark);
+
+:root {
+  --fire: #d7301f;        /* the calendar's red */
+  --ember: #fdae61;       /* the calendar's orange */
+  --ember-deep: #e08214;
+  --content: 72rem;       /* one content width for every page */
+  --measure: 48rem;       /* readable line length for prose */
+}
+/* Muted text dark enough for 4.5:1 contrast in both themes. */
+:root:root { --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 72%, var(--theme-background)); }
+
+/* ---- Width: one content width; prose keeps a readable measure, tables and figures use the full width.
+   :where() keeps these at element specificity, so a page's own classes still win. */
+:where(#observablehq-main) { max-width: var(--content); }
+:where(#observablehq-main) :is(p, ul, ol, blockquote, .note, .tip, .warning, .caution) { max-width: var(--measure); }
+:where(#observablehq-main) :is(table, figure, h1, h2, h3, h4, .katex-display, pre, .observablehq-pre-container) { max-width: none; }
+:where(#observablehq-main) table { width: 100%; }
+:where(#observablehq-main) td p, :where(#observablehq-main) li p { max-width: none; }
+
+/* ---- Links and focus */
+#observablehq-main a:not(.observablehq-header-anchor), #observablehq-footer a { text-decoration: underline; text-underline-offset: 2px; }
+button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 2px; }
+:where(#observablehq-main) :is(h2, h3)[tabindex="-1"]:focus { outline: none; }
+:where(#observablehq-main) :is(h2, h3)[tabindex="-1"]:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 4px; }
+
+/* ---- Type: section headings ask a question; the first line under them answers it. */
+:where(#observablehq-main) h2 { margin-top: 2rem; padding-top: 0.8rem; border-top: 1px solid var(--theme-foreground-faintest); }
+:where(#observablehq-main) h2.no-rule { border-top: 0; padding-top: 0; margin-top: 0; }
+.answer { font-size: 1.12rem; line-height: 1.55; margin: 0.4rem 0 0.9rem; }
+.answer b { color: var(--fire); font-variant-numeric: tabular-nums; }
+.read { font-size: 0.86rem; color: var(--theme-foreground-muted); margin: 0.3rem 0 1rem; }
+.read::before { content: "How to read it: "; font-weight: 600; }
+.hint { color: var(--theme-foreground-muted); font-size: 0.9rem; max-width: 60rem; }
+.hint a, .plain a, .explain a, .read a { text-decoration: underline; text-underline-offset: 2px; }
+dfn { font-style: normal; font-weight: 600; }
+
+/* ---- Header band (all pages) */
+.band { margin: 0.2rem 0 1rem; max-width: var(--content); }
+.band h1 { font-size: 2.7rem; line-height: 1.05; margin: 0; max-width: none; letter-spacing: -0.01em; }
+.band .band-project { margin: 0 0 0.3rem; font-size: 0.95rem; max-width: none; }
+.band .band-project a { color: var(--theme-foreground-muted); }
+.tagline { font-size: 1.25rem; line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 46rem; color: var(--theme-foreground-muted); }
+.band-figures { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; max-width: var(--content); }
+.band-figures li { display: flex; align-items: baseline; gap: 0.6rem; margin: 0; }
+.band-figures b { font-size: 2.1rem; line-height: 1; color: var(--fire); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.band-figures span { font-size: 0.9rem; line-height: 1.35; }
+.ribbon { margin: 0; max-width: var(--content); }
+.ribbon-slot { min-height: 3.1rem; } /* reserves the ribbon's height while the data loads */
+.ribbon .cells, .ribbon .months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
+.ribbon .cells span { height: 12px; }
+.ribbon .cells span:first-child { border-radius: 3px 0 0 3px; }
+.ribbon .cells span:last-child { border-radius: 0 3px 3px 0; }
+.ribbon .months span { font-size: 0.72rem; line-height: 1.5; text-align: center; color: var(--theme-foreground-muted); }
+.ribbon figcaption { font-size: 0.8rem; color: var(--theme-foreground-muted); }
+@media (max-width: 640px) { .band h1 { font-size: 2.1rem; } .band-figures { grid-template-columns: 1fr; } }
+
+/* ---- Jump bar and "Start here" row, under the band */
+.jump, .start { font-size: 0.9rem; line-height: 1.6; margin: 0.5rem 0 0; max-width: var(--content); display: flex; flex-wrap: wrap; gap: 0.1rem 1.1rem; align-items: baseline; }
+.jump-label, .start-label { font-weight: 600; }
+.start a b { color: var(--fire); font-variant-numeric: tabular-nums; }
+
+/* ---- Cards, details and blocks */
+.explain { max-width: 60rem; margin: 0.6rem 0 1.2rem; border-left: 3px solid var(--ember); padding: 0.3rem 0 0.3rem 0.9rem; }
+.explain summary, .sci summary, .cal3d summary, .all-provinces summary { cursor: pointer; font-weight: 600; }
+.explain p { line-height: 1.6; }
+.sci { margin: 0.4rem 0 1.2rem; font-size: 0.9rem; border-left: 1px solid var(--theme-foreground-faint); padding: 0.1rem 0 0.1rem 0.8rem; max-width: var(--measure); }
+.sci p, .sci ul { margin: 0.35rem 0; }
+.sci code { font-size: 0.85em; }
+.plain { max-width: 60rem; font-size: 1.08rem; line-height: 1.6; border-left: 3px solid var(--fire); padding: 0.1rem 0 0.1rem 1rem; }
+.plain p { margin: 0.45rem 0; max-width: none; }
+.block { border-top: 2px solid var(--fire); padding-top: 0.6rem; margin: 2rem 0 1.2rem; max-width: var(--content); }
+.block h2 { border-top: 0; margin-top: 0.2rem; padding-top: 0; }
+.limits ul { list-style: none; padding: 0; max-width: var(--content); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 0.4rem 2rem; }
+.limits li { border-left: 3px solid var(--ember); padding: 0.1rem 0 0.1rem 0.8rem; margin: 0.3rem 0; }
+.abstract { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.35rem 1.2rem; margin: 0.8rem 0 1.2rem; max-width: 60rem; }
+.abstract dt { font-weight: 600; }
+.abstract dd { margin: 0; line-height: 1.5; }
+@media (max-width: 640px) { .abstract { grid-template-columns: 1fr; } .abstract dd { margin-bottom: 0.4rem; } }
+.figures { list-style: none; padding: 0; margin: 0.8rem 0 1.2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0.8rem 2rem; max-width: var(--content); }
+.figures li { margin: 0; }
+.figures b { display: block; font-size: 1.9rem; line-height: 1.1; color: var(--fire); font-variant-numeric: tabular-nums; }
+.figures span { font-size: 0.9rem; line-height: 1.35; }
+.side-by-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); gap: 1rem 2rem; align-items: start; }
+.side-by-side > * { min-width: 0; }
+
+/* ---- Tables (all pages) */
+:where(#observablehq-main) th { vertical-align: bottom; }
+:where(#observablehq-main) td { vertical-align: top; }
+@media (max-width: 640px) {
+  #observablehq-main table { font-size: 13px; }
+  #observablehq-main th, #observablehq-main td, #observablehq-main p a { overflow-wrap: anywhere; padding-left: 2px; padding-right: 2px; }
+}
+/* Long addresses in table cells may break anywhere below desktop width, so tables never push the page sideways. */
+@media (max-width: 1100px) { :where(#observablehq-main) td { overflow-wrap: anywhere; } }
+/* Code boxes stay inside the content column (Framework pulls them 1rem outward on each side). */
+:where(#observablehq-main) :is(pre, .observablehq-pre-container) { margin-left: 0; margin-right: 0; }
+:where(#observablehq-main) pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Long addresses in prose wrap instead of pushing a phone page sideways. */
+:where(#observablehq-main) :is(p, li, dd) { overflow-wrap: break-word; }
+
+/* ---- Calendar page */
+.strip { margin: 0.2rem 0 1.4rem; max-width: var(--content); }
+.strip h2 { font-size: 1rem; margin: 0 0 0.5rem; border-top: 0; padding-top: 0; }
+.strip-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; }
+.strip-item { display: flex; align-items: baseline; gap: 0.6rem; color: inherit; }
+#observablehq-main a.strip-item { text-decoration: none; }
+a.strip-item span { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--theme-foreground-faint); }
+.strip-item b { font-size: 1.6rem; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.strip-item span { font-size: 0.88rem; line-height: 1.35; }
+#el-nino:focus { outline: none; }
+#el-nino:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 2px; }
+@media (max-width: 640px) { .strip-items { grid-template-columns: 1fr; } }
+.big { font-size: 2.2rem; font-weight: 700; }
+.controls form { margin-bottom: 0.4rem; }
+@media (min-width: 1280px) { .controls > .observablehq { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; column-gap: 2rem; align-items: start; } .controls .share { justify-self: start; } }
+.controls input[type="radio"], .map-grid input[type="radio"], .cal3d input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
+.controls form label { margin-right: 0.6rem; }
+.downloads { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.dl { padding: 0.5rem 0.9rem; font: inherit; cursor: pointer; }
+.picker .map { height: 420px; border-radius: 6px; margin-bottom: 0.6rem; }
+.picker .coords { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; }
+.picker .coords input { width: 6.5rem; font: inherit; }
+.picker .coords button { font: inherit; padding: 0.35rem 0.7rem; cursor: pointer; }
+@media (max-width: 640px) { .picker .map { height: 320px; } .big { font-size: 1.8rem; } }
+.how-to-read { max-width: 60rem; padding-left: 1.4rem; line-height: 1.55; }
+.how-to-read li { margin: 0.2rem 0; }
+.feedback { display: inline-block; margin: 0.2rem 0 1rem; font-weight: 600; }
+.share { margin-top: 0.5rem; padding: 0.35rem 0.8rem; font: inherit; cursor: pointer; }
+.map-grid { grid-auto-rows: auto; }
+.map-grid .card { margin: 0; }
+.map-grid > .card { min-height: 420px; }
+.map-side { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+.nino-panel h3 { margin: 0 0 0.2rem; }
+.nino-panel p { margin: 0.4rem 0; }
+.nino-panel .big { color: var(--fire); margin-right: 0.3rem; }
+.nino-panel .too-few { font-size: 1.5rem; color: inherit; }
+.nino-caution { font-size: 0.9rem; border-left: 3px solid var(--ember); }
+.nino-caution p { margin: 0; }
+.outlook-grid { grid-auto-rows: auto; }
+.outlook-grid .card { margin: 0; }
+.outlook p { margin: 0.45rem 0; }
+.outlook-lead { font-size: 1.05rem; }
+.cal3d { margin: 0.4rem 0 1rem; }
+.nino-legend { font-size: 0.85rem; color: var(--theme-foreground-muted); margin: 0.2rem 0 0.8rem; max-width: 60rem; }
+.all-provinces { margin: 0.8rem 0; }
+.all-provinces summary { margin-bottom: 0.5rem; }
+#calendar:focus { outline: none; }
+#calendar:focus-visible { outline: 2px solid var(--theme-foreground-focus); outline-offset: 4px; }
+.ranked h3 { margin-top: 0; }
+.ranked ol { padding-left: 1.4rem; margin: 0; }
+.ranked li { margin: 0.25rem 0; }
+.ranked .row { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; padding: 0.1rem 0 0.45rem; }
+.ranked button { font: inherit; text-align: left; background: none; border: 0; padding: 0; color: var(--theme-foreground-focus); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; min-height: 1.6rem; }
+.ranked .num { white-space: nowrap; color: var(--theme-foreground-muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.ranked .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--ember); border-radius: 2px; }
+
+/* ---- Footer (all pages): the three pages, then the demo, code and feedback, then the credits. */
+#observablehq-footer { color: var(--theme-foreground-muted); max-width: var(--content); }
+#observablehq-footer nav.site-pages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 2rem; max-width: none; margin: 0 0 1.2rem; }
+#observablehq-footer .site-pages a { display: block; padding: 0.5rem 0 0; border: 0; border-radius: 0; border-top: 2px solid var(--theme-foreground-faintest); text-decoration: none; color: var(--theme-foreground); }
+#observablehq-footer .site-pages a:hover { border-top-color: var(--ember); }
+#observablehq-footer .site-pages a b { display: block; font-size: 1rem; text-decoration: underline; text-underline-offset: 2px; }
+#observablehq-footer .site-pages a span { display: block; font-size: 0.85rem; color: var(--theme-foreground-muted); margin-top: 0.15rem; }
+#observablehq-footer .site-pages a[aria-current="page"] { border-top-color: var(--fire); }
+#observablehq-footer .site-pages a[aria-current="page"] b { text-decoration: none; }
+#observablehq-footer .site-pages a[aria-current="page"] b::after { content: " (this page)"; font-weight: 400; color: var(--theme-foreground-muted); }
+#observablehq-footer .site-more { display: flex; flex-wrap: wrap; gap: 0.3rem 1.4rem; margin: 0 0 0.8rem; font-size: 0.9rem; }
+#observablehq-footer .site-credits { font-size: 0.82rem; max-width: var(--measure); margin: 0; }
+@media (max-width: 640px) { #observablehq-footer nav.site-pages { grid-template-columns: 1fr; } }
+
+/* ---- Print: no navigation chrome. */
+@media print { .jump, .start, #observablehq-footer nav.site-pages, #observablehq-footer .site-more { display: none !important; } }

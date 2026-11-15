@@ -4,10 +4,24 @@ title: Sources and credits
 
 <!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README. -->
 
-# Sources, licences and AI use
+<header class="band">
+  <p class="band-project"><a href="./">Siklab hotspot calendar</a></p>
+  <h1>Sources, licences and AI use</h1>
+  <p class="tagline">Where every number on this site comes from, under which terms, and what the AI assistant did</p>
+  <ul class="band-figures">
+    <li><b>${d3.format(",")(meta.stats.kept)}</b> <span>NASA FIRMS hotspot detections kept after the filters, 2000 to ${meta.lastDate}</span></li>
+    <li><b>${Object.keys(meta.stats.bySensor).length}</b> <span>satellites: Terra and Aqua (MODIS), Suomi NPP and NOAA-20 (VIIRS)</span></li>
+    <li><b>${elnino.elNinoYears.length}</b> <span>El Niño years, ${elnino.years.join("–")}, taken from NOAA's Oceanic Niño Index</span></li>
+  </ul>
+  <div class="ribbon-slot">${seasonRibbon(monthly, elnino.years)}</div>
+  <nav class="jump" aria-label="On this page"><span class="jump-label">On this page:</span> <a href="#nasa-data">NASA data</a> <a href="#other-data-and-references">Other data and references</a> <a href="#software">Software</a> <a href="#use-of-ai-super-intelligence-tools">Use of AI</a> <a href="#built-during-the-hackathon">Built during the hackathon</a> <a href="#before-the-event">Before the event</a> <a href="#licence-of-this-project">Licence</a></nav>
+</header>
 
 ```js
 const elnino = FileAttachment("data/elnino.json").json();
+const meta = FileAttachment("data/meta.json").json();
+const monthly = FileAttachment("data/monthly.csv").csv();
+import {seasonRibbon} from "./components/band.js";
 ```
 
 ## NASA data
@@ -47,6 +61,8 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 | OpenStreetMap tiles (optional base map with place names) | Orientation on the custom-area map | Data © OpenStreetMap contributors, ODbL; tiles under the OSM tile usage policy |
 | Node.js | Runs the data pipeline | MIT |
 
+<section class="block">
+
 ## Use of AI (Super Intelligence) tools
 
 | Tool | What it did | What a person checked |
@@ -55,9 +71,19 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 
 The code and the data files in this repository were written or generated with AI assistance, as stated above and in the repository's README. No AI-generated images, video or audio are used.
 
+</section>
+
+<section class="block" id="built-during-the-hackathon">
+
 **Built during the hackathon.** Everything in this project was made within the hackathon, between the 09:00 start on 14 November and the deadline on 15 November 2026 (Manila time): the data downloads, the pipeline, the validation tests, the web application, the demo and this page. The repository's first commit is at 13:07 on 14 November.
 
+</section>
+
+<section class="block" id="before-the-event">
+
 **Before the event.** Before the start our work was research and logistics: we read the challenge, the rules, the forum and the documentation of NASA's FIRMS files. Two things from that period should be known. On 10 November, before we had read the organisers' guidance on planning (discussion 1872), our AI assistant wrote a text outline of a possible approach and a list of build options, with no code, no design assets, no interface sketches and no data; we set both aside on 11 November and planned the build after the start. On 11 November a forum Navigator had written that NASA's data is public and there is no need to wait for the hackathon to access it (discussion 1925), and the assistant read the first and last few hundred bytes of three 2025 Philippine FIRMS files to learn their column format; nothing was saved or processed. On 14 November the organisers said that downloading data before the start is not permitted (discussion 2011), so we state both here and on our project page.
+
+</section>
 
 ## Licence of this project
 
