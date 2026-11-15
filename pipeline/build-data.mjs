@@ -267,8 +267,23 @@ fs.writeFileSync(
   "area_id,month,hotspots_harmonised,source,gap_days,days,modis_aqua,modis_terra,viirs_snpp,viirs_noaa20\n" + monthlyRows.map((r) => r.join(",")).join("\n") + "\n"
 );
 
+// ---------- daily table: the harmonised value of every day with hotspots (days without are 0 or a gap) ----------
+// Gap days (no satellite data on the reference scale) are the same for every area; they are listed in meta.json (gapDates).
+const dailyRows = [], gapDates = [];
+for (const d of DAYS) {
+  if (d.slice(0, 7) < RECORD_START_MONTH) continue;
+  if (harmonisedDay("ph", d).src === "gap") gapDates.push(d);
+}
+for (const id of areaIds) for (const d of DAYS) {
+  if (d.slice(0, 7) < RECORD_START_MONTH) continue;
+  const v = Math.round(harmonisedDay(id, d).v * 10) / 10;
+  if (v > 0) dailyRows.push(id + "," + d + "," + v);
+}
+fs.writeFileSync(path.join(OUT, "daily.csv"), "area_id,date,hotspots_harmonised\n" + dailyRows.join("\n") + "\n");
+
 // ---------- harmonised hotspot points, one file per region ----------
 const byRegion = new Map(regions.map((r, i) => [i, []]));
+const intensity = new Map(); // `${areaId}|${month}` -> {n, frp, frps}
 for (const p of keepPoints) {
   const m = p.date.slice(0, 7);
   let use = false, weight = 1;
@@ -284,8 +299,21 @@ for (const p of keepPoints) {
   if (rid === "r-ncr") { stats.pointsNcr = (stats.pointsNcr || 0) + 1; if (p.type === "2") stats.pointsNcrStaticSource = (stats.pointsNcrStaticSource || 0) + 1; }
   if (p.pi >= 0 && provinces[p.pi].parent !== rid) stats.pointsRegionNotProvinceParent = (stats.pointsRegionNotProvinceParent || 0) + 1;
   byRegion.get(p.ri).push([p.date, p.time, p.lat, p.lon, satName, p.conf, p.frp, p.type, p.pi >= 0 ? provinces[p.pi].id : "", Math.round(weight * 1000) / 1000]);
+  // Fire intensity: fire radiative power (FRP, MW) of the VIIRS hotspots only; MODIS FRP is not comparable and is not converted.
+  if (m >= VIIRS_START_MONTH && Number.isFinite(+p.frp)) for (const id of ["ph", rid, ...(p.pi >= 0 ? [provinces[p.pi].id] : [])]) {
+    const k = id + "|" + m;
+    let o = intensity.get(k);
+    if (!o) intensity.set(k, (o = { n: 0, frp: 0, frps: [] }));
+    o.n += weight; o.frp += +p.frp * weight; o.frps.push(+p.frp);
+  }
 }
 const PHEAD = "date,time_utc,latitude,longitude,satellite,confidence,frp,firms_type,province_id,weight_viirs_equivalent\n";
+{
+  const med = (a) => { const x = a.sort((p, q) => p - q), n = x.length; return n % 2 ? x[(n - 1) / 2] : (x[n / 2 - 1] + x[n / 2]) / 2; };
+  const rows = [...intensity].map(([k, o]) => { const [id, m] = k.split("|"); return [id, m, Math.round(o.n * 10) / 10, Math.round(o.frp), Math.round(med(o.frps) * 10) / 10]; });
+  rows.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0));
+  fs.writeFileSync(path.join(OUT, "intensity.csv"), "area_id,month,viirs_hotspots,frp_total_mw,frp_median_mw\n" + rows.map((r) => r.join(",")).join("\n") + "\n");
+}
 for (const [ri, rows] of byRegion) {
   rows.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
   fs.writeFileSync(path.join(OUT, "points", regions[ri].id + ".csv"), PHEAD + rows.map((r) => r.join(",")).join("\n") + "\n");
@@ -340,7 +368,7 @@ const provinceShapes = {
 fs.writeFileSync(path.join(OUT, "provinces.json"), JSON.stringify(provinceShapes));
 fs.writeFileSync(
   path.join(OUT, "meta.json"),
-  JSON.stringify({ aiAssistance: AI_NOTE, builtAt: new Date().toISOString(), lastDate, recordStart: RECORD_START_MONTH, viirsStart: VIIRS_START_MONTH, fit: [FIT_START, FIT_END], n20Fit: [N20_FIT_START, N20_FIT_END], stats, factors, missingDays: Object.fromEntries(Object.entries(missing).map(([k, v]) => [k, v.size])) }, null, 1)
+  JSON.stringify({ aiAssistance: AI_NOTE, builtAt: new Date().toISOString(), lastDate, recordStart: RECORD_START_MONTH, viirsStart: VIIRS_START_MONTH, fit: [FIT_START, FIT_END], n20Fit: [N20_FIT_START, N20_FIT_END], stats, factors, missingDays: Object.fromEntries(Object.entries(missing).map(([k, v]) => [k, v.size])), gapDates }, null, 1)
 );
 // ---------- validation (track C). Rules fixed before the first run: ----------
 // Unit: region x month, counted only on days when both satellites delivered data.

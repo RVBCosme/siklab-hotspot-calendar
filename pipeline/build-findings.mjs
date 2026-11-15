@@ -151,3 +151,49 @@ console.log("summary", summary);
 console.log("strongest", testable.sort((a, b) => results[b.id].ratio - results[a.id].ratio).slice(0, 8).map((a) => `${a.name} ${results[a.id].ratio.toFixed(1)}`).join("; "));
 console.log("weakest", testable.slice(-4).map((a) => `${a.name} ${results[a.id].ratio.toFixed(1)}`).join("; "));
 console.log("seam ph", seam.ph, "regions", JSON.parse(fs.readFileSync(path.join(OUT, "seam.json"), "utf8")).summary);
+
+// ---------- El Niño outlook for the next January-May season, from past seasons (analogues), with a test on the past ----------
+// Outlook: if the next season is an El Niño season, its range is taken from the past El Niño seasons (median, lowest, highest).
+// Test (leave-one-out over 2003-2025): predict each El Niño season by the median of the other El Niño seasons, against the
+// median of all other seasons (ignoring El Niño); score = median absolute % error over the El Niño seasons.
+// Out-of-sample check: January-May 2026 (January-March ONI -0.2, not an El Niño season) against the range of the past other seasons.
+const NEXT_YEAR = 2027, CHECK_YEAR = 2026;
+const absPct = (pred, obs) => Math.abs(pred - obs) / obs;
+const outlook = {};
+for (const a of areas) {
+  const r = results[a.id];
+  if (!r.testable) continue;
+  const values = YEARS.map((y) => season(a.id, y));
+  const nino = [], base = [];
+  let inside = 0;
+  YEARS.forEach((y, i) => {
+    if (!EL_NINO_YEARS.includes(y) || !(values[i] > 0)) return;
+    const others = YEARS.map((z, j) => [z, values[j]]).filter(([z]) => z !== y);
+    const sameClass = others.filter(([z]) => EL_NINO_YEARS.includes(z)).map(([, v]) => v);
+    nino.push(absPct(median(sameClass), values[i]));
+    base.push(absPct(median(others.map(([, v]) => v)), values[i]));
+    if (values[i] >= Math.min(...sameClass) && values[i] <= Math.max(...sameClass)) inside++;
+  });
+  const otherVals = YEARS.filter((y) => !EL_NINO_YEARS.includes(y)).map((y) => season(a.id, y));
+  const check = season(a.id, CHECK_YEAR);
+  outlook[a.id] = {
+    median: r.ninoMedian, low: r.ninoMin, high: r.ninoMax, otherMedian: r.otherMedian,
+    errorElNinoAnalogues: r3(median(nino)), errorIgnoringElNino: r3(median(base)), insideRange: inside, ofSeasons: nino.length,
+    check: { year: CHECK_YEAR, value: r1(check), otherLow: r1(Math.min(...otherVals)), otherHigh: r1(Math.max(...otherVals)), insideOtherRange: check >= Math.min(...otherVals) && check <= Math.max(...otherVals), errorOtherMedian: r3(absPct(median(otherVals), check)), errorAllMedian: r3(absPct(median(values), check)) },
+  };
+}
+const outProv = areas.filter((a) => a.level === "province" && outlook[a.id]);
+fs.writeFileSync(path.join(OUT, "outlook.json"), JSON.stringify({
+  aiAssistance: AI_NOTE,
+  rules: `Outlook for January-May ${NEXT_YEAR} if it is an El Niño season (PAGASA's El Niño Advisory No. 6 of 3 November 2026 expects El Niño to last into the first half of ${NEXT_YEAR}): the median, lowest and highest of the past ${EL_NINO_YEARS.length} El Niño seasons (${YEARS[0]}-${YEARS[YEARS.length - 1]}). Areas tested for El Niño only. Test: leave-one-out over the El Niño seasons; each predicted by the median of the other El Niño seasons, against the median of all other seasons; median absolute % error. Check: January-May ${CHECK_YEAR}, not an El Niño season, against the past other seasons.`,
+  nextYear: NEXT_YEAR, checkYear: CHECK_YEAR,
+  summary: {
+    provincesWithOutlook: outProv.length,
+    provincesAnaloguesBetter: outProv.filter((a) => outlook[a.id].errorElNinoAnalogues < outlook[a.id].errorIgnoringElNino).length,
+    provincesCheckInsideOtherRange: outProv.filter((a) => outlook[a.id].check.insideOtherRange).length,
+    provincesCheckOtherMedianBetter: outProv.filter((a) => outlook[a.id].check.errorOtherMedian < outlook[a.id].check.errorAllMedian).length,
+  },
+  areas: outlook,
+}, null, 1));
+console.log("outlook ph", outlook.ph, "\noutlook summary", JSON.parse(fs.readFileSync(path.join(OUT, "outlook.json"), "utf8")).summary);
+for (const id of ["r-car", "r-zamboanga-peninsula", "p-benguet", "p-zamboanga-del-sur", "p-aurora"]) console.log(id, JSON.stringify(outlook[id]));
