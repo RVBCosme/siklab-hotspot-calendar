@@ -6,7 +6,7 @@ title: Calendar
 
 <header class="band">
   <h1>Siklab hotspot calendar</h1>
-  <p class="tagline">When and where the Philippines burns, and how El Niño changes it</p>
+  <p class="tagline">When and where the Philippines burns, and how El Niño years compare</p>
   <ul class="band-figures">
     <li><b>${elnino.areas.ph.ratio.toFixed(1)}×</b> <span>as many hotspots in El Niño fire seasons (${MONTHS[elnino.seasonMonths[0] - 1]}–${MONTHS[elnino.seasonMonths[elnino.seasonMonths.length - 1] - 1]}) as in other years: whole country, medians of ${elnino.years[0]}–${elnino.years[1]}</span></li>
     <li><b>${validation.T1_leaveOneYearOut_2012_2020.harmonised.annualMedianAbsPctError}%</b> <span>typical error of a region's yearly total, tested on years the conversion never saw</span></li>
@@ -767,7 +767,7 @@ display(html`<div class="downloads">
 
 <p class="hint">The hotspot file lists every detection that makes up the harmonised record for this area and period, with a weight that puts it on the VIIRS scale (1 for Suomi NPP, k for MODIS Aqua, f for NOAA-20 on the days it stands in for Suomi NPP). Summing the weights by month gives the calendar. ${area.level === "country" ? "For the whole country this file is large (up to about 30 MB)." : ""}</p>
 
-<p class="hint">Data run from ${meta.recordStart} to ${meta.lastDate}. Designed for fire officers, land managers, emergency responders and researchers. It describes the past and does not forecast.</p>
+<p class="hint">Data run from ${meta.recordStart} to ${meta.lastDate}. Designed for provincial fire officers (Bureau of Fire Protection), DENR forestry offices and local disaster risk reduction and management offices. It describes the past and does not forecast.</p>
 
 ## Tell us what to fix
 
@@ -823,7 +823,7 @@ a.strip-item span { text-decoration: underline; text-underline-offset: 2px; text
 .big { font-size: 2.2rem; font-weight: 700; }
 .controls form { margin-bottom: 0.4rem; }
 @media (min-width: 1280px) { .controls > .observablehq { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; column-gap: 2rem; align-items: start; } .controls .share { justify-self: start; } }
-.controls input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
+.controls input[type="radio"], .map-grid input[type="radio"] { width: 20px; height: 20px; margin: 2px 0.4rem 2px 0; vertical-align: middle; }
 .controls form label { margin-right: 0.6rem; }
 .downloads { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .dl { padding: 0.5rem 0.9rem; font: inherit; cursor: pointer; }
