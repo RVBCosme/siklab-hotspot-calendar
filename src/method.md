@@ -4,12 +4,24 @@ title: How it works and how well
 
 <!-- Written with AI assistance (Claude Code, Anthropic) during NASA Space Apps 2026, 14 Nov 2026; see README. -->
 
-# How it works, and how well it works
+<header class="band">
+  <p class="band-project"><a href="./">Siklab hotspot calendar</a></p>
+  <h1>How it works, and how well it works</h1>
+  <p class="tagline">How two NASA satellite records become one fire record, the tests that check it, and what it cannot tell you</p>
+  <ul class="band-figures">
+    <li><b>${pc(T1.harmonised.annualMedianAbsPctError)}</b> <span>typical error of a region's yearly total after conversion, against ${pc(T1.baselineRawAqua.annualMedianAbsPctError)} without it</span></li>
+    <li><b>${heldout.pairs.length}</b> <span>region-years tested, ${d3.min(heldout.pairs, (d) => d.year)}–${d3.max(heldout.pairs, (d) => d.year)}, each held out of the fit</span></li>
+    <li><b>${seam.areas.ph.harmonised.toFixed(2)}×</b> <span>the step at ${seam.after[0]}, when the satellites changed, in the harmonised record, against ${seam.areas.ph.raw.toFixed(2)}× in the raw record</span></li>
+  </ul>
+  <div class="ribbon-slot">${seasonRibbon(monthly, nino.years)}</div>
+  <nav class="jump" aria-label="On this page"><span class="jump-label">On this page:</span> <a href="#summary">Summary</a> <a href="#in-plain-words">In plain words</a> <a href="#what-we-do">Method</a> <a href="#how-well-it-works">Tests and results</a> <a href="#check-against-fire-seasons-reported-on-the-ground">Ground check</a> <a href="#el-nino-seasons">El Niño</a> <a href="#outlook-for-the-next-el-nino-season">Outlook</a> <a href="#daily-counts-and-fire-intensity">Daily and intensity</a> <a href="#limits">Limits</a> <a href="#data-dictionary">Data dictionary</a> <a href="#how-to-cite-and-reproduce">Cite and reproduce</a></nav>
+</header>
 
 ```js
 const v = FileAttachment("data/validation.json").json();
 const meta = FileAttachment("data/meta.json").json();
 const areas = FileAttachment("data/areas.json").json();
+import {seasonRibbon} from "./components/band.js";
 ```
 
 ```js
@@ -17,6 +29,17 @@ const T1 = v.T1_leaveOneYearOut_2012_2020, T2 = v.T2_driftYears_2021_2025;
 const pc = (x) => (x == null ? "n/a" : `${x}%`);
 const n = d3.format(",");
 ```
+
+<h2 id="summary" class="no-rule">Summary</h2>
+
+<dl class="abstract">
+  <dt>Objective</dt><dd>One consistent monthly count of fire hotspots for the Philippines from ${meta.recordStart} to ${meta.lastDate}, whichever satellite saw them: for the country, ${areas.filter((a) => a.level === "region").length} regions, ${areas.filter((a) => a.level === "province").length} province-level areas and any box drawn on a map.</dd>
+  <dt>Data</dt><dd>NASA FIRMS active fire hotspots: MODIS Collection 6.1 (Terra and Aqua) and VIIRS 375 m (Suomi NPP and NOAA-20), standard-quality yearly files for the Philippines to 2025 and the FIRMS area API for 2026; the FIRMS missing-data table; geoBoundaries ADM1 and ADM2; NOAA's Oceanic Niño Index.</dd>
+  <dt>Method</dt><dd>The same filter for both sensors (no volcano, offshore or low-confidence detections); per region, k = VIIRS ÷ MODIS Aqua hotspots on days both delivered data, 20 January 2012 to 31 December 2020 (k = ${meta.factors.ph.k.toFixed(1)} nationally); months before February 2012 are MODIS Aqua × k; NOAA-20 × f fills Suomi NPP's gaps; sums by month.</dd>
+  <dt>Validation</dt><dd>Tests fixed before the first run. Each year of 2012–2020 held out in turn: median error of a region's yearly total ${pc(T1.harmonised.annualMedianAbsPctError)} (${T1.harmonised.regionYears} region-years), against ${pc(T1.baselineRawAqua.annualMedianAbsPctError)} without conversion and ${pc(T1.baselineOneNationalFactor.annualMedianAbsPctError)} with one national factor; single months ${pc(T1.harmonised.monthlyMedianAbsPctError)}; after the orbit drift (2021–2025) ${pc(T2.harmonised.annualMedianAbsPctError)}. Consistency check: the step at ${seam.after[0]} is ${seam.areas.ph.raw.toFixed(2)}× raw, ${seam.areas.ph.harmonised.toFixed(2)}× harmonised and ${seam.areas.ph.aquaAlone.toFixed(2)}× for MODIS Aqua alone.</dd>
+  <dt>Result</dt><dd>January–May seasons of El Niño years had ${nino.areas.ph.ratio.toFixed(1)} times the hotspots of other years (country, medians of ${nino.years.join("–")}; chance probability ${d3.format(".2~g")(nino.areas.ph.p)}); ${nino.summary.provincesAbove2} of ${nino.summary.provincesTestable} testable provinces more than doubled.</dd>
+  <dt>Limits</dt><dd>A hotspot is not a fire, and FIRMS carries no cloud information; El Niño years are also less cloudy; provinces use their region's factor; Metro Manila's factor rests on ${n(meta.factors["r-ncr"].kAqua)} MODIS Aqua hotspots; single months are uncertain. Details under <a href="#limits">Limits</a>.</dd>
+</dl>
 
 ## In plain words
 
@@ -46,6 +69,13 @@ The approach follows the same family as the published GFED5 near-real-time metho
 ## How well it works
 
 The tests and thresholds below were written into the code before the first run, and nothing was tuned after. Each test predicts VIIRS counts from MODIS Aqua, region by region, for years the factor never saw.
+
+<ul class="figures">
+  <li><b>${pc(T1.harmonised.annualMedianAbsPctError)}</b><span>median error of a region's yearly total, each year of 2012–2020 held out in turn (${pc(T1.baselineRawAqua.annualMedianAbsPctError)} without conversion)</span></li>
+  <li><b>${pc(T1.harmonised.monthlyMedianAbsPctError)}</b><span>median error of a single month in the same test: read seasons and years, not one month</span></li>
+  <li><b>${pc(T1.harmonised.peakMonthSame)}</b><span>of region-years have the same busiest month in both records (${pc(T1.harmonised.peakMonthWithinOne)} within one month)</span></li>
+  <li><b>${pc(T2.harmonised.annualMedianAbsPctError)}</b><span>median yearly error in 2021–2025, after the MODIS orbit drift (not used: the calendar uses MODIS only before 2012)</span></li>
+</ul>
 
 | Test | Harmonised (factor per region) | No harmonisation (raw MODIS) | One national factor |
 |---|---|---|---|
@@ -94,7 +124,7 @@ A consistency check on the whole record. It is not an independent test: the year
 Across the change of sensor the harmonised record moves the way a single satellite saw it move; the ${Math.round(SP.raw)}-fold step is gone. Region by region, the raw step has a median of ${step(SS.regionsRawMedian)} (from ${step(SS.regionsRawMin)} to ${step(SS.regionsRawMax)}), and the harmonised step differs from MODIS Aqua's own by a median of ${Math.round(100 * SS.regionsHarmonisedVsAquaMedianOff)}%. The conversion is not exact: the two weak spots are ${weakest.map(([id, off]) => `${nameOf.get(id)} (${Math.round(100 * off)}% off)`).join(" and ")}. Metro Manila has very few fires and its factor rests on few MODIS Aqua hotspots (see Limits).
 
 ```js
-display(resize((width) => quietM(Plot.plot({
+const stepChart = (width) => quietM(Plot.plot({
   width,
   height: 26 * stepOrder.length + 70,
   marginLeft: Math.min(170, width * 0.38),
@@ -108,13 +138,11 @@ display(resize((width) => quietM(Plot.plot({
     Plot.ruleX([1], {stroke: "currentColor", strokeOpacity: 0.5}),
     Plot.dot(stepRows, {x: "value", y: "name", stroke: "kind", fill: "kind", symbol: "kind", r: 4.5, fillOpacity: 0.85, tip: {format: {x: (d) => `${d.toFixed(2)}×`, y: true, stroke: false, fill: false}}})
   ]
-}))));
+}));
 ```
 
-**The held-out test, point by point.** Each point is one region in one year from ${d3.min(heldout.pairs, (d) => d.year)} to ${d3.max(heldout.pairs, (d) => d.year)}: the converted MODIS count, with the factor refitted without that year, against what VIIRS counted (${heldout.pairs.length} region-years with at least 100 VIIRS hotspots, the headline test in the table above). Points on the line are exact.
-
 ```js
-display(resize((width) => quietM(Plot.plot({
+const pairsChart = (width) => quietM(Plot.plot({
   width: Math.min(width, 560),
   height: Math.min(width, 560),
   x: {type: "log", label: "VIIRS hotspots, observed (log scale)", grid: true, tickFormat: "~s"},
@@ -125,7 +153,23 @@ display(resize((width) => quietM(Plot.plot({
     Plot.line([[d3.min(heldout.pairs, (d) => Math.min(d.observed, d.predicted)), d3.min(heldout.pairs, (d) => Math.min(d.observed, d.predicted))], [d3.max(heldout.pairs, (d) => Math.max(d.observed, d.predicted)), d3.max(heldout.pairs, (d) => Math.max(d.observed, d.predicted))]], {stroke: "currentColor", strokeDasharray: "4,3"}),
     Plot.dot(heldout.pairs, {x: "observed", y: "predicted", fill: "#d7301f", fillOpacity: 0.6, r: 3.5, channels: {Region: (d) => nameOf.get(d.region), Year: "year"}, tip: {format: {x: (v) => d3.format(",.0f")(v), y: (v) => d3.format(",.0f")(v)}}})
   ]
-}))));
+}));
+```
+
+```js
+// The two charts of this section side by side on wide screens, one above the other on narrow ones.
+display(html`<div class="side-by-side">
+  <figure>
+    <h3>The step at ${seam.after[0]}, three ways, by region</h3>
+    ${resize((width) => stepChart(width))}
+    <p class="read">Each row is the country or a region. A point at 1× means no jump when the satellites changed: grey circles, the raw record; red diamonds, the harmonised record; orange squares, MODIS Aqua alone.</p>
+  </figure>
+  <figure>
+    <h3>The held-out test, point by point</h3>
+    ${resize((width) => pairsChart(width))}
+    <p class="read">Each point is one region in one year from ${d3.min(heldout.pairs, (d) => d.year)} to ${d3.max(heldout.pairs, (d) => d.year)}: the converted MODIS count, with the factor refitted without that year, against what VIIRS counted (${heldout.pairs.length} region-years with at least 100 VIIRS hotspots, the headline test in the table above). Points on the dashed line are exact.</p>
+  </figure>
+</div>`);
 ```
 
 ## Check against fire seasons reported on the ground
@@ -225,6 +269,8 @@ PAGASA expects the El Niño of late 2026 to last into the first half of ${out.ne
 
 ## Limits
 
+<div class="limits">
+
 - **A hotspot is not a fire.** One fire can make many hotspots, and small or short fires, or fires under cloud, make none. The counts compare like with like across years; they are not a count of fires or of area burned.
 - **No detection does not mean no fire.** FIRMS carries no cloud information. The wet season and cloudy years read low.
 - **Missing days** are marked with a dot on the calendar when a month lacks a week or more of data.
@@ -234,6 +280,77 @@ PAGASA expects the El Niño of late 2026 to last into the first half of ${out.ne
 - **Dates** are FIRMS acquisition dates in UTC. The night pass, at about 01:30 Philippine time, is dated the day before, so a few hotspots at the turn of a month count in the earlier month.
 - **2026** comes from the FIRMS area API: standard quality up to the end of July (VIIRS) or August (MODIS), then near real time, which NASA later replaces with standard quality. Near-real-time rows carry no FIRMS type, so detections in the same or a neighbouring 0.02° cell (about 2 km) as any spot FIRMS flagged as an active volcano are dropped (${n(meta.stats.droppedNearVolcano)} rows). Offshore detections near the coast cannot be told apart and stay in from August 2026; in 2012–2025 they were 0.3–2.4% of a year's VIIRS hotspots. The current month holds only the days so far and is marked as such.
 - The record describes the past. The El Niño outlook is a range from past El Niño seasons, not a forecast model (see above).
+
+</div>
+
+## Data dictionary
+
+**Input products** (NASA FIRMS, as NASA names them on its FIRMS pages):
+
+| What | NASA product | Used for |
+|---|---|---|
+| MODIS active fire locations, standard quality (Terra and Aqua) | MCD14ML, Collection 6.1, through FIRMS' "yearly summary by country" files | 2000–2025. The files' version field reads 6.2 (2000–2017), 6.03 (2018–2022) and 61.03 (2023–2025) |
+| VIIRS 375 m active fire locations, standard quality | VNP14IMGML (Suomi NPP) and VJ114IMGML (NOAA-20), Collection 2, same yearly files (version field 2) | Suomi NPP 2012–2025, NOAA-20 2018–2025 |
+| 2026, standard quality then near real time | FIRMS area API sources MODIS_SP, MODIS_NRT (MCD14DL, 6.1NRT), VIIRS_SNPP_SP, VIIRS_SNPP_NRT (VNP14IMGTDL_NRT), VIIRS_NOAA20_SP, VIIRS_NOAA20_NRT (VJ114IMGTDL_NRT) | 1 January 2026 to ${meta.lastDate} |
+| Days without data | FIRMS missing-data table | Gaps, and when NOAA-20 fills in |
+
+**Downloads on the calendar page.** All dates are FIRMS acquisition dates in UTC. "VIIRS-equivalent hotspots" are counts on the VIIRS (Suomi NPP) scale: VIIRS hotspots as counted, MODIS Aqua hotspots × the region's k, NOAA-20 hotspots × f.
+
+| File and column | Meaning | Unit |
+|---|---|---|
+| **Monthly analytics** (monthly_…csv), one row per month | | |
+| area, month | Area name (or the drawn box's corners); month as YYYY-MM | |
+| hotspots_viirs_equivalent | Harmonised hotspots in the month | VIIRS-equivalent hotspots |
+| difference_from_month_average | The month minus the average of the same calendar month over the area's complete months (scaled to the days so far for a month in progress) | VIIRS-equivalent hotspots |
+| source | Which record the month comes from: MODIS Aqua × k, VIIRS Suomi NPP, or VIIRS with NOAA-20 filling at least one day | |
+| missing_days | Days of the month with no data on the reference record | days |
+| month_in_progress | "yes" for the current, partial month | |
+| modis_aqua_raw, modis_terra_raw, viirs_snpp_raw, viirs_noaa20_raw | Hotspots each satellite reported after the filters, unconverted (blank for a drawn box) | hotspots |
+| factor_k | The area's k (VIIRS per MODIS Aqua hotspot); "per region" for the country and drawn boxes | ratio |
+| **Hotspots in this search** (hotspots_…csv), one row per detection | | |
+| date, time_utc | Acquisition date and time (HHMM; some 2026 near-real-time rows have no leading zero) | UTC |
+| latitude, longitude | Position of the detection | decimal degrees (WGS 84) |
+| satellite | Aqua (MODIS), Suomi NPP (VIIRS) or NOAA-20 (VIIRS); Terra is not in these files | |
+| confidence | FIRMS confidence: MODIS 30–100; VIIRS n (nominal) or h (high); low-confidence detections are dropped | % (MODIS) |
+| frp | Fire radiative power as FIRMS reports it, unconverted | MW |
+| firms_type | FIRMS type: 0 vegetation fire, 2 other static land source; blank for near-real-time rows | |
+| province_id, region_id | The province (blank near some borders) and the region file the row came from | |
+| weight_viirs_equivalent | 1 for Suomi NPP; the region's k for MODIS Aqua; f for NOAA-20 filling a Suomi NPP gap. Adding the weights gives the calendar, to within rounding | VIIRS-equivalent hotspots |
+| **Images** (calendar, season, years, harmonisation, map) | SVG pictures of the charts as shown; no data columns | |
+
+**Data files in the repository** (src/data/; every JSON file written by the pipeline carries an aiAssistance note):
+
+| File | Holds | Unit |
+|---|---|---|
+| monthly.csv | area_id, month, hotspots_harmonised, source, gap_days, days (days of the month inside the record), and the raw counts modis_aqua, modis_terra, viirs_snpp, viirs_noaa20; the country, ${areas.filter((a) => a.level === "region").length} regions and ${areas.filter((a) => a.level === "province").length} province-level areas | VIIRS-equivalent hotspots; days; hotspots |
+| daily.csv | area_id, date, hotspots_harmonised; only days above zero are written | VIIRS-equivalent hotspots |
+| intensity.csv | area_id, month, viirs_hotspots (weighted), frp_total_mw (FRP × weight, summed), frp_median_mw (unweighted median), VIIRS only, from ${meta.viirsStart} | hotspots; MW |
+| points/&lt;region&gt;.csv | Every hotspot that enters the record, with the columns of the hotspot download above | as above |
+| meta.json | Build time, record dates, fit windows, filter counts, k and f per region, missing days, gap dates | |
+| validation.json, heldout.json | The validation tests and the held-out region-years | % error |
+| elnino.json, seam.json, outlook.json | The El Niño comparison and its permutation test, the step at ${seam.after[0]}, and the 2027 outlook with its test | ratio; hotspots; % error |
+| areas.json, provinces.json | Area names, levels, parents, k, f and bounding boxes; province outlines (GeoJSON) | degrees |
+
+## How to cite and reproduce
+
+```js
+const build = FileAttachment("build-info.json").json();
+const REPO = "https://github.com/RVBCosme/siklab-hotspot-calendar";
+```
+
+- **Cite:** Team Siklab (2026). Siklab hotspot calendar: a harmonised MODIS and VIIRS fire hotspot calendar for the Philippines. NASA Space Apps Challenge 2026, Manila. ${REPO}${build.commit ? `, commit ${build.commit.slice(0, 7)}` : ""}. Please also acknowledge NASA FIRMS, as on the Sources page.
+- **Commit:** ${build.commit ? html`this site was built from commit <a href=${`${REPO}/commit/${build.commit}`}><code>${build.commit.slice(0, 7)}</code></a>` : html`see the <a href=${`${REPO}/commits/main`}>list of commits</a>`}; the data files and the pipeline that made them are in the same commit.
+- **Licence:** code under the Apache License 2.0; derived data files follow the terms of their sources (NASA FIRMS; geoBoundaries, CC BY 3.0 IGO).
+- **Rebuild:** with Node.js 18 or later, from the repository. The raw FIRMS files are not in the repository; the README gives their addresses (no login needed for the yearly files).
+
+```sh
+npm ci
+# put the FIRMS yearly country CSVs (MODIS 2000-2025, VIIRS Suomi NPP 2012-2025, NOAA-20 2018-2025) in data/raw/firms/,
+# the FIRMS missing-data table in data/raw/firms_missing_data.json and geoBoundaries PHL ADM1/ADM2 in data/raw/geoboundaries/
+node pipeline/fetch-2026.mjs   # optional, 2026 from the FIRMS area API (needs FIRMS_MAP_KEY in .env)
+npm run data                   # builds src/data/* and the findings, and runs the validation tests
+npm run build                  # builds the static site into dist/
+```
 
 ## Factors by region
 
