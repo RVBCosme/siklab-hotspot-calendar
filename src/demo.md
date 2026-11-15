@@ -19,6 +19,7 @@ const elnino = FileAttachment("data/elnino.json").json();
 const outlook = FileAttachment("data/outlook.json").json();
 const areas = FileAttachment("data/areas.json").json();
 const provinceShapes = FileAttachment("data/provinces.json").json();
+import {seasonRibbon} from "./components/band.js";
 ```
 
 ```js
@@ -37,6 +38,8 @@ const quiet = (node) => (node.querySelectorAll("g[aria-label]").forEach((g) => g
 <div class="slide title-slide">
   <p class="kicker">NASA Space Apps Challenge 2026 · Harmonization of MODIS and VIIRS Hot Spots · Manila</p>
   <h1>One fire calendar for the Philippines, whichever satellite saw the fire</h1>
+  <p class="deck-tagline">Siklab hotspot calendar: when and where the Philippines burns, and how El Niño years compare</p>
+  <div class="deck-ribbon">${seasonRibbon(monthlyRaw, elnino.years)}</div>
   <p class="who">Team Siklab: Rene Vincent Cosme, Prince Zablan, Charles Derick Yu and Gerardo Razon III</p>
   <p class="slide-no">1 / 7</p>
 </div>
@@ -115,6 +118,9 @@ display(quiet(Plot.plot({width: 380, height: 330, marginLeft: 50, style: {fontSi
 // Q3: the three provinces featured on this slide (Team Owner's choice).
 const FEATURED = ["p-zamboanga-del-sur", "p-benguet", "p-aurora"];
 const nameOf = new Map(areas.map((a) => [a.id, a.name]));
+// The north-to-south point, by island group: the median ratio of the regions in each (as on the method page).
+const ISLAND_GROUPS = [["Luzon", ["r-car", "r-ncr", "r-ilocos-region", "r-cagayan-valley", "r-central-luzon", "r-calabarzon", "r-mimaropa", "r-bicol-region"]], ["the Visayas", ["r-western-visayas", "r-central-visayas", "r-eastern-visayas"]], ["Mindanao", ["r-zamboanga-peninsula", "r-northern-mindanao", "r-davao-region", "r-soccsksargen", "r-caraga", "r-armm"]]];
+const groupText = ISLAND_GROUPS.map(([g, ids]) => `${d3.median(ids, (id) => elnino.areas[id].ratio).toFixed(1)}× in ${g}`);
 display(quiet(Plot.plot({width: 330, height: 360, ariaLabel: "Map of Philippine provinces coloured by their El Niño response", ariaDescription: `January–May hotspots in El Niño years against other years, ${elnino.years.join("–")}: red above 1×, blue below, grey too few fires to tell. The values for the country and three provinces are in the text beside the map; every province is in the table on the calendar page.`, projection: {type: "mercator", domain: provinceShapes, inset: 4}, color: {type: "diverging-log", scheme: "rdbu", reverse: true, pivot: 1, domain: [0.5, 8], unknown: "#b4b4b4", legend: true, label: "El Niño ÷ other seasons", ticks: [0.5, 1, 2, 4, 8], tickFormat: (d) => `${d}×`, width: 300}, marks: [Plot.geo(provinceShapes, {fill: (f) => elnino.areas[f.properties.id].ratio, stroke: "var(--theme-background-alt)", strokeWidth: 0.4}), Plot.geo(provinceShapes.features.filter((f) => FEATURED.includes(f.properties.id)), {stroke: "currentColor", strokeWidth: 1.5})]})));
 ```
 
@@ -122,7 +128,7 @@ display(quiet(Plot.plot({width: 330, height: 360, ariaLabel: "Map of Philippine 
 <div>
 <p class="lead"><span class="big-red">${elnino.areas.ph.ratio.toFixed(1)}×</span> as many hotspots in El Niño fire seasons (January–May) as in other years, whole country, medians of ${elnino.years.join("–")}. A random pick of ${elnino.elNinoYears.length} years does this about ${Math.round(1000 * elnino.areas.ph.p)} times in 1,000.</p>
 <ul class="featured">${FEATURED.map((id) => html`<li><b>${elnino.areas[id].ratio.toFixed(1)}×</b> ${nameOf.get(id)}</li>`)}</ul>
-<p class="small">${elnino.summary.provincesAbove2} of ${elnino.summary.provincesTestable} testable provinces more than doubled; grey: too few fires to tell. Same pattern inside the MODIS years (${elnino.areas.ph.ratioModisYears.toFixed(1)}×) and the VIIRS years (${elnino.areas.ph.ratioViirsYears.toFixed(1)}×). El Niño years are also less cloudy, so satellites see more.</p>
+<p class="small">North to south, the regions' median rises: ${groupText[0]}, ${groupText[1]} and ${groupText[2]}. ${elnino.summary.provincesAbove2} of ${elnino.summary.provincesTestable} testable provinces more than doubled (grey: too few fires). Same pattern inside the MODIS years (${elnino.areas.ph.ratioModisYears.toFixed(1)}×) and the VIIRS years (${elnino.areas.ph.ratioViirsYears.toFixed(1)}×). El Niño years are also less cloudy, so satellites see more.</p>
 <p class="small"><b>Outlook for January–May ${outlook.nextYear}</b>, if the very strong El Niño PAGASA reported on 3 November 2026 holds: ${fmt(outlook.areas.ph.low)} to ${fmt(outlook.areas.ph.high)} hotspots for the country (median ${fmt(outlook.areas.ph.median)}), the range of past El Niño seasons. Predicting each past El Niño season from the others missed by a median of ${(100 * outlook.areas.ph.errorElNinoAnalogues).toFixed(1)}%, against ${(100 * outlook.areas.ph.errorIgnoringElNino).toFixed(1)}% when El Niño was ignored. A range from past seasons, not a forecast.</p>
 <p class="small">Designed for provincial fire officers (Bureau of Fire Protection), DENR forestry offices and local disaster risk reduction and management offices.</p>
 </div>
@@ -154,12 +160,14 @@ addEventListener("keydown", (e) => {
 
 <style>
 #observablehq-main { max-width: none; }
-.slide { box-sizing: border-box; width: min(100%, 1000px); aspect-ratio: 16 / 9; margin: 0 auto 2.5rem; padding: 2rem 2.5rem; border: 1px solid var(--theme-foreground-faintest); border-radius: 10px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; background: var(--theme-background-alt); }
+.slide { box-sizing: border-box; width: min(100%, 1000px); aspect-ratio: 16 / 9; margin: 0 auto 2.5rem; padding: 2rem 2.5rem; border: 1px solid var(--theme-foreground-faintest); border-radius: 10px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; background: var(--theme-background); border-top: 4px solid #d7301f; border-radius: 0; }
 .slide h1 { font-size: 2.6rem; line-height: 1.15; max-width: none; margin: 0.5rem 0; }
 .slide h2 { font-size: 1.7rem; margin: 0 0 0.8rem; max-width: none; }
 .title-slide { justify-content: center; }
 .kicker { font-size: 1rem; color: var(--theme-foreground-muted); max-width: none; }
 .who { font-size: 1.15rem; max-width: none; margin-top: 1.2rem; }
+.deck-tagline { font-size: 1.2rem; color: var(--theme-foreground-muted); max-width: none; margin: 0.2rem 0 1rem; }
+.deck-ribbon { max-width: 640px; }
 .say { font-size: 1.15rem; max-width: none; margin: 0.6rem 0 0; }
 .slide-no { position: absolute; right: 1.2rem; bottom: 0.6rem; font-size: 0.85rem; color: var(--theme-foreground-muted); }
 .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 1.2rem; }
@@ -192,7 +200,7 @@ addEventListener("keydown", (e) => {
 @media print {
   #observablehq-main, #observablehq-center { margin: 0 !important; padding: 0 !important; max-width: none !important; }
   #observablehq-main > :not(.slide) { display: none !important; }
-  .slide { width: 1000px; height: 563px; aspect-ratio: auto; margin: 0; border: 0; border-radius: 0; break-after: auto; page-break-after: auto; }
+  .slide { width: 1000px; height: 563px; aspect-ratio: auto; margin: 0; border: 0; border-top: 4px solid #d7301f; border-radius: 0; break-after: auto; page-break-after: auto; }
   .slide ~ .slide { break-before: page; page-break-before: always; }
 }
 </style>
