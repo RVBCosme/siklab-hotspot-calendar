@@ -180,7 +180,7 @@ display(html`<section class="strip" aria-labelledby="strip-title">
   <div class="strip-items">
     <a class="strip-item" href="#el-nino" onclick=${goToPanel}><b>${nino.testable ? `${nino.ratio.toFixed(1)}×` : "Too few fires to tell"}</b><span>${nino.testable ? `as many hotspots in El Niño fire seasons (${seasonLabel}) as in other years.` : "for a comparison of El Niño fire seasons."} See the El Niño panel</span></a>
     <div class="strip-item"><b>${recordTotal > 0 ? `${Math.round(100 * peak3.share)}%` : "None"}</b><span>${recordTotal > 0 ? `of the year's hotspots fall from ${MONTH_NAMES[peak3.start]} to ${MONTH_NAMES[(peak3.start + 2) % 12]}, the three busiest months in a row` : "no hotspots in the record here"}</span></div>
-    <div class="strip-item"><b>${Number.isFinite(stepHarmonised) ? `${stepHarmonised.toFixed(2)}×` : "n/a"}</b><span>change at ${seam.after[0]}, when the satellites changed, in the harmonised record${Number.isFinite(stepRaw) ? ` (${stepRaw.toFixed(2)}× in the raw record)` : "; raw counts are not kept for a drawn box"}</span></div>
+    <div class="strip-item"><b>${Number.isFinite(stepHarmonised) ? `${stepHarmonised.toFixed(2)}×` : "n/a"}</b><span>change at ${seam.after[0]}, when the satellites changed, in the harmonised record${Number.isFinite(stepRaw) ? ` (${stepRaw.toFixed(2)}× in the raw record)` : area.id === "custom" ? "; raw counts are not kept for a drawn box" : ""}${Number.isFinite(stepHarmonised) ? "" : `: no hotspots in ${seam.before.join("–")} to compare with`}</span></div>
   </div>
 </section>`);
 ```

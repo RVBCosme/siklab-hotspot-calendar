@@ -85,7 +85,7 @@ const quietM = (node) => (node.querySelectorAll("g[aria-label]").forEach((g) => 
 
 ### Does the sensor still matter? The step at ${seam.after[0]}
 
-A second test of the conversion, on the whole record rather than single years. Compare the average year after the change of sensor (${seam.after.join("–")}) with the average year before it (${seam.before.join("–")}). Measured three ways for the whole country:
+A consistency check on the whole record. It is not an independent test: the years after the change of sensor lie inside the years the factor was fitted on (2012–2020), so a close match mainly shows that the ratio between the two sensors held steady; the held-out test above is the independent one. Compare the average year after the change of sensor (${seam.after.join("–")}) with the average year before it (${seam.before.join("–")}). Measured three ways for the whole country:
 
 - **Raw record, stitched at 2012** (MODIS Aqua counts up to 2011, VIIRS counts from 2012): **${step(SP.raw)}**, a step made by the change of instrument.
 - **Harmonised record** (what the calendar shows): **${step(SP.harmonised)}**.
@@ -100,8 +100,8 @@ display(resize((width) => quietM(Plot.plot({
   marginLeft: Math.min(170, width * 0.38),
   x: {type: "log", label: `Mean year ${seam.after.join("–")} ÷ mean year ${seam.before.join("–")} (log scale)`, grid: true, domain: [0.4, 25], tickFormat: (d) => `${d}×`, ticks: [0.5, 1, 2, 5, 10, 20]},
   y: {domain: stepOrder, label: null},
-  color: {domain: STEP_KINDS, range: ["#888888", "#d7301f", "#fdae61"], legend: true},
-  symbol: {domain: STEP_KINDS, range: ["circle", "diamond", "square"]},
+  color: {domain: STEP_KINDS, range: ["#888888", "#d7301f", "#fdae61"]},
+  symbol: {domain: STEP_KINDS, range: ["circle", "diamond", "square"], legend: true},
   ariaLabel: "The step across the change of sensor, by region, three ways",
   ariaDescription: `For the country and each region: the raw stitched record jumps about ${Math.round(SP.raw)}-fold at 2012; the harmonised record and MODIS Aqua alone stay near 1. Values are in seam.json and in the text above.`,
   marks: [
@@ -183,7 +183,7 @@ const groupMedian = GROUPS.map(([g, ids]) => ({g, median: d3.median(ids, (id) =>
 const regionRows = areas.filter((a) => a.level === "region").map((a) => ({...nino.areas[a.id], name: a.name, group: groupOf.get(a.id)})).sort((a, b) => a.ratio - b.ratio);
 ```
 
-The question: do El Niño years burn more? El Niño years here are those whose January–March value on NOAA's [Oceanic Niño Index](https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt) is +0.5 or more: ${nino.elNinoYears.join(", ")}. For each area we add up the ${nSeason} hotspots of every full year from ${nino.years[0]} to ${nino.years[1]} and compare the median of the ${nWord(nNino)} El Niño seasons with the median of the other ${nWord(nYears - nNino)}.
+The question: do El Niño years show more fire hotspots? El Niño years here are those whose January–March value on NOAA's [Oceanic Niño Index](https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt) is +0.5 or more: ${nino.elNinoYears.join(", ")}. For each area we add up the ${nSeason} hotspots of every full year from ${nino.years[0]} to ${nino.years[1]} and compare the median of the ${nWord(nNino)} El Niño seasons with the median of the other ${nWord(nYears - nNino)}.
 
 - **Country:** El Niño seasons had a median of ${d3.format(",.0f")(NPH.ninoMedian)} hotspots, against ${d3.format(",.0f")(NPH.otherMedian)} in the other seasons: **${x1(NPH.ratio)}**. When ${nWord(nNino)} of the ${nYears} years are picked at random, ${d3.format(",")(nino.shuffles)} times, ${NPH.hits} picks give a ratio this high or higher (chance probability ${pFmt(NPH.p)}).
 - **Not an effect of the change of sensor:** inside the MODIS years alone (${nino.modisYears.join("–")}) the ratio is ${x1(NPH.ratioModisYears)}; inside the VIIRS years alone (${nino.viirsYears.join("–")}) it is ${x1(NPH.ratioViirsYears)}.
@@ -194,7 +194,7 @@ The question: do El Niño years burn more? El Niño years here are those whose J
 ```js
 display(html`<table>
   <thead><tr><th>Region</th><th>Island group</th><th>El Niño ÷ other seasons</th><th>MODIS years only</th><th>VIIRS years only</th><th>Chance probability</th></tr></thead>
-  <tbody>${regionRows.map((r) => html`<tr><td>${r.name}</td><td>${r.group}</td><td><b>${x1(r.ratio)}</b></td><td>${x1(r.ratioModisYears)}</td><td>${x1(r.ratioViirsYears)}</td><td>${pFmt(r.p)}</td></tr>`)}</tbody>
+  <tbody>${regionRows.map((r) => html`<tr><td>${r.name}</td><td>${r.group}</td><td><b>${r.testable ? x1(r.ratio) : "too few fires to tell"}</b></td><td>${r.ratioModisYears == null ? "" : x1(r.ratioModisYears)}</td><td>${r.ratioViirsYears == null ? "" : x1(r.ratioViirsYears)}</td><td>${r.p == null ? "" : pFmt(r.p)}</td></tr>`)}</tbody>
 </table>`);
 ```
 

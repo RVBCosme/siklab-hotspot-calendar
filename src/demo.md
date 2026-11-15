@@ -84,7 +84,7 @@ display(quiet(Plot.plot({width: 900, height: 250, marginLeft: 56, style: {fontSi
         <div><span>${T1.harmonised.annualMedianAbsPctError}%</span>typical error on a region's yearly total after conversion</div>
         <div><span class="grey">${T1.baselineRawAqua.annualMedianAbsPctError}%</span>without conversion</div>
       </div>
-      <p class="steps-title">The step at ${seam.after[0]}, average year ${seam.after.join("–")} ÷ ${seam.before.join("–")}, whole country:</p>
+      <p class="steps-title">Consistency check, not a held-out test: the step at ${seam.after[0]}, average year ${seam.after.join("–")} ÷ ${seam.before.join("–")}, whole country:</p>
       <div class="three">
         <div><b class="grey">${seam.areas.ph.raw.toFixed(2)}×</b>raw record, MODIS then VIIRS</div>
         <div><b>${seam.areas.ph.harmonised.toFixed(2)}×</b>harmonised record</div>
@@ -95,7 +95,7 @@ display(quiet(Plot.plot({width: 900, height: 250, marginLeft: 56, style: {fontSi
 
 ```js
 const pairMin = d3.min(heldout.pairs, (d) => Math.min(d.observed, d.predicted)), pairMax = d3.max(heldout.pairs, (d) => Math.max(d.observed, d.predicted));
-display(quiet(Plot.plot({width: 380, height: 330, marginLeft: 50, style: {fontSize: "12px"}, x: {type: "log", label: "VIIRS, observed", tickFormat: "~s", grid: true}, y: {type: "log", label: "Converted MODIS, predicted", tickFormat: "~s", grid: true}, marks: [Plot.line([[pairMin, pairMin], [pairMax, pairMax]], {stroke: "currentColor", strokeDasharray: "4,3"}), Plot.dot(heldout.pairs, {x: "observed", y: "predicted", fill: "#d7301f", fillOpacity: 0.6, r: 3})]})));
+display(quiet(Plot.plot({width: 380, height: 330, marginLeft: 50, style: {fontSize: "12px"}, ariaLabel: "Converted MODIS against VIIRS, one point per region-year in the held-out test", ariaDescription: `${heldout.pairs.length} points around the one-to-one line; the median error is ${T1.harmonised.annualMedianAbsPctError}%.`, x: {type: "log", label: "VIIRS, observed", tickFormat: "~s", grid: true}, y: {type: "log", label: "Converted MODIS, predicted", tickFormat: "~s", grid: true}, marks: [Plot.line([[pairMin, pairMin], [pairMax, pairMax]], {stroke: "currentColor", strokeDasharray: "4,3"}), Plot.dot(heldout.pairs, {x: "observed", y: "predicted", fill: "#d7301f", fillOpacity: 0.6, r: 3})]})));
 ```
 
   <p class="cap">${heldout.pairs.length} region-years, each held out of the fit; dashed line = exact.</p>
@@ -106,7 +106,7 @@ display(quiet(Plot.plot({width: 380, height: 330, marginLeft: 50, style: {fontSi
 </div>
 
 <div class="slide">
-  <h2>The finding: El Niño years burn more, most of all in the south</h2>
+  <h2>The finding: El Niño years show more hotspots, most of all in the south</h2>
   <div class="finding">
     <div>
 
@@ -114,7 +114,7 @@ display(quiet(Plot.plot({width: 380, height: 330, marginLeft: 50, style: {fontSi
 // Q3: the three provinces featured on this slide (Team Owner's choice).
 const FEATURED = ["p-zamboanga-del-sur", "p-benguet", "p-aurora"];
 const nameOf = new Map(areas.map((a) => [a.id, a.name]));
-display(quiet(Plot.plot({width: 330, height: 360, projection: {type: "mercator", domain: provinceShapes, inset: 4}, color: {type: "diverging-log", scheme: "rdbu", reverse: true, pivot: 1, domain: [0.5, 8], unknown: "#b4b4b4", legend: true, label: "El Niño ÷ other seasons", ticks: [0.5, 1, 2, 4, 8], tickFormat: (d) => `${d}×`, width: 300}, marks: [Plot.geo(provinceShapes, {fill: (f) => elnino.areas[f.properties.id].ratio, stroke: "var(--theme-background-alt)", strokeWidth: 0.4}), Plot.geo(provinceShapes.features.filter((f) => FEATURED.includes(f.properties.id)), {stroke: "currentColor", strokeWidth: 1.5})]})));
+display(quiet(Plot.plot({width: 330, height: 360, ariaLabel: "Map of Philippine provinces coloured by their El Niño response", ariaDescription: `January–May hotspots in El Niño years against other years, ${elnino.years.join("–")}: red above 1×, blue below, grey too few fires to tell. The values for the country and three provinces are in the text beside the map; every province is in the table on the calendar page.`, projection: {type: "mercator", domain: provinceShapes, inset: 4}, color: {type: "diverging-log", scheme: "rdbu", reverse: true, pivot: 1, domain: [0.5, 8], unknown: "#b4b4b4", legend: true, label: "El Niño ÷ other seasons", ticks: [0.5, 1, 2, 4, 8], tickFormat: (d) => `${d}×`, width: 300}, marks: [Plot.geo(provinceShapes, {fill: (f) => elnino.areas[f.properties.id].ratio, stroke: "var(--theme-background-alt)", strokeWidth: 0.4}), Plot.geo(provinceShapes.features.filter((f) => FEATURED.includes(f.properties.id)), {stroke: "currentColor", strokeWidth: 1.5})]})));
 ```
 
 </div>
