@@ -16,6 +16,7 @@ const meta = FileAttachment("data/meta.json").json();
 const seam = FileAttachment("data/seam.json").json();
 const heldout = FileAttachment("data/heldout.json").json();
 const elnino = FileAttachment("data/elnino.json").json();
+const outlook = FileAttachment("data/outlook.json").json();
 const areas = FileAttachment("data/areas.json").json();
 const provinceShapes = FileAttachment("data/provinces.json").json();
 ```
@@ -121,7 +122,8 @@ display(quiet(Plot.plot({width: 330, height: 360, ariaLabel: "Map of Philippine 
 <div>
 <p class="lead"><span class="big-red">${elnino.areas.ph.ratio.toFixed(1)}×</span> as many hotspots in El Niño fire seasons (January–May) as in other years, whole country, medians of ${elnino.years.join("–")}. A random pick of ${elnino.elNinoYears.length} years does this about ${Math.round(1000 * elnino.areas.ph.p)} times in 1,000.</p>
 <ul class="featured">${FEATURED.map((id) => html`<li><b>${elnino.areas[id].ratio.toFixed(1)}×</b> ${nameOf.get(id)}</li>`)}</ul>
-<p class="small">${elnino.summary.provincesAbove2} of ${elnino.summary.provincesTestable} testable provinces more than doubled; grey: too few fires to tell. Same pattern inside the MODIS years (${elnino.areas.ph.ratioModisYears.toFixed(1)}×) and the VIIRS years (${elnino.areas.ph.ratioViirsYears.toFixed(1)}×). PAGASA reported a very strong El Niño on 3 November 2026. This describes past seasons, not a forecast; El Niño years are also less cloudy, so satellites see more.</p>
+<p class="small">${elnino.summary.provincesAbove2} of ${elnino.summary.provincesTestable} testable provinces more than doubled; grey: too few fires to tell. Same pattern inside the MODIS years (${elnino.areas.ph.ratioModisYears.toFixed(1)}×) and the VIIRS years (${elnino.areas.ph.ratioViirsYears.toFixed(1)}×). El Niño years are also less cloudy, so satellites see more.</p>
+<p class="small"><b>Outlook for January–May ${outlook.nextYear}</b>, if the very strong El Niño PAGASA reported on 3 November 2026 holds: ${fmt(outlook.areas.ph.low)} to ${fmt(outlook.areas.ph.high)} hotspots for the country (median ${fmt(outlook.areas.ph.median)}), the range of past El Niño seasons. Predicting each past El Niño season from the others missed by a median of ${(100 * outlook.areas.ph.errorElNinoAnalogues).toFixed(1)}%, against ${(100 * outlook.areas.ph.errorIgnoringElNino).toFixed(1)}% when El Niño was ignored. A range from past seasons, not a forecast.</p>
 <p class="small">Designed for provincial fire officers (Bureau of Fire Protection), DENR forestry offices and local disaster risk reduction and management offices.</p>
 </div>
 </div>
