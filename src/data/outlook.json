@@ -17,7 +17,6 @@
    "otherMedian": 17011.5,
    "errorElNinoAnalogues": 0.215,
    "errorIgnoringElNino": 0.372,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -36,7 +35,6 @@
    "otherMedian": 462,
    "errorElNinoAnalogues": 0.168,
    "errorIgnoringElNino": 0.465,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -55,7 +53,6 @@
    "otherMedian": 2966.7,
    "errorElNinoAnalogues": 0.298,
    "errorIgnoringElNino": 0.4,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -74,7 +71,6 @@
    "otherMedian": 38,
    "errorElNinoAnalogues": 0.303,
    "errorIgnoringElNino": 0.494,
-   "insideRange": 7,
    "ofSeasons": 7,
    "check": {
     "year": 2026,
@@ -93,7 +89,6 @@
    "otherMedian": 1217.9,
    "errorElNinoAnalogues": 0.368,
    "errorIgnoringElNino": 0.323,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -112,7 +107,6 @@
    "otherMedian": 2167,
    "errorElNinoAnalogues": 0.124,
    "errorIgnoringElNino": 0.147,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -131,7 +125,6 @@
    "otherMedian": 3087,
    "errorElNinoAnalogues": 0.229,
    "errorIgnoringElNino": 0.264,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -150,7 +143,6 @@
    "otherMedian": 654,
    "errorElNinoAnalogues": 0.179,
    "errorIgnoringElNino": 0.151,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -169,7 +161,6 @@
    "otherMedian": 3350,
    "errorElNinoAnalogues": 0.095,
    "errorIgnoringElNino": 0.311,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -188,7 +179,6 @@
    "otherMedian": 414.2,
    "errorElNinoAnalogues": 0.214,
    "errorIgnoringElNino": 0.753,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -207,7 +197,6 @@
    "otherMedian": 395,
    "errorElNinoAnalogues": 0.364,
    "errorIgnoringElNino": 0.362,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -226,7 +215,6 @@
    "otherMedian": 1001,
    "errorElNinoAnalogues": 0.084,
    "errorIgnoringElNino": 0.459,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -245,7 +233,6 @@
    "otherMedian": 313.6,
    "errorElNinoAnalogues": 0.162,
    "errorIgnoringElNino": 0.522,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -264,7 +251,6 @@
    "otherMedian": 447,
    "errorElNinoAnalogues": 0.253,
    "errorIgnoringElNino": 0.486,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -283,7 +269,6 @@
    "otherMedian": 943,
    "errorElNinoAnalogues": 0.257,
    "errorIgnoringElNino": 0.501,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -302,7 +287,6 @@
    "otherMedian": 520,
    "errorElNinoAnalogues": 0.218,
    "errorIgnoringElNino": 0.495,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -321,7 +305,6 @@
    "otherMedian": 847.5,
    "errorElNinoAnalogues": 0.209,
    "errorIgnoringElNino": 0.505,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -340,7 +323,6 @@
    "otherMedian": 177.5,
    "errorElNinoAnalogues": 0.402,
    "errorIgnoringElNino": 0.557,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -359,7 +341,6 @@
    "otherMedian": 600,
    "errorElNinoAnalogues": 0.139,
    "errorIgnoringElNino": 0.383,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -378,7 +359,6 @@
    "otherMedian": 25,
    "errorElNinoAnalogues": 0.44,
    "errorIgnoringElNino": 0.495,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -397,7 +377,6 @@
    "otherMedian": 111,
    "errorElNinoAnalogues": 0.343,
    "errorIgnoringElNino": 0.536,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -416,7 +395,6 @@
    "otherMedian": 53.9,
    "errorElNinoAnalogues": 0.7,
    "errorIgnoringElNino": 0.389,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -435,7 +413,6 @@
    "otherMedian": 218,
    "errorElNinoAnalogues": 0.512,
    "errorIgnoringElNino": 0.256,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -454,7 +431,6 @@
    "otherMedian": 834,
    "errorElNinoAnalogues": 0.377,
    "errorIgnoringElNino": 0.232,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -473,7 +449,6 @@
    "otherMedian": 60,
    "errorElNinoAnalogues": 0.45,
    "errorIgnoringElNino": 0.467,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -492,7 +467,6 @@
    "otherMedian": 136,
    "errorElNinoAnalogues": 0.288,
    "errorIgnoringElNino": 0.355,
-   "insideRange": 7,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -511,7 +485,6 @@
    "otherMedian": 186.6,
    "errorElNinoAnalogues": 0.227,
    "errorIgnoringElNino": 0.17,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -530,7 +503,6 @@
    "otherMedian": 198,
    "errorElNinoAnalogues": 0.598,
    "errorIgnoringElNino": 0.606,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -549,7 +521,6 @@
    "otherMedian": 59.7,
    "errorElNinoAnalogues": 0.175,
    "errorIgnoringElNino": 0.52,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -568,7 +539,6 @@
    "otherMedian": 781.9,
    "errorElNinoAnalogues": 0.22,
    "errorIgnoringElNino": 0.449,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -587,7 +557,6 @@
    "otherMedian": 298,
    "errorElNinoAnalogues": 0.121,
    "errorIgnoringElNino": 0.089,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -606,7 +575,6 @@
    "otherMedian": 611,
    "errorElNinoAnalogues": 0.365,
    "errorIgnoringElNino": 0.229,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -625,7 +593,6 @@
    "otherMedian": 29,
    "errorElNinoAnalogues": 0.751,
    "errorIgnoringElNino": 0.667,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -644,7 +611,6 @@
    "otherMedian": 51,
    "errorElNinoAnalogues": 0.54,
    "errorIgnoringElNino": 0.326,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -663,7 +629,6 @@
    "otherMedian": 135,
    "errorElNinoAnalogues": 0.256,
    "errorIgnoringElNino": 0.39,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -682,7 +647,6 @@
    "otherMedian": 103.6,
    "errorElNinoAnalogues": 0.294,
    "errorIgnoringElNino": 0.18,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -701,7 +665,6 @@
    "otherMedian": 32,
    "errorElNinoAnalogues": 0.218,
    "errorIgnoringElNino": 0.588,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -720,7 +683,6 @@
    "otherMedian": 20.8,
    "errorElNinoAnalogues": 0.418,
    "errorIgnoringElNino": 0.737,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -739,7 +701,6 @@
    "otherMedian": 222,
    "errorElNinoAnalogues": 0.215,
    "errorIgnoringElNino": 0.559,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -758,7 +719,6 @@
    "otherMedian": 103.5,
    "errorElNinoAnalogues": 0.244,
    "errorIgnoringElNino": 0.514,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -777,7 +737,6 @@
    "otherMedian": 182,
    "errorElNinoAnalogues": 0.251,
    "errorIgnoringElNino": 0.459,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -796,7 +755,6 @@
    "otherMedian": 92,
    "errorElNinoAnalogues": 0.348,
    "errorIgnoringElNino": 0.361,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -815,7 +773,6 @@
    "otherMedian": 36,
    "errorElNinoAnalogues": 0.369,
    "errorIgnoringElNino": 0.559,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -834,7 +791,6 @@
    "otherMedian": 23,
    "errorElNinoAnalogues": 0.449,
    "errorIgnoringElNino": 0.561,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -853,7 +809,6 @@
    "otherMedian": 301,
    "errorElNinoAnalogues": 0.235,
    "errorIgnoringElNino": 0.295,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -872,7 +827,6 @@
    "otherMedian": 509,
    "errorElNinoAnalogues": 0.369,
    "errorIgnoringElNino": 0.291,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -891,7 +845,6 @@
    "otherMedian": 82,
    "errorElNinoAnalogues": 0.595,
    "errorIgnoringElNino": 0.327,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -910,7 +863,6 @@
    "otherMedian": 86.3,
    "errorElNinoAnalogues": 0.261,
    "errorIgnoringElNino": 0.438,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -929,7 +881,6 @@
    "otherMedian": 696.9,
    "errorElNinoAnalogues": 0.155,
    "errorIgnoringElNino": 0.203,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -948,7 +899,6 @@
    "otherMedian": 311,
    "errorElNinoAnalogues": 0.324,
    "errorIgnoringElNino": 0.325,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -967,7 +917,6 @@
    "otherMedian": 22,
    "errorElNinoAnalogues": 0.256,
    "errorIgnoringElNino": 0.32,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -986,7 +935,6 @@
    "otherMedian": 62.2,
    "errorElNinoAnalogues": 0.327,
    "errorIgnoringElNino": 0.232,
-   "insideRange": 7,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1005,7 +953,6 @@
    "otherMedian": 52,
    "errorElNinoAnalogues": 0.346,
    "errorIgnoringElNino": 0.468,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1024,7 +971,6 @@
    "otherMedian": 54,
    "errorElNinoAnalogues": 0.403,
    "errorIgnoringElNino": 0.638,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1043,7 +989,6 @@
    "otherMedian": 338.1,
    "errorElNinoAnalogues": 0.102,
    "errorIgnoringElNino": 0.446,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1062,7 +1007,6 @@
    "otherMedian": 245,
    "errorElNinoAnalogues": 0.285,
    "errorIgnoringElNino": 0.464,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1081,7 +1025,6 @@
    "otherMedian": 129.9,
    "errorElNinoAnalogues": 0.128,
    "errorIgnoringElNino": 0.629,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1100,7 +1043,6 @@
    "otherMedian": 191,
    "errorElNinoAnalogues": 0.482,
    "errorIgnoringElNino": 0.533,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1119,7 +1061,6 @@
    "otherMedian": 474.2,
    "errorElNinoAnalogues": 0.121,
    "errorIgnoringElNino": 0.436,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1138,7 +1079,6 @@
    "otherMedian": 194.2,
    "errorElNinoAnalogues": 0.192,
    "errorIgnoringElNino": 0.49,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1157,7 +1097,6 @@
    "otherMedian": 780,
    "errorElNinoAnalogues": 0.224,
    "errorIgnoringElNino": 0.304,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1176,7 +1115,6 @@
    "otherMedian": 433,
    "errorElNinoAnalogues": 0.252,
    "errorIgnoringElNino": 0.302,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1195,7 +1133,6 @@
    "otherMedian": 1241,
    "errorElNinoAnalogues": 0.114,
    "errorIgnoringElNino": 0.253,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1214,7 +1151,6 @@
    "otherMedian": 206,
    "errorElNinoAnalogues": 0.37,
    "errorIgnoringElNino": 0.373,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1233,7 +1169,6 @@
    "otherMedian": 1516,
    "errorElNinoAnalogues": 0.24,
    "errorIgnoringElNino": 0.322,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1252,7 +1187,6 @@
    "otherMedian": 265,
    "errorElNinoAnalogues": 0.124,
    "errorIgnoringElNino": 0.189,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1271,7 +1205,6 @@
    "otherMedian": 524,
    "errorElNinoAnalogues": 0.356,
    "errorIgnoringElNino": 0.294,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1290,7 +1223,6 @@
    "otherMedian": 112,
    "errorElNinoAnalogues": 0.533,
    "errorIgnoringElNino": 0.326,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1309,7 +1241,6 @@
    "otherMedian": 380,
    "errorElNinoAnalogues": 0.173,
    "errorIgnoringElNino": 0.114,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1328,7 +1259,6 @@
    "otherMedian": 174,
    "errorElNinoAnalogues": 0.317,
    "errorIgnoringElNino": 0.181,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1347,7 +1277,6 @@
    "otherMedian": 39.5,
    "errorElNinoAnalogues": 0.245,
    "errorIgnoringElNino": 0.337,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1366,7 +1295,6 @@
    "otherMedian": 302,
    "errorElNinoAnalogues": 0.318,
    "errorIgnoringElNino": 0.492,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1385,7 +1313,6 @@
    "otherMedian": 250.7,
    "errorElNinoAnalogues": 0.318,
    "errorIgnoringElNino": 0.465,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1404,7 +1331,6 @@
    "otherMedian": 126,
    "errorElNinoAnalogues": 0.167,
    "errorIgnoringElNino": 0.561,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1423,7 +1349,6 @@
    "otherMedian": 173.8,
    "errorElNinoAnalogues": 0.154,
    "errorIgnoringElNino": 0.504,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1442,7 +1367,6 @@
    "otherMedian": 29,
    "errorElNinoAnalogues": 0.238,
    "errorIgnoringElNino": 0.545,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1461,7 +1385,6 @@
    "otherMedian": 628.2,
    "errorElNinoAnalogues": 0.221,
    "errorIgnoringElNino": 0.143,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1480,7 +1403,6 @@
    "otherMedian": 807.2,
    "errorElNinoAnalogues": 0.093,
    "errorIgnoringElNino": 0.173,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1499,7 +1421,6 @@
    "otherMedian": 198.4,
    "errorElNinoAnalogues": 0.34,
    "errorIgnoringElNino": 0.719,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1518,7 +1439,6 @@
    "otherMedian": 98,
    "errorElNinoAnalogues": 0.293,
    "errorIgnoringElNino": 0.752,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,
@@ -1537,7 +1457,6 @@
    "otherMedian": 60.4,
    "errorElNinoAnalogues": 0.311,
    "errorIgnoringElNino": 0.721,
-   "insideRange": 6,
    "ofSeasons": 8,
    "check": {
     "year": 2026,

@@ -165,20 +165,18 @@ for (const a of areas) {
   if (!r.testable) continue;
   const values = YEARS.map((y) => season(a.id, y));
   const nino = [], base = [];
-  let inside = 0;
   YEARS.forEach((y, i) => {
     if (!EL_NINO_YEARS.includes(y) || !(values[i] > 0)) return;
     const others = YEARS.map((z, j) => [z, values[j]]).filter(([z]) => z !== y);
     const sameClass = others.filter(([z]) => EL_NINO_YEARS.includes(z)).map(([, v]) => v);
     nino.push(absPct(median(sameClass), values[i]));
     base.push(absPct(median(others.map(([, v]) => v)), values[i]));
-    if (values[i] >= Math.min(...sameClass) && values[i] <= Math.max(...sameClass)) inside++;
   });
   const otherVals = YEARS.filter((y) => !EL_NINO_YEARS.includes(y)).map((y) => season(a.id, y));
   const check = season(a.id, CHECK_YEAR);
   outlook[a.id] = {
     median: r.ninoMedian, low: r.ninoMin, high: r.ninoMax, otherMedian: r.otherMedian,
-    errorElNinoAnalogues: r3(median(nino)), errorIgnoringElNino: r3(median(base)), insideRange: inside, ofSeasons: nino.length,
+    errorElNinoAnalogues: r3(median(nino)), errorIgnoringElNino: r3(median(base)), ofSeasons: nino.length,
     check: { year: CHECK_YEAR, value: r1(check), otherLow: r1(Math.min(...otherVals)), otherHigh: r1(Math.max(...otherVals)), insideOtherRange: check >= Math.min(...otherVals) && check <= Math.max(...otherVals), errorOtherMedian: r3(absPct(median(otherVals), check)), errorAllMedian: r3(absPct(median(values), check)) },
   };
 }
