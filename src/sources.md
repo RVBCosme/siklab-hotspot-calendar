@@ -6,6 +6,10 @@ title: Sources and credits
 
 # Sources, licences and AI use
 
+```js
+const elnino = FileAttachment("data/elnino.json").json();
+```
+
 ## NASA data
 
 | Data | What we used | Access |
@@ -29,6 +33,8 @@ We acknowledge the use of data and imagery from NASA's Fire Information for Reso
 | NASA Earthdata (2026). Suomi NPP Observations to Cease on November 2, 2026; and NASA Earthdata blog, Transitioning from Suomi NPP VIIRS & OMPS: What FIRMS Users Need to Know | The date and time Suomi NPP data stopped (13:00 UTC, 2 November 2026) | https://www.earthdata.nasa.gov/data/alerts-outages/suomi-npp-observations-cease-november-2-2026 ; https://www.earthdata.nasa.gov/news/blog/transitioning-from-suomi-npp-viirs-omps-what-firms-users-need-know |
 | Twedt, K., Xiong, X., Geng, X., Wilson, T. and Mu, Q. (2023). Impact of satellite orbit drift on MODIS Earth scene observations used in calibration of the reflective solar bands. SPIE conference paper (NASA NTRS 20240001409) | Why the conversion factor is fitted on 2012–2020 and the drift years are held out | https://ntrs.nasa.gov/citations/20240001409 |
 | NASA Science. Terra: The End of an Era; and the Aqua mission page | Terra and Aqua no longer hold their orbits; projected end of science: Terra February 2027, Aqua September 2027 | https://science.nasa.gov/science-research/earth-science/terra-the-end-of-an-era ; https://science.nasa.gov/mission/aqua |
+| NOAA Climate Prediction Center. Oceanic Niño Index (ONI), table of 3-month seasons, ERSSTv5 | Which years count as El Niño years (January–March value of +0.5 or more): ${elnino.elNinoYears.join(", ")} | U.S. Government work, https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt |
+| PAGASA (DOST). El Niño Advisory No. 6, issued 3 November 2026 | The note beside the El Niño panel on the calendar page: a very strong El Niño, expected to last into the first half of 2027 | Cited, not reproduced; https://pubfiles.pagasa.dost.gov.ph/pagasaweb/files/climate/elninolanina/ENSO_Advisory6_OS.pdf (listed at https://www.pagasa.dost.gov.ph/climate/el-nino-la-nina/advisories) |
 | News reports used in the check against reported fire seasons: Northern Philippine Times (Sept 2010), PTV News (March 2019), Rappler and Inquirer (2024) | Linked from the method page; cited, not reproduced | Each publisher's terms |
 
 ## Software

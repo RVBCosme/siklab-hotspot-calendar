@@ -92,6 +92,49 @@ display(html`<table>
 
 In Benguet the three worst January–May seasons since 2003 are 2010, 2024 and 2019, the three surges named in local reports, although 2010 comes from converted MODIS and the other two from VIIRS. This is a check on three events, not a statistical test, and all three were El Niño years, when clearer skies also let satellites see more.
 
+## El Niño seasons
+
+```js
+const nino = FileAttachment("data/elnino.json").json();
+```
+
+```js
+const NS = nino.summary, NPH = nino.areas.ph;
+const nWords = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen"];
+const nWord = (x) => nWords[x] ?? String(x);
+const nYears = nino.years[1] - nino.years[0] + 1, nNino = nino.elNinoYears.length;
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const nSeason = `${MONTH_NAMES[nino.seasonMonths[0] - 1]}–${MONTH_NAMES[nino.seasonMonths[nino.seasonMonths.length - 1] - 1]}`;
+const x1 = (r) => `${r.toFixed(1)}×`;
+const pFmt = d3.format(".2~g");
+// Island groups, to read the regions from north to south (Mimaropa and Bicol belong to the Luzon group).
+const GROUPS = [
+  ["Luzon", ["r-car", "r-ncr", "r-ilocos-region", "r-cagayan-valley", "r-central-luzon", "r-calabarzon", "r-mimaropa", "r-bicol-region"]],
+  ["Visayas", ["r-western-visayas", "r-central-visayas", "r-eastern-visayas"]],
+  ["Mindanao", ["r-zamboanga-peninsula", "r-northern-mindanao", "r-davao-region", "r-soccsksargen", "r-caraga", "r-armm"]]
+];
+const groupOf = new Map(GROUPS.flatMap(([g, ids]) => ids.map((id) => [id, g])));
+const groupMedian = GROUPS.map(([g, ids]) => ({g, median: d3.median(ids, (id) => nino.areas[id].ratio)}));
+const regionRows = areas.filter((a) => a.level === "region").map((a) => ({...nino.areas[a.id], name: a.name, group: groupOf.get(a.id)})).sort((a, b) => a.ratio - b.ratio);
+```
+
+The question: do El Niño years burn more? El Niño years here are those whose January–March value on NOAA's [Oceanic Niño Index](https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt) is +0.5 or more: ${nino.elNinoYears.join(", ")}. For each area we add up the ${nSeason} hotspots of every full year from ${nino.years[0]} to ${nino.years[1]} and compare the median of the ${nWord(nNino)} El Niño seasons with the median of the other ${nWord(nYears - nNino)}.
+
+- **Country:** El Niño seasons had a median of ${d3.format(",.0f")(NPH.ninoMedian)} hotspots, against ${d3.format(",.0f")(NPH.otherMedian)} in the other seasons: **${x1(NPH.ratio)}**. When ${nWord(nNino)} of the ${nYears} years are picked at random, ${d3.format(",")(nino.shuffles)} times, ${NPH.hits} picks give a ratio this high or higher (chance probability ${pFmt(NPH.p)}).
+- **Not an effect of the change of sensor:** inside the MODIS years alone (${nino.modisYears.join("–")}) the ratio is ${x1(NPH.ratioModisYears)}; inside the VIIRS years alone (${nino.viirsYears.join("–")}) it is ${x1(NPH.ratioViirsYears)}.
+- **The biggest seasons:** ${nWord(NS.nationalTop8ElNino)} of the ${nWord(NS.nationalTop8.length)} biggest national seasons were El Niño years. Separately, ${NS.provincesBusiestSeasonElNino} of all ${NS.provinces} provinces had their busiest season of the ${nYears} in an El Niño year.
+- **Provinces:** ${NS.provincesTestable} provinces have enough fires to test (a median of at least ${nino.minOtherMedian} hotspots in the other seasons); the rest are shown as "too few fires to tell". Of the ${NS.provincesTestable}, ${NS.provincesAbove2} had more than twice the hotspots in El Niño seasons, ${NS.provincesAbove1_5} more than 1.5 times, and ${nWord(NS.provincesBelow1)} fewer. ${NS.provincesP05} have a chance probability under 0.05, where about ${Math.round(NS.provincesP05ExpectedByChance)} would by chance alone.
+- **North to south:** the response grows southward. The median ratio of the regions is ${groupMedian.map((d) => `${x1(d.median)} in ${d.g}`).join(", ")}.
+
+```js
+display(html`<table>
+  <thead><tr><th>Region</th><th>Island group</th><th>El Niño ÷ other seasons</th><th>MODIS years only</th><th>VIIRS years only</th><th>Chance probability</th></tr></thead>
+  <tbody>${regionRows.map((r) => html`<tr><td>${r.name}</td><td>${r.group}</td><td><b>${x1(r.ratio)}</b></td><td>${x1(r.ratioModisYears)}</td><td>${x1(r.ratioViirsYears)}</td><td>${pFmt(r.p)}</td></tr>`)}</tbody>
+</table>`);
+```
+
+**Cautions.** El Niño years are also less cloudy, so satellites see more of what burns: the ratio mixes more burning with better visibility, and FIRMS carries no cloud information to separate the two. The record holds only ${nWord(nNino)} El Niño seasons. The chance test treats the years as interchangeable, so it does not allow for a slow trend or for runs of dry years. With ${NS.provincesTestable} provinces tested, a few will pass by chance alone. Metro Manila's hotspots are mostly industrial heat (see Limits). This describes past seasons; it is not a forecast.
+
 ## Limits
 
 - **A hotspot is not a fire.** One fire can make many hotspots, and small or short fires, or fires under cloud, make none. The counts compare like with like across years; they are not a count of fires or of area burned.
