@@ -148,7 +148,7 @@ display(shareButton);
 
 ```js
 // Header ribbon (shared with the other pages): the country's median month over the full years of the El Niño analysis.
-import {seasonRibbon as ribbonOf, jumpBar, jumpTo} from "./components/band.js";
+import {seasonRibbon as ribbonOf, jumpBar} from "./components/band.js";
 const seasonRibbon = ribbonOf(monthlyRaw, elnino.years);
 ```
 
@@ -156,19 +156,14 @@ const seasonRibbon = ribbonOf(monthlyRaw, elnino.years);
 // "Start here": four ready-made views, each a small story with its number, all computed from the data files.
 // Each link is a view link plus go=<section>, which scrolls to that section once the page has drawn it.
 const benguetRows = byArea.get("p-benguet");
-const benguetFebs = benguetRows.filter((d) => d.m === 2 && isFullMonth(d));
 const feb2024 = benguetRows.find((d) => d.month === "2024-02");
-const feb2024Rank = 1 + benguetFebs.filter((d) => d.hotspots > feb2024.hotspots).length;
-const ordinal = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 const phSeason = (y) => d3.sum(byArea.get("ph"), (d) => (d.year === y && elnino.seasonMonths.includes(d.m) ? d.hotspots : 0));
-const pastSeasons = d3.range(elnino.years[0], elnino.years[1] + 1).map((y) => ({y, v: phSeason(y)}));
-const season2010 = pastSeasons.find((d) => d.y === 2010);
-const season2010Rank = 1 + pastSeasons.filter((d) => d.v > season2010.v).length;
+const season2010 = {y: 2010, v: phSeason(2010)};
 const startHere = html`<nav class="start" aria-label="Start here: ready-made views"><span class="start-label">Start here:</span>
   <a href="#area=p-benguet&from=2003-01&to=2024-02&go=calendar">Benguet, Feb 2024: <b>${fmt(feb2024.hotspots)}</b> hotspots</a>
   <a href="#area=p-zamboanga-del-sur&go=where-it-burns">Zamboanga del Sur: <b>${elnino.areas["p-zamboanga-del-sur"].ratio.toFixed(1)}×</b> in El Niño seasons</a>
-  <a href="#area=ph&from=2010-01&to=2010-05&go=calendar">Jan–May 2010: <b>${fmt(season2010.v)}</b>, ${season2010Rank === 1 ? "the most" : `${ordinal(season2010Rank)} most`}</a>
-  <a href="#area=ph&from=2008-01&to=2016-12&go=harmonisation">${seam.after[0]}: <b>${seam.areas.ph.raw.toFixed(2)}×</b> raw, ${seam.areas.ph.harmonised.toFixed(2)}× harmonised</a>
+  <a href="#area=ph&from=2010-01&to=2010-05&go=calendar">Country, Jan–May 2010: <b>${fmt(season2010.v)}</b> hotspots</a>
+  <a href="#area=ph&from=2008-01&to=2016-12&go=harmonisation">${seam.after[0]} switch: <b>${seam.areas.ph.raw.toFixed(2)}×</b> raw, ${seam.areas.ph.harmonised.toFixed(2)}× harmonised</a>
 </nav>`;
 ```
 
@@ -459,8 +454,8 @@ display(ninoLegend());
 
 <details class="sci">
   <summary>For scientists</summary>
-  <p><b>Quantity:</b> harmonised monthly count of NASA FIRMS active fire detections, in VIIRS-equivalent hotspots. From ${meta.viirsStart}: VIIRS Suomi NPP 375 m (VNP14IMGML; near real time VNP14IMGTDL_NRT), with NOAA-20 (VJ114IMGML) × f on days Suomi NPP has no data and from 2 November 2026. Before: MODIS Aqua (MCD14ML) × k, k fitted per region.</p>
-  <p><b>Filter:</b> FIRMS type 0 or 2 (active volcano and offshore dropped); MODIS confidence 30 or more, VIIRS nominal or high; inside a Philippine region (geoBoundaries 2020). <b>Dates:</b> FIRMS acquisition dates, UTC. <b>Difference colouring:</b> the month minus the mean of the same calendar month over the area's complete months.</p>
+  <p><b>Quantity:</b> harmonised monthly count of NASA FIRMS active fire detections, in VIIRS-equivalent hotspots. From ${meta.viirsStart}: VIIRS Suomi NPP 375 m (VNP14IMGML; VNP14IMGTDL_NRT after the standard data end), with NOAA-20 (VJ114IMGML, or VJ114IMGTDL_NRT) × f on days Suomi NPP has no data (NOAA-20 from April 2018) and every day from 2 November 2026. Before: MODIS Aqua (MCD14ML) × k, k fitted per region.</p>
+  <p><b>Filter:</b> FIRMS type 0 or 2 where the type is given (active volcano and offshore dropped); near-real-time rows, from August 2026, carry no type, so detections within about 2 km of a FIRMS volcano spot are dropped and offshore ones stay in; MODIS confidence 30 or more, VIIRS nominal or high; inside a Philippine region (geoBoundaries 2020). <b>Dates:</b> FIRMS acquisition dates, UTC. <b>Difference colouring:</b> the month minus the mean of the same calendar month over the area's complete months.</p>
   <p><b>Numbers:</b> src/data/monthly.csv, column hotspots_harmonised; the monthly analytics download below. Definitions in the <a href="./method#data-dictionary">data dictionary</a>.</p>
 </details>
 
@@ -734,7 +729,7 @@ const ninoPanel = html`<div class="nino-panel">
 
 <h2 id="outlook">What could January to May ${outlook.nextYear} look like?</h2>
 
-<p class="answer">${outArea ? html`If El Niño holds into ${outlook.nextYear}, as PAGASA expects, past El Niño seasons put ${ninoPlace} at <b>${fmt(outArea.low)} to ${fmt(outArea.high)}</b> hotspots from January to May. That is a range drawn from past seasons, not a forecast.` : "Too few fires here to draw a range from past El Niño seasons."}</p>
+<p class="answer">${outArea ? html`In the ${word(elnino.elNinoYears.length)} past El Niño seasons, ${ninoPlace} had <b>${fmt(outArea.low)} to ${fmt(outArea.high)}</b> hotspots from January to May. If El Niño holds into ${outlook.nextYear}, as PAGASA expects, that is the range past seasons give; it is not a forecast.` : "Too few fires here to draw a range from past El Niño seasons."}</p>
 
 ```js
 // Outlook for the next January–May season if it is an El Niño season (pipeline, outlook.json, with its test on past seasons).
@@ -786,7 +781,7 @@ const outlookChart = (width) => quiet(Plot.plot({
 
 <h2 id="when">When does ${area.level === "country" ? "the Philippines" : placeName} burn?</h2>
 
-<p class="answer">${seasonMonths.length === 12 && seasonPeak > 0 ? html`Burning is usually busiest <b>${monthPhrase(busyMonths)}</b>${rareMonths.length ? `, and hotspots are rare ${monthPhrase(rareMonths)}` : ""}, judged by the median month from ${lo.slice(0, 4)} to ${hi.slice(0, 4)}.` : "Choose at least a full year to see the shape of the fire season."}</p>
+<p class="answer">${seasonMonths.length === 12 && sel.length >= 24 ? (seasonPeak > 0 ? html`Burning is usually busiest <b>${monthPhrase(busyMonths)}</b>${rareMonths.length ? `, and hotspots are rare ${monthPhrase(rareMonths)}` : ""}, judged by the median month from ${lo.slice(0, 4)} to ${hi.slice(0, 4)}.` : "Hotspots are rare here in every month of the year.") : "Choose at least two years to see the shape of the fire season."}</p>
 
 ```js
 const profile = d3.range(1, 13).map((m) => {
@@ -860,7 +855,7 @@ display(ninoLegend());
 
 <h2 id="intensity">How intense was the burning at the hotspots?</h2>
 
-<p class="answer">${frpMonthly.length && frpPeak ? html`The month with the most <dfn>fire radiative power</dfn>, the heat and light fires give off as the satellite passes, was <b>${monthName(frpPeak.month)}</b>: ${MW(frpPeak.frp)} megawatts from all its VIIRS hotspots together.` : "No VIIRS hotspots in this selection, so no fire radiative power to show."}</p>
+<p class="answer">${frpFull.length >= 2 ? html`Measured as <dfn>fire radiative power</dfn>, the heat and light a fire gives off as the satellite passes, the average VIIRS hotspot was strongest in <b>${frpTop.year}</b> (${frpTop.perHotspot.toFixed(1)} MW) and weakest in ${frpLow.year} (${frpLow.perHotspot.toFixed(1)} MW), among full years.` : frpMonthly.length ? "Choose at least two full years since 2012 to compare how intense the burning was." : "No VIIRS hotspots in this selection, so no fire radiative power to show."}</p>
 
 ```js
 // Fire intensity: fire radiative power (FRP, MW) of the VIIRS hotspots in the harmonised record (pipeline, intensity.csv),
@@ -882,6 +877,9 @@ const frpMonthly = (area.id === "custom" ? (customPoints ? frpFromPoints(customP
 const fullFrpYear = (y) => `${y}-01` >= meta.viirsStart && lo <= `${y}-01` && hi >= `${y}-12` && `${y}-12-31` <= meta.lastDate;
 const frpYearly = d3.rollups(frpMonthly, (v) => ({frp: d3.sum(v, (d) => d.frp), n: d3.sum(v, (d) => d.n)}), (d) => d.year).map(([year, o]) => ({year, ...o, full: fullFrpYear(year), perHotspot: o.n > 0 ? o.frp / o.n : NaN}));
 const partialFrpYears = frpYearly.filter((d) => !d.full).map((d) => d.year);
+// For the answer under the heading: the full years' strongest and weakest average hotspot.
+const frpFull = frpYearly.filter((d) => d.full && d.n > 0);
+const frpTop = d3.greatest(frpFull, (d) => d.perHotspot), frpLow = d3.least(frpFull, (d) => d.perHotspot);
 const frpPeak = d3.greatest(frpMonthly, (d) => d.frp);
 const MW = d3.format(",.0f");
 const intensityCharts = frpMonthly.length
@@ -966,7 +964,7 @@ display(windowDays.length ? html`<div class="card">${resize((width) => quiet(Plo
 
 <h2 id="harmonisation">Did changing satellites change the answer?</h2>
 
-<p class="answer">${Number.isFinite(stepRaw) && Number.isFinite(stepHarmonised) ? html`Laid end to end, the raw record for ${placeName} jumps <b>${stepRaw.toFixed(2)}×</b> at ${seam.after[0]}, when VIIRS took over; in the harmonised record the step is ${stepHarmonised.toFixed(2)}× (average year ${seam.after.join("–")} against ${seam.before.join("–")}).` : "For a drawn box the raw counts of each sensor are not kept; choose a region or province to compare them."}</p>
+<p class="answer">${Number.isFinite(stepRaw) && Number.isFinite(stepHarmonised) ? html`Laid end to end, the raw record for ${placeName} jumps <b>${stepRaw.toFixed(2)}×</b> at ${seam.after[0]}, when VIIRS took over; in the harmonised record the step is ${stepHarmonised.toFixed(2)}× (average year ${seam.after.join("–")} against ${seam.before.join("–")}).` : area.id === "custom" ? "For a drawn box the raw counts of each sensor are not kept; choose a region or province to compare them." : `No hotspots here in ${seam.before.join("–")} to compare with, so the step at ${seam.after[0]} cannot be measured.`}</p>
 
 ```js
 if (area.id === "custom") display(html`<p class="hint">For a custom area the raw counts of each sensor are not kept; choose a region or province to see this chart.</p>`);

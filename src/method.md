@@ -318,17 +318,17 @@ PAGASA expects the El Niño of late 2026 to last into the first half of ${out.ne
 | weight_viirs_equivalent | 1 for Suomi NPP; the region's k for MODIS Aqua; f for NOAA-20 filling a Suomi NPP gap. Adding the weights gives the calendar, to within rounding | VIIRS-equivalent hotspots |
 | **Images** (calendar, season, years, harmonisation, map) | SVG pictures of the charts as shown; no data columns | |
 
-**Data files in the repository** (src/data/; every JSON file written by the pipeline carries an aiAssistance note):
+**Data files in the repository** (src/data/; meta, validation, heldout, elnino, seam and outlook carry an aiAssistance note; areas.json and provinces.json, written earlier, do not):
 
 | File | Holds | Unit |
 |---|---|---|
 | monthly.csv | area_id, month, hotspots_harmonised, source, gap_days, days (days of the month inside the record), and the raw counts modis_aqua, modis_terra, viirs_snpp, viirs_noaa20; the country, ${areas.filter((a) => a.level === "region").length} regions and ${areas.filter((a) => a.level === "province").length} province-level areas | VIIRS-equivalent hotspots; days; hotspots |
 | daily.csv | area_id, date, hotspots_harmonised; only days above zero are written | VIIRS-equivalent hotspots |
 | intensity.csv | area_id, month, viirs_hotspots (weighted), frp_total_mw (FRP × weight, summed), frp_median_mw (unweighted median), VIIRS only, from ${meta.viirsStart} | hotspots; MW |
-| points/&lt;region&gt;.csv | Every hotspot that enters the record, with the columns of the hotspot download above | as above |
+| points/&lt;region&gt;.csv | Every hotspot that enters the record, with the columns of the hotspot download above except region_id | as above |
 | meta.json | Build time, record dates, fit windows, filter counts, k and f per region, missing days, gap dates | |
-| validation.json, heldout.json | The validation tests and the held-out region-years | % error |
-| elnino.json, seam.json, outlook.json | The El Niño comparison and its permutation test, the step at ${seam.after[0]}, and the 2027 outlook with its test | ratio; hotspots; % error |
+| validation.json, heldout.json | The validation tests and the held-out region-years | % error, in percent |
+| elnino.json, seam.json, outlook.json | The El Niño comparison and its permutation test, the step at ${seam.after[0]}, and the 2027 outlook with its test | ratio; hotspots; outlook errors as fractions (0.215 = 21.5%) |
 | areas.json, provinces.json | Area names, levels, parents, k, f and bounding boxes; province outlines (GeoJSON) | degrees |
 
 ## How to cite and reproduce

@@ -11,7 +11,9 @@
   --ember-deep: #e08214;
   --content: 72rem;       /* one content width for every page */
   --measure: 48rem;       /* readable line length for prose */
+  --fire-text: var(--fire); /* red for small text: 4.85:1 on the light background */
 }
+@media (prefers-color-scheme: dark) { :root { --fire-text: #ff6b4f; } } /* 5.9:1 or more on the dark backgrounds */
 /* Muted text dark enough for 4.5:1 contrast in both themes. */
 :root:root { --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 72%, var(--theme-background)); }
 
@@ -31,9 +33,9 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 
 /* ---- Type: section headings ask a question; the first line under them answers it. */
 :where(#observablehq-main) h2 { margin-top: 2rem; padding-top: 0.8rem; border-top: 1px solid var(--theme-foreground-faintest); }
-:where(#observablehq-main) h2.no-rule, .slide h2 { border-top: 0; padding-top: 0; margin-top: 0; }
+:where(#observablehq-main) h2.no-rule, .slide h2, .card h2 { border-top: 0; padding-top: 0; margin-top: 0; }
 .answer { font-size: 1.12rem; line-height: 1.55; margin: 0.4rem 0 0.9rem; }
-.answer b { color: var(--fire); font-variant-numeric: tabular-nums; }
+.answer b { color: var(--fire-text); font-variant-numeric: tabular-nums; }
 .read { font-size: 0.86rem; color: var(--theme-foreground-muted); margin: 0.3rem 0 1rem; }
 .read::before { content: "How to read it: "; font-weight: 600; }
 .hint { color: var(--theme-foreground-muted); font-size: 0.9rem; max-width: 60rem; }
@@ -41,12 +43,12 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 dfn { font-style: normal; font-weight: 600; }
 
 /* ---- Header band (all pages) */
-.band { margin: 0.2rem 0 1rem; max-width: var(--content); }
+.band { margin: 0.2rem 0 0.6rem; max-width: var(--content); }
 .band h1 { font-size: 2.7rem; line-height: 1.05; margin: 0; max-width: none; letter-spacing: -0.01em; }
 .band .band-project { margin: 0 0 0.3rem; font-size: 0.95rem; max-width: none; }
 .band .band-project a { color: var(--theme-foreground-muted); }
-.tagline { font-size: 1.25rem; line-height: 1.4; margin: 0.3rem 0 0.8rem; max-width: 46rem; color: var(--theme-foreground-muted); }
-.band-figures { list-style: none; padding: 0; margin: 0 0 0.7rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; max-width: var(--content); }
+.tagline { font-size: 1.25rem; line-height: 1.4; margin: 0.3rem 0 0.6rem; max-width: 46rem; color: var(--theme-foreground-muted); }
+.band-figures { list-style: none; padding: 0; margin: 0 0 0.5rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; max-width: var(--content); }
 .band-figures li { display: flex; align-items: baseline; gap: 0.6rem; margin: 0; }
 .band-figures b { font-size: 2.1rem; line-height: 1; color: var(--fire); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .band-figures span { font-size: 0.9rem; line-height: 1.35; }
@@ -60,17 +62,18 @@ dfn { font-style: normal; font-weight: 600; }
 .ribbon .cells span { height: 12px; }
 .ribbon .cells span:first-child { border-radius: 3px 0 0 3px; }
 .ribbon .cells span:last-child { border-radius: 0 3px 3px 0; }
-.ribbon .months span { font-size: 0.72rem; line-height: 1.5; text-align: center; color: var(--theme-foreground-muted); }
-.ribbon figcaption { font-size: 0.8rem; color: var(--theme-foreground-muted); }
+.ribbon .months span { font-size: 0.72rem; line-height: 1.35; text-align: center; color: var(--theme-foreground-muted); }
+.ribbon figcaption { font-size: 0.8rem; line-height: 1.3; color: var(--theme-foreground-muted); }
 @media (max-width: 640px) { .band h1 { font-size: 2.1rem; } .band-figures { grid-template-columns: 1fr; } }
 
 /* ---- Jump bar and "Start here" row, under the band */
-.jump, .start { font-size: 0.86rem; line-height: 1.6; margin: 0.45rem 0 0; max-width: var(--content); display: flex; flex-wrap: wrap; gap: 0.1rem 0.9rem; align-items: baseline; }
+.jump, .start { font-size: 0.82rem; line-height: 24px; margin: 0.4rem 0 0; max-width: var(--content); display: flex; flex-wrap: wrap; gap: 0 0.6rem; align-items: baseline; }
 .jump-label, .start-label { font-weight: 600; }
-.start a b { color: var(--fire); font-variant-numeric: tabular-nums; }
+.jump a, .start a { display: inline-block; min-height: 24px; } /* 24 px touch targets */
+.start a b { color: var(--fire-text); font-variant-numeric: tabular-nums; }
 
 /* ---- Cards, details and blocks */
-.explain { max-width: 60rem; margin: 0.5rem 0 0.9rem; border-left: 3px solid var(--ember); padding: 0.3rem 0 0.3rem 0.9rem; }
+.explain { max-width: 60rem; margin: 0.3rem 0 0.5rem; border-left: 3px solid var(--ember); padding: 0.3rem 0 0.3rem 0.9rem; }
 .explain summary, .sci summary, .cal3d summary, .all-provinces summary { cursor: pointer; font-weight: 600; }
 .explain p { line-height: 1.6; }
 .sci { margin: 0.4rem 0 1.2rem; font-size: 0.9rem; border-left: 1px solid var(--theme-foreground-faint); padding: 0.1rem 0 0.1rem 0.8rem; max-width: var(--measure); }
@@ -109,8 +112,8 @@ dfn { font-style: normal; font-weight: 600; }
 :where(#observablehq-main) :is(p, li, dd) { overflow-wrap: break-word; }
 
 /* ---- Calendar page */
-.strip { margin: 0.2rem 0 1.1rem; max-width: var(--content); }
-.strip h2 { font-size: 1rem; margin: 0 0 0.5rem; border-top: 0; padding-top: 0; }
+.strip { margin: 0.2rem 0 0.6rem; max-width: var(--content); }
+.strip h2 { font-size: 1rem; margin: 0 0 0.35rem; border-top: 0; padding-top: 0; }
 .strip-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem 2rem; }
 .strip-item { display: flex; align-items: baseline; gap: 0.6rem; color: inherit; }
 #observablehq-main a.strip-item { text-decoration: none; }
