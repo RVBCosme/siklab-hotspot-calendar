@@ -13,6 +13,11 @@ pager: false
 const monthlyRaw = FileAttachment("data/monthly.csv").csv();
 const v = FileAttachment("data/validation.json").json();
 const meta = FileAttachment("data/meta.json").json();
+const seam = FileAttachment("data/seam.json").json();
+const heldout = FileAttachment("data/heldout.json").json();
+const elnino = FileAttachment("data/elnino.json").json();
+const areas = FileAttachment("data/areas.json").json();
+const provinceShapes = FileAttachment("data/provinces.json").json();
 ```
 
 ```js
@@ -43,10 +48,10 @@ const raw = ph.filter((d) => d.year >= 2008 && d.year <= 2016).flatMap((d) => [
   {t: new Date(d.month + "-15"), v: d.aqua, s: "MODIS Aqua (since 2002)"},
   ...(d.year >= 2012 ? [{t: new Date(d.month + "-15"), v: d.snpp, s: "VIIRS Suomi NPP (since 2012)"}] : [])
 ]);
-display(quiet(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSize: "14px"}, y: {label: "Hotspots per month, raw", grid: true}, x: {label: null}, color: {legend: true, range: ["#888", "#d7301f"]}, marks: [Plot.lineY(raw, {x: "t", y: "v", stroke: "s", strokeWidth: 2}), Plot.ruleY([0])]})));
+display(quiet(Plot.plot({width: 900, height: 250, marginLeft: 56, style: {fontSize: "14px"}, y: {label: "Hotspots per month, raw", grid: true}, x: {label: null}, color: {legend: true, range: ["#888", "#d7301f"]}, marks: [Plot.lineY(raw, {x: "t", y: "v", stroke: "s", strokeWidth: 2}), Plot.ruleY([0])]})));
 ```
 
-  <p class="say">Same fires, two sensors: VIIRS counts about ${Math.round(meta.factors.ph.k)} hotspots for every one MODIS Aqua counts over the Philippines. Laid end to end, the record jumps in 2012 because the instrument changed, not the burning.</p>
+  <p class="say">Same fires, two sensors: VIIRS counts about ${Math.round(meta.factors.ph.k)} hotspots for every one MODIS Aqua counts over the Philippines. Laid end to end, the average year after the switch (${seam.after.join("–")}) is <b>${seam.areas.ph.raw.toFixed(2)}×</b> the average year before it (${seam.before.join("–")}): the instrument changed, not the burning.</p>
   <p class="slide-no">2 / 7</p>
 </div>
 
@@ -54,7 +59,7 @@ display(quiet(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSi
   <h2>What we built: a harmonised burning activity calendar</h2>
   <div class="shot">
     <img src="./img/app-calendar.png" alt="Screenshot of the live web application: the burning activity calendar for Benguet, January 2003 to November 2026, one cell per month">
-    <p class="say">The live app's calendar for Benguet, one cell per month since 2003. Choose the country, any of 17 regions or 87 province-level areas, a box on a NASA map, or click a province on the app's map. Each view is explained in plain words, and the numbers, hotspots and charts can be downloaded.</p>
+    <p class="say">The live app's calendar for Benguet, one cell per month since 2003. Choose the country, any of ${areas.filter((a) => a.level === "region").length} regions or ${areas.filter((a) => a.level === "province").length} province-level areas, a box on a NASA map, or click a province on the app's map. Each view is explained in plain words, and the numbers, hotspots and charts can be downloaded.</p>
   </div>
   <p class="slide-no">3 / 7</p>
 </div>
@@ -73,30 +78,54 @@ display(quiet(Plot.plot({width: 900, height: 285, marginLeft: 56, style: {fontSi
 
 <div class="slide">
   <h2>Does it work? Tested on years it never saw</h2>
-  <div class="bignums">
-    <div><span>${T1.harmonised.annualMedianAbsPctError}%</span>typical error on a region's yearly total after conversion</div>
-    <div><span>${T1.baselineRawAqua.annualMedianAbsPctError}%</span>without conversion</div>
-    <div><span>1st, 2nd, 3rd</span>Benguet's worst fire seasons since 2003 are 2010, 2024 and 2019, the surges reported in local news</div>
+  <div class="proof">
+    <div>
+      <div class="bignums two">
+        <div><span>${T1.harmonised.annualMedianAbsPctError}%</span>typical error on a region's yearly total after conversion</div>
+        <div><span class="grey">${T1.baselineRawAqua.annualMedianAbsPctError}%</span>without conversion</div>
+      </div>
+      <p class="steps-title">The step at ${seam.after[0]}, average year ${seam.after.join("–")} ÷ ${seam.before.join("–")}, whole country:</p>
+      <div class="three">
+        <div><b class="grey">${seam.areas.ph.raw.toFixed(2)}×</b>raw record, MODIS then VIIRS</div>
+        <div><b>${seam.areas.ph.harmonised.toFixed(2)}×</b>harmonised record</div>
+        <div><b class="amber">${seam.areas.ph.aquaAlone.toFixed(2)}×</b>MODIS Aqua alone, one satellite through both</div>
+      </div>
+    </div>
+    <div>
+
+```js
+const pairMin = d3.min(heldout.pairs, (d) => Math.min(d.observed, d.predicted)), pairMax = d3.max(heldout.pairs, (d) => Math.max(d.observed, d.predicted));
+display(quiet(Plot.plot({width: 380, height: 330, marginLeft: 50, style: {fontSize: "12px"}, x: {type: "log", label: "VIIRS, observed", tickFormat: "~s", grid: true}, y: {type: "log", label: "Converted MODIS, predicted", tickFormat: "~s", grid: true}, marks: [Plot.line([[pairMin, pairMin], [pairMax, pairMax]], {stroke: "currentColor", strokeDasharray: "4,3"}), Plot.dot(heldout.pairs, {x: "observed", y: "predicted", fill: "#d7301f", fillOpacity: 0.6, r: 3})]})));
+```
+
+  <p class="cap">${heldout.pairs.length} region-years, each held out of the fit; dashed line = exact.</p>
+    </div>
   </div>
-  <p class="say">Single months are less certain (about ${Math.round(T1.harmonised.monthlyMedianAbsPctError)}% error), so read seasons and years. Every test and limit is on the method page.</p>
+  <p class="say">Single months are less certain (about ${Math.round(T1.harmonised.monthlyMedianAbsPctError)}% error), so read seasons and years.</p>
   <p class="slide-no">5 / 7</p>
 </div>
 
 <div class="slide">
-  <h2>Is this month unusual? Compare it with every year since 2003</h2>
+  <h2>The finding: El Niño years burn more, most of all in the south</h2>
+  <div class="finding">
+    <div>
 
 ```js
-// The same comparison as the app's "Against the historical median" card: February 2024 against every other February.
-const feb = benguet.filter((d) => d.m === 2);
-const feb24 = feb.find((d) => d.year === 2024).h;
-const febMedian = d3.median(feb.filter((d) => d.year !== 2024), (d) => d.h);
-const febRank = 1 + feb.filter((d) => d.h > feb24).length;
-const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th");
-display(quiet(Plot.plot({width: 900, height: 300, style: {fontSize: "13px"}, x: {label: null, tickFormat: "d", interval: 1}, y: {label: "Hotspots in February, Benguet", grid: true}, marks: [Plot.barY(feb, {x: "year", y: "h", fill: (d) => (d.year === 2024 ? "#d7301f" : "#fdae61")}), Plot.ruleY([febMedian], {stroke: "currentColor", strokeDasharray: "5,4"}), Plot.ruleY([0])]})));
+// Q3: the three provinces featured on this slide (Team Owner's choice).
+const FEATURED = ["p-zamboanga-del-sur", "p-benguet", "p-aurora"];
+const nameOf = new Map(areas.map((a) => [a.id, a.name]));
+display(quiet(Plot.plot({width: 330, height: 360, projection: {type: "mercator", domain: provinceShapes, inset: 4}, color: {type: "diverging-log", scheme: "rdbu", reverse: true, pivot: 1, domain: [0.5, 8], unknown: "#b4b4b4", legend: true, label: "El Niño ÷ other seasons", ticks: [0.5, 1, 2, 4, 8], tickFormat: (d) => `${d}×`, width: 300}, marks: [Plot.geo(provinceShapes, {fill: (f) => elnino.areas[f.properties.id].ratio, stroke: "var(--theme-background-alt)", strokeWidth: 0.4}), Plot.geo(provinceShapes.features.filter((f) => FEATURED.includes(f.properties.id)), {stroke: "currentColor", strokeWidth: 1.5})]})));
 ```
 
-  <p class="say">February 2024 in Benguet: ${fmt(feb24)} hotspots against a median of ${fmt(febMedian)} in the other ${feb.length - 1} years (dashed), the ${ordinal(febRank)} busiest February since 2003. The question an emergency manager asks first; designed for fire officers, land managers, responders and researchers.</p>
-  <p class="slide-no">6 / 7</p>
+</div>
+<div>
+<p class="lead"><span class="big-red">${elnino.areas.ph.ratio.toFixed(1)}×</span> as many hotspots in El Niño fire seasons (January–May) as in other years, whole country, medians of ${elnino.years.join("–")}. A random pick of ${elnino.elNinoYears.length} years does this about ${Math.round(1000 * elnino.areas.ph.p)} times in 1,000.</p>
+<ul class="featured">${FEATURED.map((id) => html`<li><b>${elnino.areas[id].ratio.toFixed(1)}×</b> ${nameOf.get(id)}</li>`)}</ul>
+<p class="small">${elnino.summary.provincesAbove2} of ${elnino.summary.provincesTestable} testable provinces more than doubled; grey: too few fires to tell. Same pattern inside the MODIS years (${elnino.areas.ph.ratioModisYears.toFixed(1)}×) and the VIIRS years (${elnino.areas.ph.ratioViirsYears.toFixed(1)}×). PAGASA reported a very strong El Niño on 3 November 2026. This describes past seasons, not a forecast; El Niño years are also less cloudy, so satellites see more.</p>
+<p class="small">Designed for provincial fire officers, DENR forestry offices and local disaster risk reduction offices.</p>
+</div>
+</div>
+<p class="slide-no">6 / 7</p>
 </div>
 
 <div class="slide title-slide">
@@ -139,6 +168,21 @@ addEventListener("keydown", (e) => {
 .bignums { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 1rem; font-size: 1.1rem; }
 .bignums span { display: block; font-size: 2.6rem; font-weight: 700; color: #d7301f; }
 .future { font-size: 1.4rem; line-height: 1.8; }
+.proof { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1.2rem; align-items: center; }
+.bignums.two { grid-template-columns: 1fr 1fr; }
+.bignums .grey, .three .grey { color: var(--theme-foreground-muted); }
+.steps-title { font-size: 1rem; margin: 0.9rem 0 0.4rem; max-width: none; }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; font-size: 0.95rem; }
+.three b { display: block; font-size: 1.9rem; color: #d7301f; }
+.three .amber { color: #e08214; }
+.cap { font-size: 0.85rem; color: var(--theme-foreground-muted); margin: 0; max-width: none; }
+.finding { display: grid; grid-template-columns: 340px 1fr; gap: 1.2rem; align-items: center; }
+.lead { font-size: 1.15rem; max-width: none; margin: 0 0 0.6rem; }
+.big-red { font-size: 2.6rem; font-weight: 700; color: #d7301f; margin-right: 0.3rem; }
+.featured { list-style: none; padding: 0; margin: 0 0 0.6rem; font-size: 1.2rem; }
+.featured li { margin: 0.15rem 0; }
+.featured b { display: inline-block; min-width: 3.4rem; color: #d7301f; }
+.small { font-size: 0.88rem; max-width: none; margin: 0.4rem 0 0; }
 .deck-help { width: min(100%, 1000px); margin: 0 auto 1rem; font-size: 0.95rem; max-width: none; }
 .ai-note { position: absolute; left: 2.5rem; bottom: 0.6rem; font-size: 0.8rem; color: var(--theme-foreground-muted); max-width: 80%; }
 /* Print or "Save as PDF": one slide per 16:9 page. */
